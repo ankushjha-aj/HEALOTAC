@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stitch Design</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#0f66bd",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+            },
+            fontFamily: {
+              display: ["Public Sans"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="flex min-h-screen">
+<aside class="w-64 flex-col bg-background-light dark:bg-background-dark border-r border-slate-200 dark:border-slate-800 p-4 hidden lg:flex">
+<div class="flex flex-col gap-y-2">
+<h1 class="text-lg font-bold text-slate-900 dark:text-white">Medical Records</h1>
+<p class="text-sm text-slate-500 dark:text-slate-400">Attendant</p>
+</div>
+<nav class="mt-8 flex flex-col gap-2">
+<a class="flex items-center gap-3 rounded-lg bg-primary/10 dark:bg-primary/20 px-3 py-2 text-primary dark:text-white font-medium" href="Attendent-dashboard.html">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M224,115.55V208a16,16,0,0,1-16,16H168a16,16,0,0,1-16-16V168a8,8,0,0,0-8-8H112a8,8,0,0,0-8,8v40a16,16,0,0,1-16,16H48a16,16,0,0,1-16-16V115.55a16,16,0,0,1,5.17-11.78l80-75.48.11-.11a16,16,0,0,1,21.53,0,1.14,1.14,0,0,0,.11.11l80,75.48A16,16,0,0,1,224,115.55Z"></path>
+</svg>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium" href="Attendent-dashboard.html">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"></path>
+</svg>
+<span>Medical History</span>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium" href="Attendent-dashboard.html">
+<svg fill="currentColor" height="24" viewBox="0 0 256 256" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M212,152a12,12,0,1,1-12-12A12,12,0,0,1,212,152Zm-4.55,39.29A48.08,48.08,0,0,1,160,232H136a48.05,48.05,0,0,1-48-48V143.49A64,64,0,0,1,32,80V40A16,16,0,0,1,48,24H64a8,8,0,0,1,0,16H48V80a48,48,0,0,0,48.64,48c26.11-.34,47.36-22.25,47.36-48.83V40H128a8,8,0,0,1,0-16h16a16,16,0,0,1,16,16V79.17c0,32.84-24.53,60.29-56,64.31V184a32,32,0,0,0,32,32h24a32.06,32.06,0,0,0,31.22-25,40,40,0,1,1,16.23.27ZM224,152a24,24,0,1,0-24,24A24,24,0,0,0,224,152Z"></path>
+</svg>
+<span>Medical History</span>
+</a>
+</nav>
+</aside>
+<main class="flex-1 p-6 lg:p-8">
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+<div>
+<h2 class="text-3xl font-bold text-slate-900 dark:text-white">Cadet Medical Records</h2>
+<p class="mt-1 text-slate-500 dark:text-slate-400">Manage and access cadet medical information efficiently.</p>
+</div>
+<div class="mt-4 lg:mt-0 flex gap-2">
+<button class="flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-primary/90">
+              Add New Record
+            </button>
+<button class="flex items-center justify-center rounded-lg border border-slate-300 dark:border-slate-700 bg-background-light dark:bg-background-dark px-4 py-2 text-sm font-bold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800">
+              Export
+            </button>
+</div>
+</div>
+<div class="mt-8">
+<div class="relative">
+<svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="currentColor" height="20" viewBox="0 0 256 256" width="20" xmlns="http://www.w3.org/2000/svg">
+<path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+</svg>
+<input class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-background-light dark:bg-slate-800 py-2 pl-10 pr-4 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-primary dark:focus:ring-offset-background-dark" placeholder="Search by cadet name" type="text"/>
+</div>
+<div class="mt-4 flex flex-wrap gap-2">
+<button class="flex items-center gap-x-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-background-light dark:bg-background-dark px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
+<span>Battalion</span>
+<svg fill="currentColor" height="16" viewBox="0 0 256 256" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+</svg>
+</button>
+<button class="flex items-center gap-x-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-background-light dark:bg-background-dark px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
+<span>Visit Date</span>
+<svg fill="currentColor" height="16" viewBox="0 0 256 256" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+</svg>
+</button>
+<button class="flex items-center gap-x-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-background-light dark:bg-background-dark px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
+<span>Creation Date</span>
+<svg fill="currentColor" height="16" viewBox="0 0 256 256" width="16" xmlns="http://www.w3.org/2000/svg">
+<path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"></path>
+</svg>
+</button>
+</div>
+</div>
+<div class="mt-6 overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
+<table class="w-full min-w-[800px] table-auto">
+<thead class="bg-slate-50 dark:bg-slate-800/50">
+<tr>
+<th class="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-300">Cadet Name</th>
+<th class="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-300">Battalion</th>
+<th class="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-300">Visit Date</th>
+<th class="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-300">Medical Condition</th>
+<th class="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-300">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+<tr>
+<td class="px-4 py-3 text-slate-900 dark:text-white">Arjun Singh</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">1st Battalion</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">2024-07-20</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">Minor Injury</td>
+<td class="px-4 py-3"><a class="font-medium text-primary hover:underline" href="Attendent-dashboard.html">View</a></td>
+</tr>
+<tr>
+<td class="px-4 py-3 text-slate-900 dark:text-white">Vikram Sharma</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">2nd Battalion</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">2024-07-18</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">Routine Checkup</td>
+<td class="px-4 py-3"><a class="font-medium text-primary hover:underline" href="Attendent-dashboard.html">View</a></td>
+</tr>
+<tr>
+<td class="px-4 py-3 text-slate-900 dark:text-white">Priya Verma</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">1st Battalion</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">2024-07-15</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">Vaccination</td>
+<td class="px-4 py-3"><a class="font-medium text-primary hover:underline" href="Attendent-dashboard.html">View</a></td>
+</tr>
+<tr>
+<td class="px-4 py-3 text-slate-900 dark:text-white">Rohan Kapoor</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">3rd Battalion</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">2024-07-12</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">Allergy</td>
+<td class="px-4 py-3"><a class="font-medium text-primary hover:underline" href="Attendent-dashboard.html">View</a></td>
+</tr>
+<tr>
+<td class="px-4 py-3 text-slate-900 dark:text-white">Anjali Patel</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">2nd Battalion</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">2024-07-10</td>
+<td class="px-4 py-3 text-slate-500 dark:text-slate-400">Physical Exam</td>
+<td class="px-4 py-3"><a class="font-medium text-primary hover:underline" href="Attendent-dashboard.html">View</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+</div>
+
+</body></html>

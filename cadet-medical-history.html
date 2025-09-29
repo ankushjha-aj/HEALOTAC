@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cadet Medical History</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#0f66bd",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+            },
+            fontFamily: {
+              "display": ["Public Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
+<div class="flex min-h-screen w-full flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-700/50 px-6 py-3">
+<div class="flex items-center gap-4">
+<h2 class="text-lg font-bold text-gray-900 dark:text-white">
+            Military Health System
+          </h2>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+<a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-primary font-semibold" href="#">Cadets</a>
+<a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Reports</a>
+<a class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Settings</a>
+</nav>
+<div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white font-bold">M</div>
+</div>
+</header>
+<main class="flex-grow px-4 sm:px-6 lg:px-8 py-8">
+<div class="mx-auto max-w-5xl">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+<div>
+<h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                Cadet Medical History
+              </h1>
+<p class="text-gray-500 dark:text-gray-400 mt-1">
+                Review and manage the medical records for individual cadets.
+              </p>
+</div>
+<button class="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+<span class="material-symbols-outlined text-base"> add </span>
+              Add Another Record
+            </button>
+</div>
+<div class="rounded-lg bg-white dark:bg-gray-800/30 shadow-sm border border-gray-200 dark:border-gray-700/50 p-6 mb-8">
+<div class="flex flex-col sm:flex-row items-start gap-6">
+<div class="flex h-28 w-28 items-center justify-center rounded-full bg-primary/10 text-primary dark:bg-primary/20">
+<span class="text-5xl font-bold">A</span>
+</div>
+<div class="flex-grow pt-2">
+<h2 class="text-xl font-bold text-gray-900 dark:text-white">Arjun Sharma</h2>
+<p class="text-gray-500 dark:text-gray-400">Battalion 3, Alpha Company</p>
+</div>
+</div>
+</div>
+<div>
+<h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 px-1">Medical Records</h2>
+<div class="flow-root">
+<ul class="-mb-8" role="list">
+<li>
+<div class="relative pb-8">
+<span aria-hidden="true" class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700"></span>
+<div class="relative flex space-x-3 items-start">
+<div>
+<div class="relative px-1">
+<div class="h-8 w-8 bg-primary/10 dark:bg-primary/20 text-primary rounded-full flex items-center justify-center ring-8 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined">
+                              clinical_notes
+                            </span>
+</div>
+</div>
+</div>
+<div class="min-w-0 flex-1 py-1.5">
+<div class="bg-white dark:bg-gray-800/30 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700/50">
+<div class="p-4">
+<div class="flex justify-between items-center">
+<p class="text-md font-semibold text-gray-900 dark:text-white">Routine Checkup</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">2023-08-15</p>
+</div>
+<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+<div class="col-span-1 sm:col-span-2">
+<p class="font-medium text-gray-500 dark:text-gray-400">Diagnosis</p>
+<p class="text-gray-800 dark:text-gray-200">Healthy</p>
+</div>
+<div>
+<p class="font-medium text-gray-500 dark:text-gray-400">Treatment</p>
+<p class="text-gray-800 dark:text-gray-200">N/A</p>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<p class="font-medium text-gray-500 dark:text-gray-400">Remarks</p>
+<p class="text-gray-800 dark:text-gray-200">Cadet is in excellent physical condition.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</li>
+<li>
+<div class="relative pb-8">
+<span aria-hidden="true" class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-700"></span>
+<div class="relative flex space-x-3 items-start">
+<div>
+<div class="relative px-1">
+<div class="h-8 w-8 bg-primary/10 dark:bg-primary/20 text-primary rounded-full flex items-center justify-center ring-8 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined">
+                              personal_injury
+                            </span>
+</div>
+</div>
+</div>
+<div class="min-w-0 flex-1 py-1.5">
+<div class="bg-white dark:bg-gray-800/30 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700/50">
+<div class="p-4">
+<div class="flex justify-between items-center">
+<p class="text-md font-semibold text-gray-900 dark:text-white">Injury Report</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">2023-07-20</p>
+</div>
+<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+<div>
+<p class="font-medium text-gray-500 dark:text-gray-400">Problem</p>
+<p class="text-gray-800 dark:text-gray-200">Sprained Ankle</p>
+</div>
+<div>
+<p class="font-medium text-gray-500 dark:text-gray-400">Diagnosis</p>
+<p class="text-gray-800 dark:text-gray-200">Grade 2 Ankle Sprain</p>
+</div>
+<div>
+<p class="font-medium text-gray-500 dark:text-gray-400">Treatment</p>
+<p class="text-gray-800 dark:text-gray-200">Physical therapy, rest</p>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<p class="font-medium text-gray-500 dark:text-gray-400">Remarks</p>
+<p class="text-gray-800 dark:text-gray-200">Injury sustained during training exercise.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</li>
+<li>
+<div class="relative">
+<div class="relative flex space-x-3 items-start">
+<div>
+<div class="relative px-1">
+<div class="h-8 w-8 bg-primary/10 dark:bg-primary/20 text-primary rounded-full flex items-center justify-center ring-8 ring-background-light dark:ring-background-dark">
+<span class="material-symbols-outlined">
+                              event_repeat
+                            </span>
+</div>
+</div>
+</div>
+<div class="min-w-0 flex-1 py-1.5">
+<div class="bg-white dark:bg-gray-800/30 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700/50">
+<div class="p-4">
+<div class="flex justify-between items-center">
+<p class="text-md font-semibold text-gray-900 dark:text-white">Follow-up Appointment</p>
+<p class="text-sm text-gray-500 dark:text-gray-400">2023-07-25</p>
+</div>
+<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+<div>
+<p class="font-medium text-gray-500 dark:text-gray-400">Diagnosis</p>
+<p class="text-gray-800 dark:text-gray-200">Ankle Sprain Recovery</p>
+</div>
+<div>
+<p class="font-medium text-gray-500 dark:text-gray-400">Treatment</p>
+<p class="text-gray-800 dark:text-gray-200">Continued physical therapy</p>
+</div>
+<div class="col-span-1 sm:col-span-2">
+<p class="font-medium text-gray-500 dark:text-gray-400">Remarks</p>
+<p class="text-gray-800 dark:text-gray-200">Cadet is showing good progress in recovery.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

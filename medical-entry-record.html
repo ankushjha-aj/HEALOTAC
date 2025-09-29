@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add New Medical Record</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#0f66bd",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+            },
+            fontFamily: {
+              display: ["Public Sans"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px"
+            },
+          },
+        },
+      };
+    </script>
+<style>
+      .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .dark .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%234b5563' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="flex min-h-screen w-full flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-primary/20 dark:border-primary/30 px-6 md:px-10 py-3">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 text-primary">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M39.5563 34.1455V13.8546C39.5563 15.708 36.8773 17.3437 32.7927 18.3189C30.2914 18.916 27.263 19.2655 24 19.2655C20.737 19.2655 17.7086 18.916 15.2073 18.3189C11.1227 17.3437 8.44365 15.708 8.44365 13.8546V34.1455C8.44365 35.9988 11.1227 37.6346 15.2073 38.6098C17.7086 39.2069 20.737 39.5564 24 39.5564C27.263 39.5564 30.2914 39.2069 32.7927 38.6098C36.8773 37.6346 39.5563 35.9988 39.5563 34.1455Z" fill="currentColor"></path>
+<path clip-rule="evenodd" d="M10.4485 13.8519C10.4749 13.9271 10.6203 14.246 11.379 14.7361C12.298 15.3298 13.7492 15.9145 15.6717 16.3735C18.0007 16.9296 20.8712 17.2655 24 17.2655C27.1288 17.2655 29.9993 16.9296 32.3283 16.3735C34.2508 15.9145 35.702 15.3298 36.621 14.7361C37.3796 14.246 37.5251 13.9271 37.5515 13.8519C37.5287 13.7876 37.4333 13.5973 37.0635 13.2931C36.5266 12.8516 35.6288 12.3647 34.343 11.9175C31.79 11.0295 28.1333 10.4437 24 10.4437C19.8667 10.4437 16.2099 11.0295 13.657 11.9175C12.3712 12.3647 11.4734 12.8516 10.9365 13.2931C10.5667 13.5973 10.4713 13.7876 10.4485 13.8519ZM37.5563 18.7877C36.3176 19.3925 34.8502 19.8839 33.2571 20.2642C30.5836 20.9025 27.3973 21.2655 24 21.2655C20.6027 21.2655 17.4164 20.9025 14.7429 20.2642C13.1498 19.8839 11.6824 19.3925 10.4436 18.7877V34.1275C10.4515 34.1545 10.5427 34.4867 11.379 35.027C12.298 35.6207 13.7492 36.2054 15.6717 36.6644C18.0007 37.2205 20.8712 37.5564 24 37.5564C27.1288 37.5564 29.9993 37.2205 32.3283 36.6644C34.2508 36.2054 35.702 35.6207 36.621 35.027C37.4573 34.4867 37.5485 34.1546 37.5563 34.1275V18.7877ZM41.5563 13.8546V34.1455C41.5563 36.1078 40.158 37.5042 38.7915 38.3869C37.3498 39.3182 35.4192 40.0389 33.2571 40.5551C30.5836 41.1934 27.3973 41.5564 24 41.5564C20.6027 41.5564 17.4164 41.1934 14.7429 40.5551C12.5808 40.0389 10.6502 39.3182 9.20848 38.3869C7.84205 37.5042 6.44365 36.1078 6.44365 34.1455L6.44365 13.8546C6.44365 12.2684 7.37223 11.0454 8.39581 10.2036C9.43325 9.3505 10.8137 8.67141 12.343 8.13948C15.4203 7.06909 19.5418 6.44366 24 6.44366C28.4582 6.44366 32.5797 7.06909 35.657 8.13948C37.1863 8.67141 38.5667 9.3505 39.6042 10.2036C40.6278 11.0454 41.5563 12.2684 41.5563 13.8546Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold text-gray-800 dark:text-white">Indian Army Medical Corps</h2>
+</div>
+<div class="flex items-center gap-4">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary" href="#">Dashboard</a>
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary" href="#">Cadets</a>
+<a class="text-sm font-medium text-primary dark:text-primary" href="#">Medical Records</a>
+<a class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary" href="#">Reports</a>
+</nav>
+<button class="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary/10 dark:hover:bg-primary/20">
+<span class="material-symbols-outlined"> notifications </span>
+</button>
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="text-xl font-bold text-primary">M</span>
+</div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-4xl mx-auto py-8 px-4 sm:px-6">
+<div class="space-y-8">
+<div>
+<h1 class="text-3xl font-bold text-gray-900 dark:text-white">Add New Medical Record</h1>
+<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              Enter the medical details for a new cadet record. Required fields are marked with an asterisk (*).
+            </p>
+</div>
+<form class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="space-y-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="cadet-name">Name *</label>
+<input class="form-input block w-full rounded-lg border-primary/20 dark:border-primary/30 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-primary focus:border-primary" id="cadet-name" placeholder="Enter Name" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="company">Company *</label>
+<input class="form-input block w-full rounded-lg border-primary/20 dark:border-primary/30 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-primary focus:border-primary" id="company" placeholder="Enter Company" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="battalion">Battalion *</label>
+<input class="form-input block w-full rounded-lg border-primary/20 dark:border-primary/30 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-primary focus:border-primary" id="battalion" placeholder="Enter Battalion" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="date-of-reporting">Date of Reporting *</label>
+<input class="form-input block w-full rounded-lg border-primary/20 dark:border-primary/30 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-primary focus:border-primary" id="date-of-reporting" type="date"/>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="medical-problem">Medical Problem *</label>
+<textarea class="form-textarea block w-full rounded-lg border-primary/20 dark:border-primary/30 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-primary focus:border-primary" id="medical-problem" placeholder="Describe the cadet's medical problem" rows="3"></textarea>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="diagnosis">Diagnosis *</label>
+<textarea class="form-textarea block w-full rounded-lg border-primary/20 dark:border-primary/30 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-primary focus:border-primary" id="diagnosis" placeholder="Enter the diagnosis" rows="3"></textarea>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="space-y-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="status">Status *</label>
+<select class="form-select block w-full rounded-lg border-primary/20 dark:border-primary/30 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="status">
+<option>Select Status</option>
+<option value="active-duty">Active Duty</option>
+<option value="sick-report">Sick Report</option>
+<option value="hospitalized">Hospitalized</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="attend-c">Attend C</label>
+<select class="form-select block w-full rounded-lg border-primary/20 dark:border-primary/30 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white focus:ring-primary focus:border-primary" id="attend-c">
+<option>Select</option>
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+<option value="10">10</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="training-missed">No. of Days Training Missed</label>
+<input class="form-input block w-full rounded-lg border-primary/20 dark:border-primary/30 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-primary focus:border-primary" id="training-missed" placeholder="Enter number of days" type="number"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="contact-no">Contact No. (Admin-only)</label>
+<input class="form-input block w-full rounded-lg border-primary/20 dark:border-primary/30 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-primary focus:border-primary" id="contact-no" placeholder="Enter Contact Number" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="remarks">Remarks</label>
+<textarea class="form-textarea block w-full rounded-lg border-primary/20 dark:border-primary/30 bg-background-light dark:bg-background-dark text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-primary focus:border-primary" id="remarks" placeholder="Enter any additional remarks" rows="3"></textarea>
+</div>
+<div class="flex justify-end pt-4">
+<button class="inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-offset-background-dark" type="submit">
+                Submit Record
+              </button>
+</div>
+</form>
+</div>
+</main>
+</div>
+
+</body></html>

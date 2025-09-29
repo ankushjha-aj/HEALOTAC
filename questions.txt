@@ -1,0 +1,52 @@
+1. Security | How to secure the app ?
+    1.1 ? Database (username and password with only permission of reading and writing)
+    1.2 ? Access only for single IP, (yaha lagega automation static ip nahi hai, dynamic)
+          Pay static ip price 
+    1.3 ? Proper Cyber security
+        1.3.1 ? Database security ( Encrypted ) - Medical Condition and Contact
+        1.3.2 ? Application security (Handle by provider)
+
+2. Which platform it need to be deployed ? Hostinger 
+3. Admin and doctor user id ? Handle by vipin
+    3.1 ? Admin Creds -- Global or How ? (MAX -- 20)
+    3.2 ? Doctor Creds -- how to manage ? (MAX -- 20)
+will create a page for admin and doctor to manage and create their credentials by , Delete Auto Data, Superadmin.
+
+4. Database Storage paid or free ? Handle by Major TICK 
+5. Performance or Optimisation
+    5.1 ? image
+    5.2 ? video
+    5.3 ? API Hit
+    5.4 ? Database config low (Downtime) 
+    5.5 ? Store Data into Session Storage (Memory)
+    5.6 ? Small Server Storage Memory CPU (Downtime) 
+
+##################################################################################
+
+1. Hostinger -- 599 INR PM (Approx).
+2. Neon Database-- 500 INR PM (Approx). 
+1500 INR PM (Approx).
+
+##################################################################################
+
+1. Dashboard page real time record for cadet for the current date, need single box,  DONE
+2. Update the Form Fileds, DONE
+3. Reports Filter (Yesterday, Today, week, custom Date). DONE
+5. App name -- Curacadet (AA) DONE
+
+Superadmin -- Gaurav (you are able to view all records, create user credentials, delete auto data). (Full Access RWD)
+Admin -- Doctor, Commander , caption ..... (Viewing Full Access)
+User (Nurse) -- (Add Data) 
+
+
+
+############################
+In progress ....... 
+
+1. Auto status update if cadet is not reporting after their attendance date mark as Completed.
+2. Active Complete Auto Filling, for existing and new cadets.
+3. Filter for cadets, companies, battalions, statuses, health statuses.
+4. Superadmin, Admin, User (Nurse) -- (Add Data) part will atek Time.
+6. Course Changes - Remove indentation showing, only 7 numbers.
+7. In medical History : total records --> Total Cadets.
+8. Create Button for Monitoring Case, will fetch all yes records.
