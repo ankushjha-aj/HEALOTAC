@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Edit } from 'lucide-react'
+import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Edit, Plus } from 'lucide-react'
 import Link from 'next/link'
+import MedicalRecordsList from './MedicalRecordsList'
 
 interface CadetInfo {
   id: number
@@ -47,13 +48,14 @@ export default async function CadetDetailsPage({
   }
 
   try {
-    // Fetch cadet details and medical records
     const [cadetRes, recordsRes] = await Promise.all([
       fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/cadets/${cadetId}`, {
-        cache: 'no-store'
+        cache: 'no-store',
+        credentials: 'include'
       }),
       fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/medical-history/${cadetId}`, {
-        cache: 'no-store'
+        cache: 'no-store',
+        credentials: 'include'
       })
     ])
 
@@ -94,9 +96,21 @@ export default async function CadetDetailsPage({
                 </div>
                 <div className="space-y-3">
                   <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                      {cadetInfo.name}
-                    </h1>
+                    <div className="flex items-center gap-3 mb-2">
+                      <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                        {cadetInfo.name}
+                      </h1>
+                      <Link
+                        href={`/cadets/${cadetId}/edit`}
+                        className="inline-flex items-center justify-center p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                        title="Edit cadet information"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </Link>
+                    </div>
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-4">
                       <MapPin className="h-4 w-4" />
                       <span>{cadetInfo.company} Company, {cadetInfo.battalion}</span>
@@ -214,23 +228,25 @@ export default async function CadetDetailsPage({
                             </div>
                           </div>
                         )}
+
+                        {/* Edit Button removed - now next to name */}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Action Buttons if no demographics - removed */}
+                  {!(cadetInfo.height || cadetInfo.weight || cadetInfo.age || cadetInfo.course || cadetInfo.sex) && (
+                    <div className="mt-6">
+                      {/* Edit button removed */}
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="text-right">
+              <div className="text-center">
                 <div className="space-y-2">
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Cadet ID</div>
+                  <div className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Cadet ID</div>
                   <div className="text-2xl font-bold text-primary">#{cadetId}</div>
-                  <Link
-                    href={`/cadets/${cadetId}/edit`}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    <Edit className="h-4 w-4" />
-                    Edit Cadet
-                  </Link>
                 </div>
               </div>
             </div>
@@ -239,20 +255,33 @@ export default async function CadetDetailsPage({
           {/* Medical History Section */}
           <div className="card">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Medical History
-                </h2>
-                <Link
-                  href={`/medical-history/${cadetId}`}
-                  className="text-primary hover:text-primary/80 text-sm"
-                >
-                  View Timeline →
-                </Link>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                      Medical History
+                    </h2>
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href={`/medical-records/new?cadetId=${cadetId}`}
+                        className="inline-flex items-center justify-center p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                        title="Add another medical record"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Link>
+                      <Link
+                        href={`/medical-history/${cadetId}`}
+                        className="text-primary hover:text-primary/80 text-sm"
+                      >
+                        View Timeline →
+                      </Link>
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400 mt-2">
+                    Complete medical record history for {cadetInfo.name}
+                  </p>
+                </div>
               </div>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Complete medical record history for {cadetInfo.name}
-              </p>
             </div>
 
             <div className="p-6">
@@ -267,92 +296,7 @@ export default async function CadetDetailsPage({
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {medicalRecordsResult.slice(0, 5).map((record: MedicalRecord) => (
-                    <div key={record.id} className="card p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                            {record.medicalProblem}
-                          </h3>
-                          <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-4 w-4" />
-                              <span>{new Date(record.dateOfReporting).toLocaleDateString()}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              <span>Created {new Date(record.createdAt).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            record.status === 'Active'
-                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                              : record.status === 'Completed'
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                              : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-                          }`}>
-                            {record.status}
-                          </span>
-                          {record.monitoringCase && (
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
-                              Monitoring Case
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {record.diagnosis && (
-                          <div>
-                            <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                              Diagnosis
-                            </label>
-                            <p className="text-sm text-gray-900 dark:text-white mt-1">
-                              {record.diagnosis}
-                            </p>
-                          </div>
-                        )}
-
-                        <div>
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Details
-                          </label>
-                          <div className="text-sm text-gray-900 dark:text-white mt-1 space-y-1">
-                            <div>Attend C: {record.attendC}</div>
-                            {record.trainingDaysMissed > 0 && (
-                              <div>Training Days Missed: {record.trainingDaysMissed}</div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      {record.remarks && (
-                        <div className="mt-3">
-                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Remarks
-                          </label>
-                          <p className="text-sm text-gray-900 dark:text-white mt-1">
-                            {record.remarks}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-
-                  {medicalRecordsResult.length > 5 && (
-                    <div className="text-center pt-4">
-                      <Link
-                        href={`/medical-history/${cadetId}`}
-                        className="text-primary hover:text-primary/80"
-                      >
-                        View all {medicalRecordsResult.length} records →
-                      </Link>
-                    </div>
-                  )}
-                </div>
+                <MedicalRecordsList records={medicalRecordsResult} cadetId={cadetId} />
               )}
             </div>
           </div>

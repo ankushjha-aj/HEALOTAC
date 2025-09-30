@@ -244,10 +244,10 @@ export default function DashboardPage() {
           <div className="mt-4 lg:mt-0 flex items-center gap-3">
             <button
               onClick={refreshData}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              title="Refresh data"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
+              <RefreshCw className="h-4 w-4" />
             </button>
             <Link href="/medical-records/new" className="btn-primary">
               Add New Record
@@ -260,33 +260,22 @@ export default function DashboardPage() {
           {stats.map((stat) => {
             const Icon = stat.icon
             return (
-              <div key={stat.label} className="card p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      DB Status: <span className={`font-medium ${
-                        dbStatus.includes('connected') ? 'text-green-600' :
-                        dbStatus.includes('error') || dbStatus.includes('failed') ? 'text-red-600' :
-                        'text-yellow-600'
-                      }`}>{dbStatus}</span>
-                    </p>
-                  </div>
-                  <div className="relative">
-                    <div className="flex items-center justify-between w-full">
-                      {/* Left side - Number and ECG */}
-                      <div className="flex items-center gap-3">
-                        <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                          {stat.value}
-                        </div>
-                        <AnimatedECGWaveform />
-                      </div>
+              <div key={stat.label} className="card p-6 relative">
+                {/* Full-width ECG Waveform background */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <AnimatedECGWaveform />
+                </div>
 
-                      {/* Center - Animated ECG Waveform */}
-                      <div className="flex-1 mx-4">
-                        <AnimatedECGWaveform />
+                {/* Content overlay */}
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                      <div className="text-3xl font-bold text-gray-900 dark:text-white">
+                        {stat.value}
                       </div>
-
+                    </div>
+                    <div className="relative">
                       {/* Right side - Users Icon (hoverable) */}
                       <div
                         className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg cursor-pointer transition-all hover:bg-primary/20 dark:hover:bg-primary/30"
@@ -300,26 +289,26 @@ export default function DashboardPage() {
                       >
                         <Icon className="h-5 w-5 text-primary" />
                       </div>
-                    </div>
 
-                    {/* Custom Tooltip */}
-                    {showTooltip && (
-                      <div
-                        ref={tooltipRef}
-                        className="absolute bottom-full right-0 mb-2 w-64 max-h-48 bg-gray-900 text-white text-sm rounded-lg shadow-lg z-50 overflow-hidden animate-fade-in"
-                      >
-                        <div className="p-3 border-b border-gray-700">
-                          <strong>Cadets with Records Today ({todayCadetNames.length})</strong>
+                      {/* Custom Tooltip */}
+                      {showTooltip && (
+                        <div
+                          ref={tooltipRef}
+                          className="absolute bottom-full right-0 mb-2 w-64 max-h-48 bg-gray-900 text-white text-sm rounded-lg shadow-lg z-50 overflow-hidden animate-fade-in"
+                        >
+                          <div className="p-3 border-b border-gray-700">
+                            <strong>Cadets with Records Today ({todayCadetNames.length})</strong>
+                          </div>
+                          <div className="max-h-32 overflow-y-auto">
+                            {tooltipContent.map((name, index) => (
+                              <div key={index} className="px-3 py-2 border-b border-gray-700 last:border-b-0 hover:bg-gray-800 transition-colors">
+                                {name}
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <div className="max-h-32 overflow-y-auto">
-                          {tooltipContent.map((name, index) => (
-                            <div key={index} className="px-3 py-2 border-b border-gray-700 last:border-b-0 hover:bg-gray-800 transition-colors">
-                              {name}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

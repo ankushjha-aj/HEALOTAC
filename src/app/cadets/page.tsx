@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Search, Download, Eye, Edit, Trash2, Plus } from 'lucide-react'
+import { Search, Eye, Edit, Trash2, Plus } from 'lucide-react'
 import Link from 'next/link'
 
 // Interface for Cadet
@@ -136,10 +136,6 @@ export default function CadetsPage() {
             <Link href="/medical-records/new" className="btn-primary">
               Add New Record
             </Link>
-            <button className="btn-secondary">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </button>
           </div>
         </div>
 

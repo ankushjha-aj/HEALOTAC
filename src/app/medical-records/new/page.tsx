@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import Link from 'next/link'
 import { X, Plus, User } from 'lucide-react'
@@ -29,11 +29,15 @@ interface CadetFormData {
 
 export default function NewMedicalRecordPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [cadets, setCadets] = useState<Cadet[]>([])
   const [loadingCadets, setLoadingCadets] = useState(true)
   const [showAddCadetModal, setShowAddCadetModal] = useState(false)
   const [isCreatingCadet, setIsCreatingCadet] = useState(false)
+  const [cadetSearchTerm, setCadetSearchTerm] = useState('')
+  const [showCadetSuggestions, setShowCadetSuggestions] = useState(false)
+  const [selectedCadet, setSelectedCadet] = useState<Cadet | null>(null)
   const [formData, setFormData] = useState({
     // Form fields in required order
     cadetId: '',
@@ -63,18 +67,36 @@ export default function NewMedicalRecordPage() {
 
   const [cadetError, setCadetError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({})
 
   // Fetch cadets for the dropdown
   useEffect(() => {
     const fetchCadets = async () => {
       try {
-        const response = await fetch('/api/cadets')
+        const token = localStorage.getItem('jwt_token')
+        if (!token) {
+          setError('Authentication required')
+          setLoadingCadets(false)
+          return
+        }
+
+        const response = await fetch('/api/cadets', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+
         if (response.ok) {
           const cadetsData = await response.json()
           setCadets(cadetsData)
+        } else if (response.status === 401) {
+          setError('Authentication required')
+        } else {
+          throw new Error('Failed to fetch cadets')
         }
       } catch (err) {
         console.error('Error fetching cadets:', err)
+        setError(err instanceof Error ? err.message : 'Failed to fetch cadets')
       } finally {
         setLoadingCadets(false)
       }
@@ -83,20 +105,64 @@ export default function NewMedicalRecordPage() {
     fetchCadets()
   }, [])
 
+  // Handle cadetId from URL query parameter
+  useEffect(() => {
+    const cadetIdParam = searchParams.get('cadetId')
+    if (cadetIdParam && cadets.length > 0) {
+      const cadetId = parseInt(cadetIdParam)
+      const cadet = cadets.find(c => c.id === cadetId)
+      if (cadet) {
+        handleCadetSelect(cadet)
+      }
+    }
+  }, [cadets, searchParams])
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
-
-    // Handle special case for cadet selection
-    if (name === 'cadetId' && value === 'add-new') {
-      setShowAddCadetModal(true)
-      return
-    }
 
     setFormData(prev => ({
       ...prev,
       [name]: value
     }))
   }
+
+  // Handle cadet search input
+  const handleCadetSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setCadetSearchTerm(value)
+
+    // Only show suggestions when there's actual text
+    setShowCadetSuggestions(value.trim().length > 0)
+
+    // Clear selection if search term is empty
+    if (!value.trim()) {
+      setSelectedCadet(null)
+      setFormData(prev => ({ ...prev, cadetId: '' }))
+    }
+  }
+
+  // Handle input focus - don't show suggestions automatically
+  const handleCadetFocus = () => {
+    // Only show suggestions if there's text already
+    setShowCadetSuggestions(cadetSearchTerm.trim().length > 0)
+  }
+
+  // Handle cadet selection from suggestions
+  const handleCadetSelect = (cadet: Cadet) => {
+    setSelectedCadet(cadet)
+    setCadetSearchTerm(`${cadet.name} - ${cadet.company} Company, ${cadet.battalion}`)
+    setFormData(prev => ({ ...prev, cadetId: cadet.id.toString() }))
+    setShowCadetSuggestions(false)
+  }
+
+  // Filter cadets based on search term (only when there's text)
+  const filteredCadets = cadets.filter(cadet =>
+    cadetSearchTerm.trim() !== '' && (
+      cadet.name.toLowerCase().includes(cadetSearchTerm.toLowerCase()) ||
+      cadet.company.toLowerCase().includes(cadetSearchTerm.toLowerCase()) ||
+      cadet.battalion.toLowerCase().includes(cadetSearchTerm.toLowerCase())
+    )
+  )
 
   const handleCadetFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -112,10 +178,17 @@ export default function NewMedicalRecordPage() {
     setIsCreatingCadet(true)
 
     try {
+      const token = localStorage.getItem('jwt_token')
+      if (!token) {
+        setCadetError('Authentication required')
+        return
+      }
+
       const response = await fetch('/api/cadets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(cadetFormData),
       })
@@ -162,12 +235,42 @@ export default function NewMedicalRecordPage() {
     }
   }
 
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {}
+
+    if (!formData.cadetId) {
+      errors.cadetId = 'Please select a cadet'
+    }
+
+    if (!formData.dateOfReporting) {
+      errors.dateOfReporting = 'Date of reporting is required'
+    }
+
+    if (!formData.medicalProblem.trim()) {
+      errors.medicalProblem = 'Medical problem is required'
+    }
+
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!validateForm()) {
+      return
+    }
+
     setError(null)
     setIsSubmitting(true)
 
     try {
+      const token = localStorage.getItem('jwt_token')
+      if (!token) {
+        setError('Authentication required')
+        return
+      }
+
       const submitData = {
         cadetId: formData.cadetId,
         dateOfReporting: formData.dateOfReporting,
@@ -184,6 +287,7 @@ export default function NewMedicalRecordPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(submitData),
       })
@@ -224,39 +328,98 @@ export default function NewMedicalRecordPage() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* 1. Select Cadet */}
+              {/* 1. Find or Add Cadet */}
               <div className="md:col-span-2">
-                <label htmlFor="cadetId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Select Cadet *
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Cadet Selection *
                 </label>
-                {loadingCadets ? (
-                  <div className="input-field flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-                    Loading cadets...
+                <div className="flex gap-3">
+                  {/* Cadet Search Input */}
+                  <div className="flex-1 relative">
+                    {loadingCadets ? (
+                      <div className="input-field flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                        Loading cadets...
+                      </div>
+                    ) : (
+                      <>
+                        <input
+                          type="text"
+                          placeholder="Search for existing cadet by name, company, or battalion..."
+                          value={cadetSearchTerm}
+                          onChange={handleCadetSearch}
+                          onFocus={handleCadetFocus}
+                          onBlur={() => setTimeout(() => setShowCadetSuggestions(false), 200)}
+                          className={`input-field ${fieldErrors.cadetId ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                          required={!!formData.cadetId}
+                        />
+
+                        {/* Auto-complete suggestions */}
+                        {showCadetSuggestions && filteredCadets.length > 0 && (
+                          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                            {filteredCadets.slice(0, 10).map((cadet) => (
+                              <div
+                                key={cadet.id}
+                                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0"
+                                onClick={() => handleCadetSelect(cadet)}
+                              >
+                                <div className="font-medium text-gray-900 dark:text-white">
+                                  {cadet.name}
+                                </div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">
+                                  {cadet.company} Company, {cadet.battalion}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
-                ) : (
-                  <select
-                    id="cadetId"
-                    name="cadetId"
-                    required
-                    value={formData.cadetId}
-                    onChange={handleChange}
-                    className="input-field"
-                  >
-                    <option value="">Select a cadet...</option>
-                    {cadets.map((cadet) => (
-                      <option key={cadet.id} value={cadet.id.toString()}>
-                        {cadet.name} - {cadet.company} Company, {cadet.battalion}
-                      </option>
-                    ))}
-                    <option value="add-new" className="border-t border-gray-200 mt-2 pt-2 font-medium text-primary">
-                      ➕ Add New Cadet
-                    </option>
-                  </select>
+
+                  {/* Action buttons for cadet management */}
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddCadetModal(true)}
+                      className="btn-secondary text-sm px-3 py-1"
+                      title="Add new cadet"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                    {selectedCadet && (
+                      <Link
+                        href={`/cadets/${selectedCadet.id}/edit`}
+                        className="btn-secondary text-sm px-3 py-1"
+                        title="Edit selected cadet"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+
+                {fieldErrors.cadetId && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.cadetId}</p>
                 )}
+
+                {selectedCadet && (
+                  <div className="mt-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <div className="text-sm">
+                      <span className="font-medium text-green-800 dark:text-green-400">Selected:</span>{' '}
+                      <span className="text-green-700 dark:text-green-300">
+                        {selectedCadet.name} - {selectedCadet.company} Company, {selectedCadet.battalion}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 {cadets.length === 0 && !loadingCadets && (
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    No cadets available. Please add cadets first.
+                    No cadets available. Use &quot;Add New&quot; to create the first cadet.
                   </p>
                 )}
               </div>
@@ -273,8 +436,11 @@ export default function NewMedicalRecordPage() {
                   required
                   value={formData.dateOfReporting}
                   onChange={handleChange}
-                  className="input-field"
+                  className={`input-field ${fieldErrors.dateOfReporting ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                 />
+                {fieldErrors.dateOfReporting && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.dateOfReporting}</p>
+                )}
               </div>
 
               {/* 3. Medical Problem */}
@@ -289,9 +455,12 @@ export default function NewMedicalRecordPage() {
                   required
                   value={formData.medicalProblem}
                   onChange={handleChange}
-                  className="input-field"
+                  className={`input-field ${fieldErrors.medicalProblem ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                   placeholder="e.g., Ankle Sprain, Viral Fever"
                 />
+                {fieldErrors.medicalProblem && (
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.medicalProblem}</p>
+                )}
               </div>
 
               {/* 4. Diagnosis */}
