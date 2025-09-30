@@ -1,7 +1,14 @@
 {
-  "/page": "app/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/api/auth/login/route": "app/api/auth/login/route.js",
   "/api/cadets/route": "app/api/cadets/route.js",
-  "/api/medical-records/route": "app/api/medical-records/route.js"
+  "/cadets/page": "app/cadets/page.js",
+  "/cadets/[id]/edit/page": "app/cadets/[id]/edit/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/cadets/[id]/page": "app/cadets/[id]/page.js",
+  "/api/medical-records/route": "app/api/medical-records/route.js",
+  "/api/cadets/filters/route": "app/api/cadets/filters/route.js",
+  "/medical-history/[id]/page": "app/medical-history/[id]/page.js",
+  "/api/medical-records/[id]/route": "app/api/medical-records/[id]/route.js",
+  "/api/cadets/[id]/route": "app/api/cadets/[id]/route.js",
+  "/medical-records/new/page": "app/medical-records/new/page.js",
+  "/reports/page": "app/reports/page.js"
 }
