@@ -1,7 +1,7 @@
 {
-  "/api/cadets/route": "app/api/cadets/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
   "/page": "app/page.js",
-  "/api/medical-records/route": "app/api/medical-records/route.js",
-  "/cadets/page": "app/cadets/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
+  "/medical-history/page": "app/medical-history/page.js",
+  "/medical-records/new/page": "app/medical-records/new/page.js"
 }

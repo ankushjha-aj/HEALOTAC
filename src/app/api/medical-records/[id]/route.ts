@@ -56,16 +56,11 @@ export async function PUT(
       .update(medicalRecords)
       .set({
         cadetId: cadetId ? parseInt(cadetId) : undefined,
-        condition,
+        medicalProblem: condition,
         diagnosis,
-        treatment,
-        prescription,
-        doctor,
-        visitDate: visitDate ? new Date(visitDate) : undefined,
-        followUpDate: followUpDate ? new Date(followUpDate) : null,
         status,
-        leaveDays: leaveDays ? parseInt(leaveDays) : null,
-        notes,
+        contactNo: prescription,
+        remarks: notes,
         updatedAt: new Date(),
       })
       .where(eq(medicalRecords.id, parseInt(params.id)))

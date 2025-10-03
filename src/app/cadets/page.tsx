@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Search, Eye, Edit, Trash2, Plus } from 'lucide-react'
+import { Eye, Edit, Trash2, Plus, Search } from 'lucide-react'
 import Link from 'next/link'
 
 // Interface for Cadet
@@ -138,7 +138,6 @@ export default function CadetsPage() {
             </Link>
           </div>
         </div>
-
         {/* Search Section */}
         <div className="card p-6">
           <div className="space-y-4">
