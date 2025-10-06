@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Eye, Edit, Trash2, Plus, Search } from 'lucide-react'
+import { Search, Eye, Edit, Trash2, Plus } from 'lucide-react'
 import Link from 'next/link'
 
 // Interface for Cadet
@@ -14,6 +14,7 @@ interface Cadet {
   joinDate: string
   status: string
   healthStatus: string
+  academyNumber?: number
   createdAt: string
 }
 
@@ -138,6 +139,7 @@ export default function CadetsPage() {
             </Link>
           </div>
         </div>
+
         {/* Search Section */}
         <div className="card p-6">
           <div className="space-y-4">
@@ -175,6 +177,9 @@ export default function CadetsPage() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Company
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Academy Number
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Join Date
@@ -215,6 +220,11 @@ export default function CadetsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {cadet.company}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {cadet.academyNumber || 'N/A'}
                       </p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

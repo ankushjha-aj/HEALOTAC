@@ -20,6 +20,8 @@ export const cadets = pgTable('cadets', {
   joinDate: timestamp('join_date').notNull(),
   status: varchar('status', { length: 20 }).default('Active').notNull(),
   healthStatus: varchar('health_status', { length: 20 }).default('Fit').notNull(),
+  // Academy number field
+  academyNumber: integer('academy_number'),
   // New demographic fields
   height: integer('height'), // in cm
   weight: integer('weight'), // in kg

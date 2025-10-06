@@ -17,10 +17,10 @@ interface CadetFormData {
   name: string
   battalion: string
   company: string
-  academyNumber: string
   joinDate: string
   status: string
   healthStatus: string
+  academyNumber?: string
   height?: string
   weight?: string
   age?: string
@@ -56,10 +56,10 @@ export default function NewMedicalRecordPage() {
     name: '',
     battalion: '',
     company: '',
-    academyNumber: '',
     joinDate: '',
     status: 'Active',
     healthStatus: 'Fit',
+    academyNumber: '',
     height: '',
     weight: '',
     age: '',
@@ -215,10 +215,10 @@ export default function NewMedicalRecordPage() {
           name: '',
           battalion: '',
           company: '',
-          academyNumber: '',
           joinDate: '',
           status: 'Active',
           healthStatus: 'Fit',
+          academyNumber: '',
           height: '',
           weight: '',
           age: '',
@@ -670,6 +670,23 @@ export default function NewMedicalRecordPage() {
                     </select>
                   </div>
 
+                  {/* Academy Number */}
+                  <div>
+                    <label htmlFor="academyNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Academy Number
+                    </label>
+                    <input
+                      type="number"
+                      id="academyNumber"
+                      name="academyNumber"
+                      value={cadetFormData.academyNumber}
+                      onChange={handleCadetFormChange}
+                      className="input-field"
+                      placeholder="e.g., 12345"
+                      min={1}
+                    />
+                  </div>
+
                   {/* Join Date */}
                   <div>
                     <label htmlFor="cadetJoinDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -756,20 +773,20 @@ export default function NewMedicalRecordPage() {
                     />
                   </div>
 
-                  {/* Academy Number */}
+                  {/* Age */}
                   <div>
-                    <label htmlFor="academyNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Academy Number
+                    <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Age
                     </label>
                     <input
                       type="number"
-                      id="academyNumber"
-                      name="academyNumber"
-                      min="1"
-                      value={cadetFormData.academyNumber}
+                      id="age"
+                      name="age"
+                      min={0}
+                      value={cadetFormData.age}
                       onChange={handleCadetFormChange}
                       className="input-field"
-                      placeholder="e.g., 12345"
+                      placeholder="e.g., 21"
                     />
                   </div>
 

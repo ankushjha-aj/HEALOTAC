@@ -12,6 +12,7 @@ interface CadetInfo {
   joinDate: string
   status: string
   healthStatus: string
+  academyNumber?: number
   height?: number
   weight?: number
   age?: number
@@ -141,6 +142,16 @@ export default async function CadetDetailsPage({
                       </div>
                     </div>
 
+                    {cadetInfo.academyNumber && (
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-primary" />
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Academy Number</p>
+                          <p className="text-sm font-medium">{cadetInfo.academyNumber}</p>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex items-center gap-2">
                       <Activity className="h-4 w-4 text-primary" />
                       <div>
@@ -175,7 +186,7 @@ export default async function CadetDetailsPage({
                   </div>
 
                   {/* Demographics Section */}
-                  {(cadetInfo.height || cadetInfo.weight || cadetInfo.age || cadetInfo.course || cadetInfo.sex) && (
+                  {(cadetInfo.height || cadetInfo.weight || cadetInfo.age || cadetInfo.course || cadetInfo.sex || cadetInfo.academyNumber) && (
                     <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Demographics</h3>
                       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -235,7 +246,7 @@ export default async function CadetDetailsPage({
                   )}
 
                   {/* Action Buttons if no demographics - removed */}
-                  {!(cadetInfo.height || cadetInfo.weight || cadetInfo.age || cadetInfo.course || cadetInfo.sex) && (
+                  {!(cadetInfo.height || cadetInfo.weight || cadetInfo.age || cadetInfo.course || cadetInfo.sex || cadetInfo.academyNumber) && (
                     <div className="mt-6">
                       {/* Edit button removed */}
                     </div>
