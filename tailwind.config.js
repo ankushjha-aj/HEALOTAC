@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+/** @type {import('tailwindcss').Config} */  
 module.exports = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,7 +10,7 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#0f66bd',
+          DEFAULT: '#0f66bd', 
           50: '#eff6ff',
           100: '#dbeafe',
           200: '#bfdbfe',
