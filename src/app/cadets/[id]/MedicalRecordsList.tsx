@@ -12,7 +12,8 @@ interface MedicalRecord {
   diagnosis?: string
   status: string
   attendC: number
-  trainingDaysMissed: number
+  miDetained: number
+  totalTrainingDaysMissed: number
   monitoringCase: boolean
   contactNo: string
   remarks: string
@@ -123,8 +124,11 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
               </label>
               <div className="text-sm text-gray-900 dark:text-white mt-1 space-y-1">
                 <div>Attend C: {record.attendC}</div>
-                {record.trainingDaysMissed > 0 && (
-                  <div>Training Days Missed: {record.trainingDaysMissed}</div>
+                <div>MI Detained: {record.miDetained}</div>
+                {record.totalTrainingDaysMissed > 0 && (
+                  <div className="font-medium text-red-600 dark:text-red-400">
+                    Total Training Days Missed: {record.totalTrainingDaysMissed}
+                  </div>
                 )}
               </div>
             </div>

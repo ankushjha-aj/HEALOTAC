@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
         diagnosis: medicalRecords.diagnosis,
         status: medicalRecords.status,
         attendC: medicalRecords.attendC,
-        trainingDaysMissed: medicalRecords.trainingDaysMissed,
+        miDetained: medicalRecords.miDetained,
+        totalTrainingDaysMissed: medicalRecords.totalTrainingDaysMissed,
         monitoringCase: medicalRecords.monitoringCase,
         contactNo: medicalRecords.contactNo,
         remarks: medicalRecords.remarks,
@@ -73,6 +74,8 @@ export async function POST(request: NextRequest) {
       diagnosis,
       status,
       attendC,
+      miDetained,
+      totalTrainingDaysMissed,
       monitoringCase,
       contactNo,
       remarks
@@ -95,9 +98,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Derive days missed from Attend C. Example rule: 1 attendC == 1 day missed.
+    // Derive total days missed from Attend C and MI Detained
     const attendCInt = attendC ? parseInt(attendC) : 0
-    const derivedDaysMissed = attendCInt
+    const miDetainedInt = miDetained ? parseInt(miDetained) : 0
+    const totalDaysMissed = totalTrainingDaysMissed ? parseInt(totalTrainingDaysMissed) : (attendCInt + miDetainedInt)
 
     const [newRecord] = await db.insert(medicalRecords).values({
       cadetId: parseInt(cadetId),
@@ -106,7 +110,8 @@ export async function POST(request: NextRequest) {
       diagnosis,
       status: status || 'Active',
       attendC: attendCInt,
-      trainingDaysMissed: derivedDaysMissed,
+      miDetained: miDetainedInt,
+      totalTrainingDaysMissed: totalDaysMissed,
       monitoringCase: !!(monitoringCase === true || monitoringCase === 'Yes' || monitoringCase === 'yes' || monitoringCase === 'true'),
       contactNo,
       remarks,

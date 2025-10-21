@@ -40,7 +40,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { name, battalion, company, joinDate, status, healthStatus, height, weight, age, course, sex } = await request.json()
+    const { name, battalion, company, joinDate, status, academyNumber, height, weight, age, course, sex } = await request.json()
 
     const [updatedCadet] = await db
       .update(cadets)
@@ -50,7 +50,7 @@ export async function PUT(
         company,
         joinDate: joinDate ? new Date(joinDate) : undefined,
         status,
-        healthStatus,
+        academyNumber: academyNumber ? parseInt(academyNumber) : undefined,
         height: typeof height === 'number' ? height : height ? parseInt(height) : undefined,
         weight: typeof weight === 'number' ? weight : weight ? parseInt(weight) : undefined,
         age: typeof age === 'number' ? age : age ? parseInt(age) : undefined,
@@ -72,6 +72,53 @@ export async function PUT(
     return NextResponse.json(updatedCadet)
   } catch (error) {
     console.error('❌ Error updating cadet:', error)
+    return NextResponse.json(
+      { error: 'Failed to update cadet' },
+      { status: 500 }
+    )
+  }
+}
+
+// PATCH /api/cadets/[id] - Partial update cadet (for weight updates)
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const updates = await request.json()
+    const updateData: any = {}
+
+    // Only allow updating weight for now
+    if ('weight' in updates) {
+      updateData.weight = typeof updates.weight === 'number' ? updates.weight : updates.weight ? parseInt(updates.weight) : undefined
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { error: 'No valid fields to update' },
+        { status: 400 }
+      )
+    }
+
+    updateData.updatedAt = new Date()
+
+    const [updatedCadet] = await db
+      .update(cadets)
+      .set(updateData)
+      .where(eq(cadets.id, parseInt(params.id)))
+      .returning()
+
+    if (!updatedCadet) {
+      return NextResponse.json(
+        { error: 'Cadet not found' },
+        { status: 404 }
+      )
+    }
+
+    console.log('🔄 PARTIALLY UPDATED CADET:', updatedCadet)
+    return NextResponse.json(updatedCadet)
+  } catch (error) {
+    console.error('❌ Error partially updating cadet:', error)
     return NextResponse.json(
       { error: 'Failed to update cadet' },
       { status: 500 }

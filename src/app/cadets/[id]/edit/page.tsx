@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { notFound } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
@@ -59,11 +59,7 @@ export default function EditCadetPage({
     sex: ''
   })
 
-  useEffect(() => {
-    fetchCadetAndFilters()
-  }, [cadetId])
-
-  const fetchCadetAndFilters = async () => {
+  const fetchCadetAndFilters = useCallback(async () => {
     try {
       setLoading(true)
       const [cadetRes, filtersRes] = await Promise.all([
@@ -101,7 +97,11 @@ export default function EditCadetPage({
     } finally {
       setLoading(false)
     }
-  }
+  }, [cadetId])
+
+  useEffect(() => {
+    fetchCadetAndFilters()
+  }, [cadetId, fetchCadetAndFilters])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target

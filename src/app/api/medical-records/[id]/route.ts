@@ -40,32 +40,32 @@ export async function PUT(
   try {
     const {
       cadetId,
-      condition,
+      dateOfReporting,
+      medicalProblem,
       diagnosis,
-      treatment,
-      prescription,
-      doctor,
-      visitDate,
-      followUpDate,
       status,
-      leaveDays,
-      notes
+      attendC,
+      miDetained,
+      totalTrainingDaysMissed,
+      monitoringCase,
+      contactNo,
+      remarks
     } = await request.json()
 
     const [updatedRecord] = await db
       .update(medicalRecords)
       .set({
         cadetId: cadetId ? parseInt(cadetId) : undefined,
-        condition,
+        dateOfReporting: dateOfReporting ? new Date(dateOfReporting) : undefined,
+        medicalProblem,
         diagnosis,
-        treatment,
-        prescription,
-        doctor,
-        visitDate: visitDate ? new Date(visitDate) : undefined,
-        followUpDate: followUpDate ? new Date(followUpDate) : null,
         status,
-        leaveDays: leaveDays ? parseInt(leaveDays) : null,
-        notes,
+        attendC: attendC !== undefined ? parseInt(attendC) : undefined,
+        miDetained: miDetained !== undefined ? parseInt(miDetained) : undefined,
+        totalTrainingDaysMissed: totalTrainingDaysMissed !== undefined ? parseInt(totalTrainingDaysMissed) : undefined,
+        monitoringCase,
+        contactNo,
+        remarks,
         updatedAt: new Date(),
       })
       .where(eq(medicalRecords.id, parseInt(params.id)))

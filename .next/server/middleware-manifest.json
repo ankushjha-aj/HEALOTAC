@@ -10,19 +10,13 @@
       "page": "/",
       "matchers": [
         {
-          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?(?:\\/((?!api|_next\\/static|_next\\/image|favicon.ico).*))(.json)?[\\/#\\?]?$",
-          "originalSource": "/((?!api|_next/static|_next/image|favicon.ico).*)"
+          "regexp": "^/.*$",
+          "originalSource": "/:path*"
         }
       ],
       "wasm": [],
       "assets": [],
-      "env": {
-        "__NEXT_BUILD_ID": "e0hK5-6964bBChVJ3pMM5",
-        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "TC0Kct4HWiI+JxAatLTAWXV5GddEOOL8fAsKPiMl0ro=",
-        "__NEXT_PREVIEW_MODE_ID": "c6d1374016bb0de463dd8d72412c4bdb",
-        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "4a6681c40faf14678b2be08c72373d46b96a9bf5d1d4fb31b6e95728c7e5f507",
-        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "36bd6ba3d85d121e44cc3611810a15a5f48bf53f601551db001699b34fd1c6f9"
-      }
+      "environments": {}
     }
   },
   "functions": {},

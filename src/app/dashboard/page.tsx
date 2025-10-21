@@ -63,6 +63,7 @@ interface Cadet {
   healthStatus: string
   lastActivity?: string
   createdAt: string
+  relegated?: string
 }
 
 interface MedicalRecord {
@@ -370,10 +371,16 @@ export default function DashboardPage() {
                             {cadet.name.split(' ').map((n: string) => n[0]).join('')}
                           </span>
                         </div>
-                        <div className="ml-3">
+                        <div className="ml-3 flex items-center gap-2">
                           <p className="text-sm font-medium text-gray-900 dark:text-white">
                             {cadet.name}
                           </p>
+                          {cadet.relegated === 'Y' && (
+                            <>
+                              <span className="text-red-600 dark:text-red-400 font-bold">R</span>
+                              <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </td>

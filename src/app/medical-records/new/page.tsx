@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
@@ -11,6 +13,7 @@ interface Cadet {
   name: string
   company: string
   battalion: string
+  relegated?: string
 }
 
 interface CadetFormData {
@@ -19,13 +22,13 @@ interface CadetFormData {
   company: string
   joinDate: string
   status: string
-  healthStatus: string
   academyNumber?: string
   height?: string
   weight?: string
   age?: string
   course?: string
   sex?: string
+  relegated?: string
 }
 
 export default function NewMedicalRecordPage() {
@@ -47,9 +50,11 @@ export default function NewMedicalRecordPage() {
     diagnosis: '',
     status: 'Active',
     attendC: '0',
+    miDetained: '0',
     contactNo: '',
     remarks: '',
     monitoringCase: 'No',
+    weight: '',
   })
 
   const [cadetFormData, setCadetFormData] = useState<CadetFormData>({
@@ -57,14 +62,14 @@ export default function NewMedicalRecordPage() {
     battalion: '',
     company: '',
     joinDate: '',
-    status: 'Active',
-    healthStatus: 'Fit',
+    status: 'Ex PPG',
     academyNumber: '',
     height: '',
     weight: '',
     age: '',
     course: '',
     sex: '',
+    relegated: 'N',
   })
 
   const [cadetError, setCadetError] = useState<string | null>(null)
@@ -122,10 +127,21 @@ export default function NewMedicalRecordPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
 
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [name]: value
+      }
+
+      // Mutual exclusion logic for Attend C and MI Detained
+      if (name === 'attendC' && value !== '0') {
+        newData.miDetained = '0'
+      } else if (name === 'miDetained' && value !== '0') {
+        newData.attendC = '0'
+      }
+
+      return newData
+    })
   }
 
   // Handle cadet search input
@@ -216,14 +232,14 @@ export default function NewMedicalRecordPage() {
           battalion: '',
           company: '',
           joinDate: '',
-          status: 'Active',
-          healthStatus: 'Fit',
+          status: 'Ex PPG',
           academyNumber: '',
           height: '',
           weight: '',
           age: '',
           course: '',
           sex: '',
+          relegated: 'N',
         })
 
         alert('Cadet added successfully!')
@@ -281,6 +297,8 @@ export default function NewMedicalRecordPage() {
         diagnosis: formData.diagnosis,
         status: formData.status,
         attendC: parseInt(formData.attendC),
+        miDetained: parseInt(formData.miDetained),
+        totalTrainingDaysMissed: parseInt(formData.attendC) + parseInt(formData.miDetained),
         contactNo: formData.contactNo,
         remarks: formData.remarks,
         monitoringCase: formData.monitoringCase,
@@ -299,6 +317,29 @@ export default function NewMedicalRecordPage() {
 
       if (response.ok) {
         console.log('✅ CREATED MEDICAL RECORD:', data)
+
+        // Update cadet's weight if provided
+        if (formData.weight && formData.weight.trim() !== '') {
+          try {
+            const weightResponse = await fetch(`/api/cadets/${formData.cadetId}`, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ weight: parseFloat(formData.weight) }),
+            })
+
+            if (weightResponse.ok) {
+              console.log('✅ UPDATED CADET WEIGHT')
+            } else {
+              console.warn('⚠️ Failed to update cadet weight, but medical record was created')
+            }
+          } catch (weightError) {
+            console.warn('⚠️ Error updating cadet weight:', weightError)
+          }
+        }
+
         alert('Medical record added successfully!')
         router.push('/reports')
       } else {
@@ -366,8 +407,14 @@ export default function NewMedicalRecordPage() {
                                 className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0"
                                 onClick={() => handleCadetSelect(cadet)}
                               >
-                                <div className="font-medium text-gray-900 dark:text-white">
+                                <div className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
                                   {cadet.name}
+                                  {cadet.relegated === 'Y' && (
+                                    <>
+                                      <span className="text-red-600 dark:text-red-400 font-bold">R</span>
+                                      <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                    </>
+                                  )}
                                 </div>
                                 <div className="text-sm text-gray-500 dark:text-gray-400">
                                   {cadet.company} Company, {cadet.battalion}
@@ -413,8 +460,15 @@ export default function NewMedicalRecordPage() {
                   <div className="mt-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                     <div className="text-sm">
                       <span className="font-medium text-green-800 dark:text-green-400">Selected:</span>{' '}
-                      <span className="text-green-700 dark:text-green-300">
-                        {selectedCadet.name} - {selectedCadet.company} Company, {selectedCadet.battalion}
+                      <span className="text-green-700 dark:text-green-300 flex items-center gap-2">
+                        {selectedCadet.name}
+                        {selectedCadet.relegated === 'Y' && (
+                          <>
+                            <span className="text-red-600 dark:text-red-400 font-bold">R</span>
+                            <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                          </>
+                        )}
+                        - {selectedCadet.company} Company, {selectedCadet.battalion}
                       </span>
                     </div>
                   </div>
@@ -466,10 +520,28 @@ export default function NewMedicalRecordPage() {
                 )}
               </div>
 
-              {/* 4. Diagnosis */}
+              {/* 4. Weight (kg) */}
+              <div>
+                <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Weight (kg)
+                </label>
+                <input
+                  type="number"
+                  id="weight"
+                  name="weight"
+                  min={0}
+                  step="0.1"
+                  value={formData.weight}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="e.g., 68.5"
+                />
+              </div>
+
+              {/* 5. Diagnosis */}
               <div className="md:col-span-2">
                 <label htmlFor="diagnosis" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Diagnosis
+                  Prescription
                 </label>
                 <textarea
                   id="diagnosis"
@@ -478,11 +550,11 @@ export default function NewMedicalRecordPage() {
                   value={formData.diagnosis}
                   onChange={handleChange}
                   className="input-field"
-                  placeholder="Detailed diagnosis information"
+                  placeholder="detailed prescription option"
                 />
               </div>
 
-              {/* 5. Status */}
+              {/* 6. Status */}
               <div>
                 <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Status
@@ -499,7 +571,7 @@ export default function NewMedicalRecordPage() {
                 </select>
               </div>
 
-              {/* 6. Attend C */}
+              {/* 7. Attend C */}
               <div>
                 <label htmlFor="attendC" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Attend C
@@ -510,6 +582,7 @@ export default function NewMedicalRecordPage() {
                   value={formData.attendC}
                   onChange={handleChange}
                   className="input-field"
+                  disabled={formData.miDetained !== '0'}
                 >
                   {[...Array(11)].map((_, i) => (
                     <option key={i} value={i.toString()}>
@@ -519,7 +592,26 @@ export default function NewMedicalRecordPage() {
                 </select>
               </div>
 
-              {/* 7. Monitoring Case */}
+              {/* 8. MI Detained */}
+              <div>
+                <label htmlFor="miDetained" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  MI Detained
+                </label>
+                <select
+                  id="miDetained"
+                  name="miDetained"
+                  value={formData.miDetained}
+                  onChange={handleChange}
+                  className="input-field"
+                  disabled={formData.attendC !== '0'}
+                >
+                  {[...Array(31)].map((_, i) => (
+                    <option key={i} value={i.toString()}>
+                      {i}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label htmlFor="monitoringCase" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Monitoring Case
@@ -536,7 +628,7 @@ export default function NewMedicalRecordPage() {
                 </select>
               </div>
 
-              {/* 8. Contact No. */}
+              {/* 9. Contact No. */}
               <div>
                 <label htmlFor="contactNo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Contact No.
@@ -552,7 +644,7 @@ export default function NewMedicalRecordPage() {
                 />
               </div>
 
-              {/* 9. Remarks */}
+              {/* 10. Remarks */}
               <div className="md:col-span-2">
                 <label htmlFor="remarks" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Remarks
@@ -637,16 +729,18 @@ export default function NewMedicalRecordPage() {
                     <label htmlFor="cadetBattalion" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Battalion *
                     </label>
-                    <input
-                      type="text"
+                    <select
                       id="cadetBattalion"
                       name="battalion"
                       required
                       value={cadetFormData.battalion}
                       onChange={handleCadetFormChange}
                       className="input-field"
-                      placeholder="e.g., 12th Battalion"
-                    />
+                    >
+                      <option value="">Select battalion...</option>
+                      <option value="Shivaji">Shivaji</option>
+                      <option value="Ranjit Singh">Ranjit Singh</option>
+                    </select>
                   </div>
 
                   {/* Company */}
@@ -663,10 +757,12 @@ export default function NewMedicalRecordPage() {
                       className="input-field"
                     >
                       <option value="">Select company...</option>
-                      <option value="Alpha">Alpha</option>
-                      <option value="Beta">Beta</option>
-                      <option value="Gamma">Gamma</option>
-                      <option value="Delta">Delta</option>
+                      <option value="M">M</option>
+                      <option value="N">N</option>
+                      <option value="Z">Z</option>
+                      <option value="J">J</option>
+                      <option value="K">K</option>
+                      <option value="P">P</option>
                     </select>
                   </div>
 
@@ -715,27 +811,9 @@ export default function NewMedicalRecordPage() {
                       onChange={handleCadetFormChange}
                       className="input-field"
                     >
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                      <option value="Graduated">Graduated</option>
-                    </select>
-                  </div>
-
-                  {/* Health Status */}
-                  <div>
-                    <label htmlFor="cadetHealthStatus" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Health Status
-                    </label>
-                    <select
-                      id="cadetHealthStatus"
-                      name="healthStatus"
-                      value={cadetFormData.healthStatus}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                    >
-                      <option value="Fit">Fit</option>
-                      <option value="Under Treatment">Under Treatment</option>
-                      <option value="Recovered">Recovered</option>
+                      <option value="Ex PPG">Ex PPG</option>
+                      <option value="Attend B">Attend B</option>
+                      <option value="Physiotherapy">Physiotherapy</option>
                     </select>
                   </div>
 
@@ -822,6 +900,23 @@ export default function NewMedicalRecordPage() {
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
                       <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  {/* Relegated */}
+                  <div>
+                    <label htmlFor="relegated" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Relegated
+                    </label>
+                    <select
+                      id="relegated"
+                      name="relegated"
+                      value={cadetFormData.relegated}
+                      onChange={handleCadetFormChange}
+                      className="input-field"
+                    >
+                      <option value="N">N</option>
+                      <option value="Y">Y</option>
                     </select>
                   </div>
                 </div>

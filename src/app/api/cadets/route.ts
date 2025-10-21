@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   if (authError) return authError
 
   try {
-    const { name, battalion, company, joinDate, status, healthStatus, height, weight, age, course, sex } = await request.json()
+    const { name, battalion, company, joinDate, status, academyNumber, height, weight, age, course, sex, relegated } = await request.json()
 
     // Validate required fields
     if (!name || !battalion || !company || !joinDate) {
@@ -45,12 +45,13 @@ export async function POST(request: NextRequest) {
       company,
       joinDate: new Date(joinDate),
       status: status || 'Active',
-      healthStatus: healthStatus || 'Fit',
+      academyNumber: academyNumber ? parseInt(academyNumber) : null,
       height: typeof height === 'number' ? height : height ? parseInt(height) : null,
       weight: typeof weight === 'number' ? weight : weight ? parseInt(weight) : null,
       age: typeof age === 'number' ? age : age ? parseInt(age) : null,
       course: course || null,
       sex: sex || null,
+      relegated: relegated || 'N',
     }).returning()
 
     console.log('✅ CREATED CADET:', newCadet)
