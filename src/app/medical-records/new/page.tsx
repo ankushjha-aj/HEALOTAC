@@ -48,8 +48,11 @@ export default function NewMedicalRecordPage() {
     medicalProblem: '',
     diagnosis: '',
     status: 'Active',
-    attendC: '0',
-    miDetained: '0',
+    trainingType: 'none', // 'none', 'attendC', or 'miDetained'
+    trainingDays: '0', // Combined value for both Attend C and MI Detained
+    exPpg: '0',
+    attendB: '0',
+    physiotherapy: '0',
     contactNo: '',
     remarks: '',
     monitoringCase: 'No',
@@ -131,11 +134,14 @@ export default function NewMedicalRecordPage() {
         [name]: value
       }
 
-      // Mutual exclusion logic for Attend C and MI Detained
-      if (name === 'attendC' && value !== '0') {
-        newData.miDetained = '0'
-      } else if (name === 'miDetained' && value !== '0') {
-        newData.attendC = '0'
+      // Handle training type changes
+      if (name === 'trainingType') {
+        if (value === 'none') {
+          newData.trainingDays = '0'
+        } else if (value !== prev.trainingType) {
+          // Reset training days when switching between attendC and miDetained
+          newData.trainingDays = '0'
+        }
       }
 
       return newData
@@ -293,9 +299,12 @@ export default function NewMedicalRecordPage() {
         medicalProblem: formData.medicalProblem,
         diagnosis: formData.diagnosis,
         medicalStatus: formData.status,
-        attendC: parseInt(formData.attendC),
-        miDetained: parseInt(formData.miDetained),
-        totalTrainingDaysMissed: parseInt(formData.attendC) + parseInt(formData.miDetained),
+        attendC: formData.trainingType === 'attendC' ? parseInt(formData.trainingDays) : 0,
+        miDetained: formData.trainingType === 'miDetained' ? parseInt(formData.trainingDays) : 0,
+        exPpg: parseInt(formData.exPpg),
+        attendB: parseInt(formData.attendB),
+        physiotherapy: parseInt(formData.physiotherapy),
+        totalTrainingDaysMissed: parseInt(formData.trainingDays) || 0,
         contactNo: formData.contactNo,
         remarks: formData.remarks,
         monitoringCase: formData.monitoringCase,
@@ -568,47 +577,96 @@ export default function NewMedicalRecordPage() {
                 </select>
               </div>
 
-              {/* 7. Attend C */}
+              {/* 7. Training Days (Combined Attend C / MI Detained) */}
               <div>
-                <label htmlFor="attendC" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Attend C
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Training Days
                 </label>
-                <select
-                  id="attendC"
-                  name="attendC"
-                  value={formData.attendC}
-                  onChange={handleChange}
-                  className="input-field"
-                  disabled={formData.miDetained !== '0'}
-                >
-                  {[...Array(11)].map((_, i) => (
-                    <option key={i} value={i.toString()}>
-                      {i}
-                    </option>
-                  ))}
-                </select>
+                <div className="space-y-2">
+                  {/* Training Type Selection */}
+                  <select
+                    name="trainingType"
+                    value={formData.trainingType}
+                    onChange={handleChange}
+                    className="input-field"
+                  >
+                    <option value="none">None</option>
+                    <option value="attendC">Attend C</option>
+                    <option value="miDetained">MI Detained</option>
+                  </select>
+
+                  {/* Training Days Input - Only show if a type is selected */}
+                  {formData.trainingType !== 'none' && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600 dark:text-gray-400 min-w-0">
+                        {formData.trainingType === 'attendC' ? 'Attend C:' : 'MI Detained:'}
+                      </span>
+                      <input
+                        type="number"
+                        name="trainingDays"
+                        min="0"
+                        max={formData.trainingType === 'attendC' ? '10' : '30'}
+                        value={formData.trainingDays}
+                        onChange={handleChange}
+                        className="input-field flex-1"
+                        placeholder="0"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* 8. MI Detained */}
+              {/* 9. Ex-PPG */}
               <div>
-                <label htmlFor="miDetained" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  MI Detained
+                <label htmlFor="exPpg" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Ex-PPG
                 </label>
-                <select
-                  id="miDetained"
-                  name="miDetained"
-                  value={formData.miDetained}
+                <input
+                  type="number"
+                  id="exPpg"
+                  name="exPpg"
+                  min="0"
+                  value={formData.exPpg}
                   onChange={handleChange}
                   className="input-field"
-                  disabled={formData.attendC !== '0'}
-                >
-                  {[...Array(31)].map((_, i) => (
-                    <option key={i} value={i.toString()}>
-                      {i}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="0"
+                />
               </div>
+
+              {/* 10. Attend B */}
+              <div>
+                <label htmlFor="attendB" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Attend B
+                </label>
+                <input
+                  type="number"
+                  id="attendB"
+                  name="attendB"
+                  min="0"
+                  value={formData.attendB}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="0"
+                />
+              </div>
+
+              {/* 11. Physiotherapy */}
+              <div>
+                <label htmlFor="physiotherapy" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Physiotherapy
+                </label>
+                <input
+                  type="number"
+                  id="physiotherapy"
+                  name="physiotherapy"
+                  min="0"
+                  value={formData.physiotherapy}
+                  onChange={handleChange}
+                  className="input-field"
+                  placeholder="0"
+                />
+              </div>
+
               <div>
                 <label htmlFor="monitoringCase" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Monitoring Case

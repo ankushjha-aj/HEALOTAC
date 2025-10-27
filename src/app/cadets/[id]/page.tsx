@@ -33,6 +33,9 @@ interface MedicalRecord {
   status: string
   attendC: number
   miDetained: number
+  exPpg: number
+  attendB: number
+  physiotherapy: number
   totalTrainingDaysMissed: number
   monitoringCase: boolean
   contactNo: string

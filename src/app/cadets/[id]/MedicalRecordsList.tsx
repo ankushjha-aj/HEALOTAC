@@ -13,6 +13,9 @@ interface MedicalRecord {
   medicalStatus: string
   attendC: number
   miDetained: number
+  exPpg: number
+  attendB: number
+  physiotherapy: number
   totalTrainingDaysMissed: number
   monitoringCase: boolean
   contactNo: string
@@ -139,6 +142,9 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
                     Total Training Days Missed: {record.totalTrainingDaysMissed}
                   </div>
                 )}
+                <div>Ex-PPG: {record.exPpg || 0}</div>
+                <div>Attend B: {record.attendB || 0}</div>
+                <div>Physiotherapy: {record.physiotherapy || 0}</div>
               </div>
             </div>
           </div>
