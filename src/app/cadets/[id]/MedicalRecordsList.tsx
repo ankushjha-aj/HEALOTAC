@@ -28,8 +28,17 @@ interface MedicalRecordsListProps {
   cadetId: number
 }
 
-export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsListProps) {
+export default function MedicalRecordsList({ records: initialRecords, cadetId }: MedicalRecordsListProps) {
+  const [records, setRecords] = useState<MedicalRecord[]>(initialRecords)
+  const [updatingRecordId, setUpdatingRecordId] = useState<number | null>(null)
+
   const handleStatusUpdate = async (recordId: number, newStatus: string) => {
+    // Show confirmation dialog
+    const confirmed = confirm(`Are you sure you want to mark this medical record as ${newStatus.toLowerCase()}?`)
+    if (!confirmed) return
+
+    setUpdatingRecordId(recordId)
+
     try {
       const token = localStorage.getItem('jwt_token')
       if (!token) {
@@ -47,8 +56,14 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
       })
 
       if (response.ok) {
-        // Refresh the page to show updated data
-        window.location.reload()
+        // Update the local state immediately to show the new status
+        setRecords(prevRecords =>
+          prevRecords.map(record =>
+            record.id === recordId
+              ? { ...record, medicalStatus: newStatus }
+              : record
+          )
+        )
       } else {
         const error = await response.json()
         alert(`Failed to update status: ${error.error || 'Unknown error'}`)
@@ -56,6 +71,8 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
     } catch (error) {
       console.error('Error updating status:', error)
       alert('Failed to update medical record status')
+    } finally {
+      setUpdatingRecordId(null)
     }
   }
 
@@ -92,13 +109,26 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
               {record.medicalStatus === 'Active' && (
                 <button
                   onClick={() => handleStatusUpdate(record.id, 'Completed')}
-                  className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                  disabled={updatingRecordId === record.id}
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed transition-colors"
                   title="Mark as completed"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  Complete
+                  {updatingRecordId === record.id ? (
+                    <>
+                      <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                      Complete
+                    </>
+                  )}
                 </button>
               )}
               {record.monitoringCase && (
@@ -126,25 +156,49 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
                 Details
               </label>
               <div className="text-sm text-gray-900 dark:text-white mt-1 space-y-1">
-                {record.attendC > 0 && (
+                {/* Only show Attend C if > 0 */}
+                {record.attendC && Number(record.attendC) > 0 ? (
                   <div>Attend C: {record.attendC}</div>
-                )}
-                {record.attendC === 0 && record.totalTrainingDaysMissed && record.totalTrainingDaysMissed > 0 && (
+                ) : null}
+
+                {/* Only show MI Detained if > 0 */}
+                {record.attendC === 0 && record.totalTrainingDaysMissed && Number(record.totalTrainingDaysMissed) > 0 ? (
                   <div className="font-medium text-orange-600 dark:text-orange-400">
                     MI Detained: {record.totalTrainingDaysMissed} days
                   </div>
-                )}
-                {record.attendC > 0 && record.totalTrainingDaysMissed && record.totalTrainingDaysMissed > record.attendC && (
-                  <div>MI Detained: {record.totalTrainingDaysMissed - record.attendC} days</div>
-                )}
-                {record.totalTrainingDaysMissed > 0 && (
-                  <div className="font-medium text-red-600 dark:text-red-400">
-                    Total Training Days Missed: {record.totalTrainingDaysMissed}
+                ) : null}
+                {record.attendC && Number(record.attendC) > 0 && record.totalTrainingDaysMissed && Number(record.totalTrainingDaysMissed) > Number(record.attendC) ? (
+                  <div className="font-medium text-orange-600 dark:text-orange-400">
+                    MI Detained: {record.totalTrainingDaysMissed - record.attendC} days
                   </div>
-                )}
-                <div>Ex-PPG: {record.exPpg || 0}</div>
-                <div>Attend B: {record.attendB || 0}</div>
-                <div>Physiotherapy: {record.physiotherapy || 0}</div>
+                ) : null}
+
+                {/* Only show Ex-PPG if > 0 */}
+                {record.exPpg && Number(record.exPpg) > 0 ? (
+                  <div>Ex-PPG: {record.exPpg} (+{(record.exPpg * 0.25).toFixed(1)} day{(record.exPpg * 0.25) !== 1 ? 's' : ''} missed)</div>
+                ) : null}
+
+                {/* Only show Attend B if > 0 */}
+                {record.attendB && Number(record.attendB) > 0 ? (
+                  <div>Attend B: {record.attendB} (+{(record.attendB * 0.25).toFixed(1)} day{(record.attendB * 0.25) !== 1 ? 's' : ''} missed)</div>
+                ) : null}
+
+                {/* Only show Physiotherapy if > 0 */}
+                {record.physiotherapy && Number(record.physiotherapy) > 0 ? (
+                  <div>Physiotherapy: {record.physiotherapy}</div>
+                ) : null}
+
+                {/* Calculate and show total training days missed for this record */}
+                {(() => {
+                  let totalDays = record.totalTrainingDaysMissed || 0
+                  if (record.exPpg && Number(record.exPpg) > 0) totalDays += Number(record.exPpg) * 0.25
+                  if (record.attendB && Number(record.attendB) > 0) totalDays += Number(record.attendB) * 0.25
+                  return totalDays > 0 ? (
+                    <div className="font-medium text-red-600 dark:text-red-400 border-t border-gray-200 dark:border-gray-600 pt-1 mt-2">
+                      Training Days Missed: {totalDays.toFixed(1)} day{totalDays !== 1 ? 's' : ''}
+                    </div>
+                  ) : null
+                })()}
               </div>
             </div>
           </div>

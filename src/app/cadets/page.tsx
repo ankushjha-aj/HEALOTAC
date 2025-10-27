@@ -11,6 +11,8 @@ interface MedicalRecord {
   cadetId: number
   totalTrainingDaysMissed: number
   medicalStatus: string
+  exPpg: number
+  attendB: number
 }
 
 // Interface for Cadet
@@ -121,7 +123,23 @@ export default function CadetsPage() {
   // Calculate training days missed for each cadet
   const cadetsWithTrainingMissed = cadets.map(cadet => {
     const cadetRecords = medicalRecords.filter(record => record.cadetId === cadet.id)
-    const totalTrainingMissed = cadetRecords.reduce((total, record) => total + record.totalTrainingDaysMissed, 0)
+    const totalTrainingMissed = cadetRecords.reduce((total, record) => {
+      let days = record.totalTrainingDaysMissed || 0
+
+      // Add Ex-PPG contribution (each point = 0.25 days missed)
+      if (record.exPpg) {
+        days += record.exPpg * 0.25
+      }
+
+      // Add Attend B contribution (each point = 0.25 days missed)
+      if (record.attendB) {
+        days += record.attendB * 0.25
+      }
+
+      // Physiotherapy doesn't add to training days missed
+
+      return total + days
+    }, 0)
     return { ...cadet, totalTrainingMissed }
   })
 

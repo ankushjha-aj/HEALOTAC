@@ -126,7 +126,21 @@ export default function CadetDetailsPage({
 
   // Calculate total training days missed
   const totalTrainingDaysMissed = medicalRecords.reduce((total: number, record: MedicalRecord) => {
-    return total + (record.totalTrainingDaysMissed || 0)
+    let days = record.totalTrainingDaysMissed || 0
+
+    // Add Ex-PPG contribution (each point = 0.25 days missed)
+    if (record.exPpg) {
+      days += record.exPpg * 0.25
+    }
+
+    // Add Attend B contribution (each point = 0.25 days missed)
+    if (record.attendB) {
+      days += record.attendB * 0.25
+    }
+
+    // Physiotherapy doesn't add to training days missed
+
+    return total + days
   }, 0)
 
   if (loading) {
