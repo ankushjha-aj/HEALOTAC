@@ -50,3 +50,25 @@ In progress .......
 6. Course Changes - Remove indentation showing, only 7 numbers.
 7. In medical History : total records --> Total Cadets.
 8. Create Button for Monitoring Case, will fetch all yes records.
+
+
+
+
+
+#####################################
+name -- HEALOTAC
+exppg -- 0.25/1 -- exppg 4 toh 1 day bsent
+Attend B -- same as exppg
+Physitherapy -- no attend C 
+
+monitoring cases -list
+date + time
+status cadet page -- remove from cadet page.
+Medical status -- exppg 
+
+
+
+
+
+
+
