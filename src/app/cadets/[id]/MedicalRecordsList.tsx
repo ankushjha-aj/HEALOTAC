@@ -10,7 +10,7 @@ interface MedicalRecord {
   dateOfReporting: string
   medicalProblem: string
   diagnosis?: string
-  status: string
+  medicalStatus: string
   attendC: number
   miDetained: number
   totalTrainingDaysMissed: number
@@ -40,7 +40,7 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ medicalStatus: newStatus }),
       })
 
       if (response.ok) {
@@ -78,15 +78,15 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
             </div>
             <div className="flex gap-2 items-center">
               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                record.status === 'Active'
+                record.medicalStatus === 'Active'
                   ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                  : record.status === 'Completed'
+                  : record.medicalStatus === 'Completed'
                   ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                   : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
               }`}>
-                {record.status}
+                {record.medicalStatus}
               </span>
-              {record.status === 'Active' && (
+              {record.medicalStatus === 'Active' && (
                 <button
                   onClick={() => handleStatusUpdate(record.id, 'Completed')}
                   className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700 transition-colors"

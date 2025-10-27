@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   if (authError) return authError
 
   try {
-    const { name, battalion, company, joinDate, status, academyNumber, height, weight, age, course, sex, relegated } = await request.json()
+    const { name, battalion, company, joinDate, academyNumber, height, weight, age, course, sex, relegated } = await request.json()
 
     // Validate required fields
     if (!name || !battalion || !company || !joinDate) {
@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
       battalion,
       company,
       joinDate: new Date(joinDate),
-      status: status || 'Active',
       academyNumber: academyNumber ? parseInt(academyNumber) : null,
       height: typeof height === 'number' ? height : height ? parseInt(height) : null,
       weight: typeof weight === 'number' ? weight : weight ? parseInt(weight) : null,

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Search, Eye, Edit, Trash2, Plus, Filter } from 'lucide-react'
+import { Search, Edit, Trash2, Plus, Filter } from 'lucide-react'
 import Link from 'next/link'
 
 // Interface for Medical Record
@@ -10,7 +10,7 @@ interface MedicalRecord {
   id: number
   cadetId: number
   totalTrainingDaysMissed: number
-  status: string
+  medicalStatus: string
 }
 
 // Interface for Cadet
@@ -249,16 +249,13 @@ export default function CadetsPage() {
                     Company
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Training Days Missed
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Academy Number
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Join Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Training Days Missed
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Actions
@@ -276,9 +273,12 @@ export default function CadetsPage() {
                           </span>
                         </div>
                         <div className="ml-3 flex items-center gap-2">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          <Link
+                            href={`/cadets/${cadet.id}`}
+                            className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary"
+                          >
                             {cadet.name}
-                          </p>
+                          </Link>
                           {cadet.relegated === 'Y' && (
                             <>
                               <span className="text-red-600 dark:text-red-400 font-bold">R</span>
@@ -299,25 +299,6 @@ export default function CadetsPage() {
                       </p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {cadet.academyNumber || 'N/A'}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(cadet.joinDate).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        cadet.status === 'Active'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                          : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-                      }`}>
-                        {cadet.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         cadet.totalTrainingMissed >= 30
                           ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
@@ -328,6 +309,16 @@ export default function CadetsPage() {
                         {cadet.totalTrainingMissed} days
                       </span>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {cadet.academyNumber || 'N/A'}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {new Date(cadet.joinDate).toLocaleDateString()}
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
                         <Link
@@ -335,7 +326,7 @@ export default function CadetsPage() {
                           className="text-primary hover:text-primary/80"
                           title="View cadet details"
                         >
-                          <Eye className="h-4 w-4" />
+                          View
                         </Link>
                         <Link
                           href={`/cadets/${cadet.id}/edit`}

@@ -5,8 +5,8 @@ import { usePathname } from 'next/navigation'
 import { Home, Users, Activity, Plus, FileText, LogOut } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-// Custom Shield Icon with Medical Cross
-const ShieldIcon = ({ className = "" }: { className?: string }) => (
+// Army Shield Icon
+const ArmyShieldIcon = ({ className = "" }: { className?: string }) => (
   <svg
     viewBox="0 0 24 24"
     fill="none"
@@ -18,8 +18,10 @@ const ShieldIcon = ({ className = "" }: { className?: string }) => (
   >
     {/* Shield outline */}
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    {/* Medical cross in the middle - larger */}
-    <path d="M12 7v6M10 10h4" stroke="currentColor" strokeWidth="2" />
+    {/* Crossed swords in the middle */}
+    <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" strokeWidth="2" />
+    {/* Horizontal line for emphasis */}
+    <path d="M12 7v6" stroke="currentColor" strokeWidth="1.5" />
   </svg>
 )
 
@@ -45,9 +47,9 @@ export default function Sidebar() {
     <aside className="w-64 flex-col bg-white dark:bg-gray-800/50 border-r border-gray-200 dark:border-gray-700/50 p-4 hidden lg:flex">
       <div className="flex flex-col gap-y-2 mb-8">
         <div className="flex items-center gap-3">
-          <ShieldIcon className="w-8 h-8 text-primary" />
+          <ArmyShieldIcon className="w-8 h-8 text-primary" />
           <div>
-            <h1 className="text-lg font-bold text-gray-900 dark:text-white">CURACADET</h1>
+            <h1 className="text-lg font-bold text-gray-900 dark:text-white">HEALOTAC</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">Attendant Portal</p>
           </div>
         </div>

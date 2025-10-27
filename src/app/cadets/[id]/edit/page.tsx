@@ -48,7 +48,6 @@ export default function EditCadetPage({
     battalion: '',
     company: '',
     joinDate: '',
-    status: 'Active',
     height: '',
     weight: '',
     age: '',
@@ -80,7 +79,6 @@ export default function EditCadetPage({
         battalion: cadetData.battalion || '',
         company: cadetData.company || '',
         joinDate: cadetData.joinDate ? cadetData.joinDate.split('T')[0] : '',
-        status: cadetData.status || 'Active',
         height: cadetData.height ? cadetData.height.toString() : '',
         weight: cadetData.weight ? cadetData.weight.toString() : '',
         age: cadetData.age ? cadetData.age.toString() : '',
@@ -124,7 +122,6 @@ export default function EditCadetPage({
         battalion: formData.battalion,
         company: formData.company,
         joinDate: formData.joinDate,
-        status: formData.status,
         height: formData.height ? parseInt(formData.height) : undefined,
         weight: formData.weight ? parseInt(formData.weight) : undefined,
         age: formData.age ? parseInt(formData.age) : undefined,
@@ -155,10 +152,8 @@ export default function EditCadetPage({
     }
   }
 
-  // Get available companies for selected battalion
-  const availableCompanies = formData.battalion === 'all'
-    ? filters?.companies || []
-    : filters?.companiesByBattalion?.[formData.battalion] || []
+  // Get available companies for selected battalion (show all companies for editing)
+  // const availableCompanies = filters?.companies || []
 
   if (loading) {
     return (
@@ -293,38 +288,14 @@ export default function EditCadetPage({
                     onChange={handleInputChange}
                     className="input-field"
                     required
-                    disabled={!formData.battalion}
                   >
                     <option value="">Select Company</option>
-                    {availableCompanies.map((company: string) => (
-                      <option key={company} value={company}>{company} Company</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Status Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-                Status Information
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Cadet Status
-                  </label>
-                  <select
-                    id="status"
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                    className="input-field"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="Graduated">Graduated</option>
+                    <option value="M">M</option>
+                    <option value="N">N</option>
+                    <option value="Z">Z</option>
+                    <option value="J">J</option>
+                    <option value="K">K</option>
+                    <option value="P">P</option>
                   </select>
                 </div>
               </div>

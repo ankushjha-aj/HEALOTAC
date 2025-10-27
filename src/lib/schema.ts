@@ -18,7 +18,6 @@ export const cadets = pgTable('cadets', {
   battalion: varchar('battalion', { length: 100 }).notNull(),
   company: varchar('company', { length: 50 }).notNull(),
   joinDate: timestamp('join_date').notNull(),
-  status: varchar('status', { length: 20 }).default('Active').notNull(),
   // Academy number field
   academyNumber: integer('academy_number'),
   // New demographic fields
@@ -41,7 +40,7 @@ export const medicalRecords = pgTable('medical_records', {
   dateOfReporting: timestamp('date_of_reporting').notNull(),
   medicalProblem: text('medical_problem').notNull(),
   diagnosis: text('diagnosis'),
-  status: varchar('status', { length: 20 }).default('Active').notNull(),
+  medicalStatus: varchar('medical_status', { length: 20 }).default('Active').notNull(),
   attendC: integer('attend_c').default(0).notNull(),
   miDetained: integer('mi_detained').default(0).notNull(),
   totalTrainingDaysMissed: integer('total_training_days_missed').default(0).notNull(),

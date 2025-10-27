@@ -13,7 +13,6 @@ interface CadetInfo {
   battalion: string
   company: string
   joinDate: string
-  status: string
   academyNumber?: number
   height?: number
   weight?: number
@@ -158,7 +157,7 @@ export default function CadetDetailsPage({
       <DashboardLayout>
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Header */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between">
             <Link
               href="/dashboard"
               className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
@@ -166,6 +165,13 @@ export default function CadetDetailsPage({
               <ArrowLeft className="h-4 w-4" />
               Back to Dashboard
             </Link>
+
+            <div className="text-right">
+              <div className="space-y-1">
+                <div className="text-sm font-semibold text-gray-500 dark:text-gray-400">Cadet ID</div>
+                <div className="text-2xl font-bold text-primary">#{cadetId}</div>
+              </div>
+            </div>
           </div>
 
           {/* Cadet Info Card */}
@@ -207,26 +213,12 @@ export default function CadetDetailsPage({
                   </div>
 
                   {/* Basic Info Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-primary" />
                       <div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Join Date</p>
                         <p className="text-sm font-medium">{new Date(cadetInfo.joinDate).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-primary" />
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</p>
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          cadetInfo.status === 'Active'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-                        }`}>
-                          {cadetInfo.status}
-                        </span>
                       </div>
                     </div>
 
@@ -369,13 +361,6 @@ export default function CadetDetailsPage({
                       {/* Edit button removed */}
                     </div>
                   )}
-                </div>
-              </div>
-
-              <div className="text-center">
-                <div className="space-y-2">
-                  <div className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">Cadet ID</div>
-                  <div className="text-2xl font-bold text-primary">#{cadetId}</div>
                 </div>
               </div>
             </div>

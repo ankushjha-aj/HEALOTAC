@@ -63,7 +63,7 @@ Physitherapy -- no attend C
 
 monitoring cases -list
 date + time
-status cadet page -- remove from cadet page.
+status cadet page -- remove from cadet page. 
 Medical status -- exppg 
 
 

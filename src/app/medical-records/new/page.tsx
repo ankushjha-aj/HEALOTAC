@@ -21,7 +21,6 @@ interface CadetFormData {
   battalion: string
   company: string
   joinDate: string
-  status: string
   academyNumber?: string
   height?: string
   weight?: string
@@ -62,7 +61,6 @@ export default function NewMedicalRecordPage() {
     battalion: '',
     company: '',
     joinDate: '',
-    status: 'Ex PPG',
     academyNumber: '',
     height: '',
     weight: '',
@@ -232,7 +230,6 @@ export default function NewMedicalRecordPage() {
           battalion: '',
           company: '',
           joinDate: '',
-          status: 'Ex PPG',
           academyNumber: '',
           height: '',
           weight: '',
@@ -295,7 +292,7 @@ export default function NewMedicalRecordPage() {
         dateOfReporting: formData.dateOfReporting,
         medicalProblem: formData.medicalProblem,
         diagnosis: formData.diagnosis,
-        status: formData.status,
+        medicalStatus: formData.status,
         attendC: parseInt(formData.attendC),
         miDetained: parseInt(formData.miDetained),
         totalTrainingDaysMissed: parseInt(formData.attendC) + parseInt(formData.miDetained),
@@ -557,11 +554,11 @@ export default function NewMedicalRecordPage() {
               {/* 6. Status */}
               <div>
                 <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Status
+                  Medical Status
                 </label>
                 <select
                   id="status"
-                  name="status"
+                  name="medicalStatus"
                   value={formData.status}
                   onChange={handleChange}
                   className="input-field"
@@ -799,24 +796,6 @@ export default function NewMedicalRecordPage() {
                     />
                   </div>
 
-                  {/* Status */}
-                  <div>
-                    <label htmlFor="cadetStatus" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Status
-                    </label>
-                    <select
-                      id="cadetStatus"
-                      name="status"
-                      value={cadetFormData.status}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                    >
-                      <option value="Ex PPG">Ex PPG</option>
-                      <option value="Attend B">Attend B</option>
-                      <option value="Physiotherapy">Physiotherapy</option>
-                    </select>
-                  </div>
-
                   {/* Height (cm) */}
                   <div>
                     <label htmlFor="height" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -900,7 +879,6 @@ export default function NewMedicalRecordPage() {
                       <option value="">Select...</option>
                       <option value="Male">Male</option>
                       <option value="Female">Female</option>
-                      <option value="Other">Other</option>
                     </select>
                   </div>
 

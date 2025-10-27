@@ -1,4 +1,4 @@
-# 🏥 CURACADET
+# 🏥 HEALOTAC
 
 A modern, responsive web application for managing medical records of Indian Army cadets. Built with Next.js 14, TypeScript, and Tailwind CSS.
 
@@ -177,7 +177,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📝 License
 
-This project is for CURACADET. All rights reserved.
+This project is for HEALOTAC. All rights reserved.
 
 ## 📧 Contact
 

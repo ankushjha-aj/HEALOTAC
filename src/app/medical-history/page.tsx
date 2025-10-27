@@ -29,6 +29,7 @@ export default function MedicalHistoryPage() {
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [currentDateTime, setCurrentDateTime] = useState<string>('')
 
   useEffect(() => {
     const fetchMedicalRecords = async () => {
@@ -61,6 +62,21 @@ export default function MedicalHistoryPage() {
     fetchMedicalRecords()
   }, [])
 
+  // Update current date and time
+  useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date()
+      const date = now.toLocaleDateString()
+      const time = now.toLocaleTimeString()
+      setCurrentDateTime(`${date} ${time}`)
+    }
+
+    updateDateTime()
+    const interval = setInterval(updateDateTime, 1000)
+
+    return () => clearInterval(interval)
+  }, [])
+
   // Filter records based on search and status
   const filteredRecords = medicalRecords.filter(record => {
     const matchesSearch = searchTerm === '' ||
@@ -71,13 +87,13 @@ export default function MedicalHistoryPage() {
 
     let matchesStatus = true
     if (statusFilter === 'Active') {
-      matchesStatus = record.status === 'Active'
+      matchesStatus = record.medicalStatus === 'Active'
     } else if (statusFilter === 'Completed') {
-      matchesStatus = record.status === 'Completed'
+      matchesStatus = record.medicalStatus === 'Completed'
     } else if (statusFilter === 'monitoring') {
       matchesStatus = record.monitoringCase === true
     } else if (statusFilter !== 'all') {
-      matchesStatus = record.status === statusFilter
+      matchesStatus = record.medicalStatus === statusFilter
     }
 
     return matchesSearch && matchesStatus
@@ -107,21 +123,20 @@ export default function MedicalHistoryPage() {
               Complete medical records for all cadets
             </p>
           </div>
-          <div className="mt-4 lg:mt-0 flex gap-2">
-            <button
-              onClick={() => setStatusFilter('monitoring')}
-              className="btn-secondary"
-            >
-              Monitoring Cases
-            </button>
-            <Link href="/medical-records/new" className="btn-primary">
-              Add New Record
-            </Link>
+          <div className="mt-4 lg:mt-0 flex flex-col lg:items-end gap-2">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {currentDateTime}
+            </div>
+            <div className="flex gap-2">
+              <Link href="/medical-records/new" className="btn-primary">
+                Add New Record
+              </Link>
+            </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="card p-4">
             <div className="flex items-center gap-3">
               <FileText className="h-8 w-8 text-primary" />
@@ -140,7 +155,7 @@ export default function MedicalHistoryPage() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {medicalRecords.filter(r => r.status === 'Active').length}
+                  {medicalRecords.filter(r => r.medicalStatus === 'Active').length}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Active Cases</div>
               </div>
@@ -153,9 +168,20 @@ export default function MedicalHistoryPage() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {medicalRecords.filter(r => r.status === 'Completed').length}
+                  {medicalRecords.filter(r => r.medicalStatus === 'Completed').length}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Completed Cases</div>
+              </div>
+            </div>
+          </div>
+          <div className="card p-4">
+            <div className="flex items-center gap-3">
+              <Eye className="h-8 w-8 text-red-500" />
+              <div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {medicalRecords.filter(r => r.monitoringCase).length}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Monitoring Cases</div>
               </div>
             </div>
           </div>
@@ -179,7 +205,7 @@ export default function MedicalHistoryPage() {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="input-field"
               >
-                <option value="all">All Status</option>
+                <option value="all">All Medical Status</option>
                 <option value="Active">Active</option>
                 <option value="Completed">Completed</option>
                 <option value="monitoring">Monitoring Cases</option>
@@ -214,7 +240,7 @@ export default function MedicalHistoryPage() {
                     Date Reported
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Status
+                    Medical Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Actions
@@ -300,13 +326,13 @@ export default function MedicalHistoryPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          record.status === 'Active'
+                          record.medicalStatus === 'Active'
                             ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                            : record.status === 'Completed'
+                            : record.medicalStatus === 'Completed'
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                             : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
                         }`}>
-                          {record.status}
+                          {record.medicalStatus}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

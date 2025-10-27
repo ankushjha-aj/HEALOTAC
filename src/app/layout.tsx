@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'CURACADET',
+  title: 'HEALOTAC',
   description: 'Medical Records Management System for Indian Army Cadets',
-  keywords: 'curacadet, medical records, indian army, cadet health, military healthcare',
+  keywords: 'healotac, medical records, indian army, cadet health, military healthcare',
   icons: {
     icon: [
       { url: '/favicon.png', sizes: 'any' },

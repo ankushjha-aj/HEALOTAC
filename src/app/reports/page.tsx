@@ -14,7 +14,7 @@ interface ReportRecord {
   dateOfReporting: string
   medicalProblem: string
   diagnosis: string
-  status: string
+  medicalStatus: string
   attendC: number
   trainingDaysMissed: number
   monitoringCase: boolean
@@ -180,7 +180,7 @@ export default function ReportsPage() {
 
     // Simulate processing time
     setTimeout(() => {
-      const headers = ['ID', 'Cadet ID', 'Name', 'Company', 'Battalion', 'Date of Reporting', 'Medical Problem', 'Diagnosis', 'Status', 'Attend C', 'Training Days Missed', 'Monitoring Case', 'Contact No', 'Remarks', 'Created At']
+      const headers = ['ID', 'Cadet ID', 'Name', 'Company', 'Battalion', 'Date of Reporting', 'Medical Problem', 'Diagnosis', 'Medical Status', 'Attend C', 'Training Days Missed', 'Monitoring Case', 'Contact No', 'Remarks', 'Created At']
       const csvContent = [
         headers.join(','),
         ...reportData.map(record => [
@@ -192,7 +192,7 @@ export default function ReportsPage() {
           record.dateOfReporting,
           `"${record.medicalProblem}"`,
           `"${record.diagnosis || ''}"`,
-          record.status,
+          record.medicalStatus,
           record.attendC,
           record.trainingDaysMissed || 0,
           record.monitoringCase ? 'Yes' : 'No',
@@ -442,7 +442,7 @@ export default function ReportsPage() {
                       Medical Problem
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Status
+                      Medical Status
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Monitoring Case
@@ -477,11 +477,11 @@ export default function ReportsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          record.status === 'Active'
+                          record.medicalStatus === 'Active'
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                             : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
                         }`}>
-                          {record.status}
+                          {record.medicalStatus}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">

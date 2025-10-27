@@ -12,7 +12,7 @@ interface MedicalRecord {
   dateOfReporting: string
   medicalProblem: string
   diagnosis?: string
-  status: string
+  medicalStatus: string
   attendC: number
   totalTrainingDaysMissed: number
   monitoringCase: boolean

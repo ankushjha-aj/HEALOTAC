@@ -73,7 +73,7 @@ interface MedicalRecord {
   dateOfReporting: string
   medicalProblem: string
   diagnosis?: string
-  status: string
+  medicalStatus: string
   attendC: number
   trainingDaysMissed: number
   contactNo: string
@@ -95,6 +95,7 @@ export default function DashboardPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [jwtToken, setJwtToken] = useState<string | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const [currentDateTime, setCurrentDateTime] = useState<string>('')
 
   // Check authentication on mount
   useEffect(() => {
@@ -106,6 +107,21 @@ export default function DashboardPage() {
       // Redirect to login if no token
       window.location.href = '/login'
     }
+  }, [])
+
+  // Update current date and time
+  useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date()
+      const date = now.toLocaleDateString()
+      const time = now.toLocaleTimeString()
+      setCurrentDateTime(`${date} ${time}`)
+    }
+
+    updateDateTime()
+    const interval = setInterval(updateDateTime, 1000)
+
+    return () => clearInterval(interval)
   }, [])
 
   // Fetch data function with JWT authentication
@@ -350,7 +366,7 @@ export default function DashboardPage() {
                     Join Date
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Status
+                    Medical Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Last Activity
@@ -402,9 +418,13 @@ export default function DashboardPage() {
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         cadet.status === 'Active'
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                          : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                          : cadet.status === 'Inactive'
+                          ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                          : cadet.status === 'Suspended'
+                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                          : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
                       }`}>
-                        {cadet.status}
+                        {cadet.status || 'Active'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
