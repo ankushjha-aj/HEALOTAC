@@ -7,11 +7,11 @@ export const metadata: Metadata = {
   keywords: 'healotac, medical records, indian army, cadet health, military healthcare',
   icons: {
     icon: [
-      { url: '/favicon.png', sizes: 'any' },
-      { url: '/favicon.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/logo.png', sizes: 'any' },
+      { url: '/logo.png', sizes: '16x16', type: 'image/png' },
+      { url: '/logo.png', sizes: '32x32', type: 'image/png' },
     ],
-    shortcut: '/favicon.png',
+    shortcut: '/logo.png',
   },
 }
 

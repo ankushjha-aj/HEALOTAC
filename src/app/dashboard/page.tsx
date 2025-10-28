@@ -209,8 +209,8 @@ export default function DashboardPage() {
 
   // Get cadets who have medical records created or updated today
   const todayRecords = medicalRecords.filter(record => {
-    const createdDate = record.createdAt.split('T')[0] // Get YYYY-MM-DD part
-    const updatedDate = record.updatedAt ? record.updatedAt.split('T')[0] : null
+    const createdDate = new Date(record.createdAt).toISOString().split('T')[0] // Get YYYY-MM-DD part
+    const updatedDate = record.updatedAt ? new Date(record.updatedAt).toISOString().split('T')[0] : null
 
     return createdDate === todayString || (updatedDate && updatedDate === todayString)
   })

@@ -4,24 +4,9 @@ import { User, Menu } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import ThemeToggle from '@/components/theme/ThemeToggle'
 
-// Army Shield Icon
-const ArmyShieldIcon = ({ className = "" }: { className?: string }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    {/* Shield outline */}
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    {/* Crossed swords in the middle */}
-    <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" strokeWidth="2" />
-    {/* Horizontal line for emphasis */}
-    <path d="M12 7v6" stroke="currentColor" strokeWidth="1.5" />
-  </svg>
+// Logo Image
+const Logo = ({ className = "" }: { className?: string }) => (
+  <img src="/logo.png" alt="Logo" className={className} />
 )
 
 export default function Header() {
@@ -48,7 +33,7 @@ export default function Header() {
               <Menu className="h-6 w-6" />
             </button>
             <div className="flex items-center gap-3">
-              <ArmyShieldIcon className="w-8 h-8 text-primary" />
+              <Logo className="w-8 h-8" />
               <h1 className="text-lg font-bold text-gray-900 dark:text-white">
                 Medical Record for OTA Chennai
               </h1>
