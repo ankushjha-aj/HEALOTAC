@@ -11,14 +11,17 @@ async function updateAdmins() {
 
     // Hash passwords
     const rmoPassword = await bcrypt.hash('rmo@ota', 12)
-    const naPassword = await bcrypt.hash('na @ota', 12)
+    const naPassword = await bcrypt.hash('na@ota', 12)
 
-    // Insert new admin users
+    // Insert new admin users (or update if they exist)
     await sql`
       INSERT INTO users (username, password, email, role)
       VALUES ('rmo', ${rmoPassword}, 'rmo@army.mil', 'admin'),
              ('na', ${naPassword}, 'na@army.mil', 'admin')
-      ON CONFLICT (username) DO NOTHING
+      ON CONFLICT (username) DO UPDATE SET
+        password = EXCLUDED.password,
+        email = EXCLUDED.email,
+        role = EXCLUDED.role
     `
 
     // Delete the old admin user
