@@ -5,7 +5,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout'
 import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Edit, Plus, Save, X } from 'lucide-react'
 import Link from 'next/link'
 import MedicalRecordsList from '../../cadets/[id]/MedicalRecordsList'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface MedicalRecord {
   id: number
@@ -51,15 +51,7 @@ export default function MedicalHistoryPage({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (isNaN(cadetId)) {
-      notFound()
-      return
-    }
-    fetchData()
-  }, [cadetId])
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -88,7 +80,15 @@ export default function MedicalHistoryPage({
     } finally {
       setLoading(false)
     }
-  }
+  }, [cadetId])
+
+  useEffect(() => {
+    if (isNaN(cadetId)) {
+      notFound()
+      return
+    }
+    fetchData()
+  }, [cadetId, fetchData])
 
   if (loading) {
     return (

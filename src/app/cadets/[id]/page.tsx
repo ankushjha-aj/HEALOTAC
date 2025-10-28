@@ -6,7 +6,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout'
 import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Edit, Plus, Save, X } from 'lucide-react'
 import Link from 'next/link'
 import MedicalRecordsList from './MedicalRecordsList'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface CadetInfo {
   id: number
@@ -60,23 +60,7 @@ export default function CadetDetailsPage({
   const [weightInput, setWeightInput] = useState('')
   const [updatingWeight, setUpdatingWeight] = useState(false)
 
-  useEffect(() => {
-    console.log(`🔄 USEEFFECT TRIGGERED: cadetId=${cadetId}`)
-    fetchCadetData()
-  }, [cadetId])
-
-  // Check for refresh parameter using searchParams
-  useEffect(() => {
-    if (searchParams.get('refresh') === 'true') {
-      console.log('🔄 DETECTED REFRESH PARAMETER - refreshing data directly')
-      // Remove the refresh parameter from URL
-      router.replace(window.location.pathname)
-      // Trigger refresh directly
-      fetchCadetData()
-    }
-  }, [searchParams])
-
-  const fetchCadetData = async () => {
+  const fetchCadetData = useCallback(async () => {
     try {
       console.log(`📡 FETCHING CADET DATA for cadet ${cadetId}`)
       setLoading(true)
@@ -123,7 +107,23 @@ export default function CadetDetailsPage({
     } finally {
       setLoading(false)
     }
-  }
+  }, [cadetId])
+
+  useEffect(() => {
+    console.log(`🔄 USEEFFECT TRIGGERED: cadetId=${cadetId}`)
+    fetchCadetData()
+  }, [cadetId, fetchCadetData])
+
+  // Check for refresh parameter using searchParams
+  useEffect(() => {
+    if (searchParams.get('refresh') === 'true') {
+      console.log('🔄 DETECTED REFRESH PARAMETER - refreshing data directly')
+      // Remove the refresh parameter from URL
+      router.replace(window.location.pathname)
+      // Trigger refresh directly
+      fetchCadetData()
+    }
+  }, [searchParams, fetchCadetData, router])
 
   const handleUpdateWeight = async () => {
     if (!cadetInfo) return

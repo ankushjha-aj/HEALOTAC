@@ -1,50 +1,108 @@
 {
   "pages": {
+    "/_not-found/page": [
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/app/_not-found/page-0bcec0e0a6121691.js"
+    ],
     "/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/layout.css",
-      "static/chunks/app/layout.js"
-    ],
-    "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
-    ],
-    "/dashboard/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/page.js"
-    ],
-    "/medical-records/new/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/medical-records/new/page.js"
-    ],
-    "/cadets/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/cadets/[id]/page.js"
-    ],
-    "/cadets/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/cadets/page.js"
-    ],
-    "/medical-history/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/medical-history/page.js"
-    ],
-    "/medical-history/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/medical-history/[id]/page.js"
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/css/b0c42dedac870615.css",
+      "static/chunks/app/layout-251762547a9976aa.js"
     ],
     "/cadets/[id]/edit/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/cadets/[id]/edit/page.js"
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/631-a3c55a83e28c567b.js",
+      "static/chunks/app/cadets/[id]/edit/page-c983d0ba94735941.js"
+    ],
+    "/cadets/[id]/page": [
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/631-a3c55a83e28c567b.js",
+      "static/chunks/196-1a91dd463092e236.js",
+      "static/chunks/app/cadets/[id]/page-766935ade775cafb.js"
+    ],
+    "/cadets/page": [
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/631-a3c55a83e28c567b.js",
+      "static/chunks/app/cadets/page-a8d76a4fab28c390.js"
+    ],
+    "/cadets/new/page": [
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/631-a3c55a83e28c567b.js",
+      "static/chunks/app/cadets/new/page-5f37d86dc7ded374.js"
+    ],
+    "/dashboard/page": [
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/631-a3c55a83e28c567b.js",
+      "static/chunks/app/dashboard/page-586a3f5c03d3feda.js"
+    ],
+    "/medical-history/[id]/page": [
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/631-a3c55a83e28c567b.js",
+      "static/chunks/196-1a91dd463092e236.js",
+      "static/chunks/app/medical-history/[id]/page-a923ab102f587e18.js"
+    ],
+    "/medical-history/page": [
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/631-a3c55a83e28c567b.js",
+      "static/chunks/app/medical-history/page-d14214e8e88ea651.js"
+    ],
+    "/page": [
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/app/page-062b4e94c85d8246.js"
+    ],
+    "/login/page": [
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/app/login/page-b8a2b834ff01bb4f.js"
+    ],
+    "/reports/page": [
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/631-a3c55a83e28c567b.js",
+      "static/chunks/873-506104d1fe0aa0a6.js",
+      "static/chunks/app/reports/page-c1d8ed3870a91b83.js"
+    ],
+    "/medical-records/new/page": [
+      "static/chunks/webpack-616e068a201ad621.js",
+      "static/chunks/fd9d1056-8f02fde8f1d9ed66.js",
+      "static/chunks/117-1a5173ffe277e6ed.js",
+      "static/chunks/main-app-678d9dcbae374d24.js",
+      "static/chunks/631-a3c55a83e28c567b.js",
+      "static/chunks/app/medical-records/new/page-4dc9c5fb33c1d4c2.js"
     ]
   }
 }

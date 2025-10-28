@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import Link from 'next/link'
@@ -30,7 +30,7 @@ interface CadetFormData {
   relegated?: string
 }
 
-export default function NewMedicalRecordPage() {
+function NewMedicalRecordPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -1054,5 +1054,19 @@ export default function NewMedicalRecordPage() {
         </div>
       )}
     </DashboardLayout>
+  )
+}
+
+export default function NewMedicalRecordPage() {
+  return (
+    <Suspense fallback={
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </DashboardLayout>
+    }>
+      <NewMedicalRecordPageInner />
+    </Suspense>
   )
 }
