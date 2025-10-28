@@ -437,6 +437,9 @@ video {
 [hidden]:where(:not([hidden="until-found"])) {
   display: none;
 }
+.pointer-events-none{
+  pointer-events: none;
+}
 .fixed{
   position: fixed;
 }
@@ -467,6 +470,66 @@ video {
 }
 .top-0{
   top: 0px;
+}
+.left-16{
+  left: 4rem;
+}
+.top-20{
+  top: 5rem;
+}
+.bottom-16{
+  bottom: 4rem;
+}
+.bottom-20{
+  bottom: 5rem;
+}
+.bottom-32{
+  bottom: 8rem;
+}
+.bottom-40{
+  bottom: 10rem;
+}
+.left-1\/2{
+  left: 50%;
+}
+.left-1\/3{
+  left: 33.333333%;
+}
+.left-1\/4{
+  left: 25%;
+}
+.left-12{
+  left: 3rem;
+}
+.left-20{
+  left: 5rem;
+}
+.right-1\/3{
+  right: 33.333333%;
+}
+.right-12{
+  right: 3rem;
+}
+.right-16{
+  right: 4rem;
+}
+.right-24{
+  right: 6rem;
+}
+.top-1\/2{
+  top: 50%;
+}
+.top-1\/4{
+  top: 25%;
+}
+.top-16{
+  top: 4rem;
+}
+.top-3\/4{
+  top: 75%;
+}
+.top-32{
+  top: 8rem;
 }
 .z-10{
   z-index: 10;
@@ -1305,6 +1368,14 @@ video {
   --tw-text-opacity: 1;
   color: rgb(254 240 138 / var(--tw-text-opacity, 1));
 }
+.text-blue-700{
+  --tw-text-opacity: 1;
+  color: rgb(29 78 216 / var(--tw-text-opacity, 1));
+}
+.text-blue-800{
+  --tw-text-opacity: 1;
+  color: rgb(30 64 175 / var(--tw-text-opacity, 1));
+}
 .antialiased{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1331,6 +1402,9 @@ video {
 }
 .opacity-10{
   opacity: 0.1;
+}
+.opacity-5{
+  opacity: 0.05;
 }
 .shadow-lg{
   --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -1393,6 +1467,9 @@ video {
 }
 .duration-200{
   transition-duration: 200ms;
+}
+.ease-in-out{
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Basic styles for HEALOTAC */
@@ -1911,6 +1988,21 @@ body {
 .dark\:text-yellow-400:is(.dark *){
   --tw-text-opacity: 1;
   color: rgb(250 204 21 / var(--tw-text-opacity, 1));
+}
+
+.dark\:text-blue-200:is(.dark *){
+  --tw-text-opacity: 1;
+  color: rgb(191 219 254 / var(--tw-text-opacity, 1));
+}
+
+.dark\:text-blue-300:is(.dark *){
+  --tw-text-opacity: 1;
+  color: rgb(147 197 253 / var(--tw-text-opacity, 1));
+}
+
+.dark\:text-red-200:is(.dark *){
+  --tw-text-opacity: 1;
+  color: rgb(254 202 202 / var(--tw-text-opacity, 1));
 }
 
 .dark\:placeholder-gray-500:is(.dark *)::-moz-placeholder{
