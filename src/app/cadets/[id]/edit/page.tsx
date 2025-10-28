@@ -18,6 +18,8 @@ interface CadetData {
   age?: number
   course?: string
   sex?: string
+  academyNumber?: number
+  relegated?: string
 }
 
 export default function EditCadetPage({
@@ -43,7 +45,9 @@ export default function EditCadetPage({
     weight: '',
     age: '',
     course: '',
-    sex: ''
+    sex: '',
+    academyNumber: '',
+    relegated: ''
   })
 
   const fetchCadetAndFilters = useCallback(async () => {
@@ -81,7 +85,9 @@ export default function EditCadetPage({
         weight: cadetData.weight ? cadetData.weight.toString() : '',
         age: cadetData.age ? cadetData.age.toString() : '',
         course: cadetData.course || '',
-        sex: cadetData.sex || ''
+        sex: cadetData.sex || '',
+        academyNumber: cadetData.academyNumber ? cadetData.academyNumber.toString() : '',
+        relegated: cadetData.relegated || 'N'
       })
     } catch (err) {
       console.error('Error fetching data:', err)
@@ -129,7 +135,9 @@ export default function EditCadetPage({
         weight: formData.weight ? parseInt(formData.weight) : undefined,
         age: formData.age ? parseInt(formData.age) : undefined,
         course: formData.course || undefined,
-        sex: formData.sex || undefined
+        sex: formData.sex || undefined,
+        academyNumber: formData.academyNumber ? parseInt(formData.academyNumber) : undefined,
+        relegated: formData.relegated || 'N'
       }
 
       const response = await fetch(`/api/cadets/${cadetId}`, {
@@ -359,6 +367,38 @@ export default function EditCadetPage({
                     min="16"
                     max="50"
                   />
+                </div>
+
+                <div>
+                  <label htmlFor="academyNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Academy Number
+                  </label>
+                  <input
+                    type="number"
+                    id="academyNumber"
+                    name="academyNumber"
+                    value={formData.academyNumber}
+                    onChange={handleInputChange}
+                    className="input-field"
+                    placeholder="e.g. 12345"
+                    min="1"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="relegated" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Relegated Status
+                  </label>
+                  <select
+                    id="relegated"
+                    name="relegated"
+                    value={formData.relegated}
+                    onChange={handleInputChange}
+                    className="input-field"
+                  >
+                    <option value="N">No (N)</option>
+                    <option value="Y">Yes (Y)</option>
+                  </select>
                 </div>
 
                 <div>

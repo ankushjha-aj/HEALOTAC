@@ -45,7 +45,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { name, battalion, company, joinDate, academyNumber, height, weight, age, course, sex } = await request.json()
+    const { name, battalion, company, joinDate, academyNumber, height, weight, age, course, sex, relegated } = await request.json()
 
     const [updatedCadet] = await db
       .update(cadets)
@@ -60,6 +60,7 @@ export async function PUT(
         age: typeof age === 'number' ? age : age ? parseInt(age) : undefined,
         course,
         sex,
+        relegated,
         updatedAt: new Date(),
       })
       .where(eq(cadets.id, parseInt(params.id)))
