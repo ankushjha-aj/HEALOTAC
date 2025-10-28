@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { cadets, medicalRecords } from '@/lib/schema'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 
 // GET /api/medical-history/[id] - Get medical history for a cadet
 export async function GET(
@@ -47,23 +47,9 @@ export async function GET(
     console.log(`🔍 SEARCHING FOR RECORDS WITH cadetId = ${cadetId} (type: ${typeof cadetId})`)
 
     // Try a simple where query
-    const simpleQuery = await db
-      .select()
-      .from(medicalRecords)
-      .where(eq(medicalRecords.cadetId, cadetId))
+    const medicalRecordsResult = await db.select().from(medicalRecords).where(eq(medicalRecords.cadetId, cadetId))
 
-    console.log(`📊 SIMPLE QUERY RESULT: ${simpleQuery.length} records`)
-
-    // Try with explicit type conversion
-    const typeQuery = await db
-      .select()
-      .from(medicalRecords)
-      .where(eq(medicalRecords.cadetId, parseInt(cadetId.toString())))
-
-    console.log(`📊 TYPE CONVERSION QUERY RESULT: ${typeQuery.length} records`)
-
-    // Use the simple query result
-    const medicalRecordsResult = simpleQuery
+    console.log(`📊 QUERY RESULT: ${medicalRecordsResult.length} records`)
 
     console.log(`📊 FINAL RESULT: ${medicalRecordsResult.length} MEDICAL RECORDS FOR CADET ${cadetId}`)
     console.log('📋 RECORDS DETAILS:', medicalRecordsResult.map(r => ({ id: r.id, cadetId: r.cadetId, medicalProblem: r.medicalProblem })))

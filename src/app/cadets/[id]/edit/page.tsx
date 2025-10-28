@@ -269,9 +269,8 @@ export default function EditCadetPage({
                     required
                   >
                     <option value="">Select Battalion</option>
-                    {filters?.battalions.map(battalion => (
-                      <option key={battalion} value={battalion}>{battalion}</option>
-                    ))}
+                    <option value="Shivaji">Shivaji</option>
+                    <option value="Ranjit Singh">Ranjit Singh</option>
                   </select>
                 </div>
 

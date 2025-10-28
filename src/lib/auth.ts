@@ -1,5 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+import { NextRequest, NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
+
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not defined');
+}
 
 export interface JWTPayload {
   userId: number
@@ -9,14 +13,29 @@ export interface JWTPayload {
   exp?: number
 }
 
+export const jwtConfig = {
+  algorithm: 'HS256' as const,
+  expiresIn: '1h',
+  issuer: 'CURACADET',
+  audience: 'web-app'
+};
+
 export function verifyToken(token: string): JWTPayload | null {
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload
-    return decoded
-  } catch (error) {
-    console.error('JWT verification failed:', error)
-    return null
+  const secrets = [
+    process.env.JWT_SECRET,
+    process.env.PREV_JWT_SECRET || ''
+  ].filter(Boolean);
+
+  for (const secret of secrets) {
+    try {
+      const decoded = jwt.verify(token, secret as string, { algorithms: [jwtConfig.algorithm] }) as unknown as JWTPayload;
+      return decoded;
+    } catch (error) {
+      // Try next secret
+    }
   }
+  console.error('JWT verification failed with all secrets');
+  return null;
 }
 
 export function getTokenFromRequest(request: NextRequest): string | null {

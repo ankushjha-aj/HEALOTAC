@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { Calendar, Clock, FileText, Activity } from 'lucide-react'
+import { Calendar, Clock, FileText } from 'lucide-react'
 import Link from 'next/link'
 
 interface MedicalRecord {
@@ -26,14 +25,15 @@ interface MedicalRecord {
 interface MedicalRecordsListProps {
   records: MedicalRecord[]
   cadetId: number
+  showAll?: boolean
 }
 
-export default function MedicalRecordsList({ records: initialRecords, cadetId }: MedicalRecordsListProps) {
-  const [records, setRecords] = useState<MedicalRecord[]>(initialRecords)
+export default function MedicalRecordsList({ records, cadetId, showAll = false }: MedicalRecordsListProps) {
+  const visibleRecords = showAll ? records : records.slice(0, 5)
 
   return (
     <div className="space-y-4">
-      {records.slice(0, 5).map((record: MedicalRecord) => (
+      {visibleRecords.map((record: MedicalRecord) => (
         <div key={record.id} className="card p-4">
           <div className="flex items-start justify-between mb-3">
             <div>
@@ -132,7 +132,7 @@ export default function MedicalRecordsList({ records: initialRecords, cadetId }:
         </div>
       ))}
 
-      {records.length > 5 && (
+      {!showAll && records.length > 5 && (
         <div className="text-center pt-4">
           <Link
             href={`/medical-history/${cadetId}`}

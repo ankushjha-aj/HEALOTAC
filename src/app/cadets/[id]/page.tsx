@@ -1,6 +1,7 @@
 'use client'
 
 import { notFound } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Edit, Plus, Save, X } from 'lucide-react'
 import Link from 'next/link'
@@ -48,6 +49,8 @@ export default function CadetDetailsPage({
 }: {
   params: { id: string }
 }) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const cadetId = parseInt(params.id)
   const [cadetInfo, setCadetInfo] = useState<CadetInfo | null>(null)
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
@@ -62,18 +65,16 @@ export default function CadetDetailsPage({
     fetchCadetData()
   }, [cadetId])
 
-  // Check for refresh parameter on mount to trigger data refresh
+  // Check for refresh parameter using searchParams
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('refresh') === 'true') {
+    if (searchParams.get('refresh') === 'true') {
       console.log('🔄 DETECTED REFRESH PARAMETER - refreshing data directly')
       // Remove the refresh parameter from URL
-      const newUrl = window.location.pathname
-      window.history.replaceState({}, '', newUrl)
+      router.replace(window.location.pathname)
       // Trigger refresh directly
       fetchCadetData()
     }
-  }, [])
+  }, [searchParams])
 
   const fetchCadetData = async () => {
     try {
@@ -446,7 +447,7 @@ export default function CadetDetailsPage({
                   </p>
                 </div>
               ) : (
-                <MedicalRecordsList records={medicalRecords} cadetId={cadetId} />
+                <MedicalRecordsList records={medicalRecords} cadetId={cadetId} showAll />
               )}
             </div>
           </div>
