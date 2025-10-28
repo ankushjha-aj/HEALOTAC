@@ -20,12 +20,6 @@ interface CadetData {
   sex?: string
 }
 
-interface Filters {
-  battalions: string[]
-  companies: string[]
-  companiesByBattalion: Record<string, string[]>
-}
-
 export default function EditCadetPage({
   params,
 }: {
@@ -35,7 +29,6 @@ export default function EditCadetPage({
   const cadetId = parseInt(params.id)
 
   const [cadet, setCadet] = useState<CadetData | null>(null)
-  const [filters, setFilters] = useState<Filters | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -56,20 +49,27 @@ export default function EditCadetPage({
   const fetchCadetAndFilters = useCallback(async () => {
     try {
       setLoading(true)
-      const [cadetRes, filtersRes] = await Promise.all([
-        fetch(`/api/cadets/${cadetId}`),
-        fetch('/api/cadets/filters')
-      ])
+      setError(null)
+
+      const token = localStorage.getItem('jwt_token')
+      if (!token) {
+        setError('Authentication required')
+        return
+      }
+
+      const cadetRes = await fetch(`/api/cadets/${cadetId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
 
       if (!cadetRes.ok) {
         notFound()
       }
 
       const cadetData = await cadetRes.json()
-      const filtersData = await filtersRes.json()
 
       setCadet(cadetData)
-      setFilters(filtersData)
 
       // Populate form with existing data
       setFormData({
@@ -114,6 +114,11 @@ export default function EditCadetPage({
         throw new Error('Name, battalion, company, and join date are required')
       }
 
+      const token = localStorage.getItem('jwt_token')
+      if (!token) {
+        throw new Error('Authentication required')
+      }
+
       // Prepare data for API
       const updateData = {
         name: formData.name,
@@ -131,6 +136,7 @@ export default function EditCadetPage({
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(updateData),
       })
@@ -151,7 +157,6 @@ export default function EditCadetPage({
   }
 
   // Get available companies for selected battalion (show all companies for editing)
-  // const availableCompanies = filters?.companies || []
 
   if (loading) {
     return (
