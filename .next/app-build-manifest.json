@@ -1,9 +1,9 @@
 {
   "pages": {
-    "/page": [
+    "/cadets/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/cadets/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -11,30 +11,35 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/dashboard/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/page.js"
-    ],
     "/cadets/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/cadets/[id]/page.js"
     ],
-    "/cadets/page": [
+    "/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/cadets/page.js"
+      "static/chunks/app/dashboard/page.js"
     ],
     "/medical-history/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/medical-history/page.js"
     ],
-    "/medical-history/[id]/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/medical-history/[id]/page.js"
+      "static/chunks/app/page.js"
+    ],
+    "/medical-records/new/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/medical-records/new/page.js"
+    ],
+    "/_not-found/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }

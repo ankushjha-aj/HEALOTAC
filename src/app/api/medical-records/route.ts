@@ -87,6 +87,13 @@ export async function POST(request: NextRequest) {
       remarks
     } = await request.json()
 
+    console.log('📝 API RECEIVED MEDICAL RECORD DATA:', {
+      cadetId,
+      dateOfReporting,
+      medicalProblem,
+      medicalStatus
+    })
+
     // Validate required fields
     if (!cadetId || !dateOfReporting || !medicalProblem) {
       return NextResponse.json(
@@ -103,6 +110,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    console.log('✅ CADET EXISTS:', cadetExists[0])
 
     // Derive total days missed from Attend C and MI Detained
     const attendCInt = attendC ? parseInt(attendC) : 0
@@ -126,7 +135,7 @@ export async function POST(request: NextRequest) {
       remarks,
     }).returning()
 
-    console.log('✅ CREATED MEDICAL RECORD:', newRecord)
+    console.log('✅ CREATED MEDICAL RECORD IN DB:', newRecord)
     return NextResponse.json(newRecord, { status: 201 })
   } catch (error) {
     console.error('❌ Error creating medical record:', error)

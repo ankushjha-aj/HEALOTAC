@@ -20,10 +20,10 @@ async function seed() {
 
     // Create sample cadets
     await sql`
-      INSERT INTO cadets (name, battalion, company, join_date, status, health_status) VALUES
-      ('Vipin Kumar', '12th Battalion', 'Alpha', '2025-06-15', 'Active', 'Fit'),
-      ('Ankush Sharma', '12th Battalion', 'Gamma', '2025-07-01', 'Active', 'Fit'),
-      ('Gaurav Singh', '12th Battalion', 'Beta', '2025-05-20', 'Active', 'Fit')
+      INSERT INTO cadets (name, battalion, company, join_date) VALUES
+      ('Vipin Kumar', '12th Battalion', 'Alpha', '2025-06-15'),
+      ('Ankush Sharma', '12th Battalion', 'Gamma', '2025-07-01'),
+      ('Gaurav Singh', '12th Battalion', 'Beta', '2025-05-20')
       ON CONFLICT DO NOTHING
     `
 
@@ -41,7 +41,7 @@ async function seed() {
       const cadet = cadets.find(c => c.name === record.cadetName)
       if (cadet) {
         await sql`
-          INSERT INTO medical_records (cadet_id, date_of_reporting, medical_problem, diagnosis, status, attend_c, training_days_missed, contact_no, remarks)
+          INSERT INTO medical_records (cadet_id, date_of_reporting, medical_problem, diagnosis, medical_status, attend_c, total_training_days_missed, contact_no, remarks)
           VALUES (${cadet.id}, '2025-09-20', ${record.problem}, ${record.diagnosis}, ${record.status}, ${record.attendC}, ${record.trainingDays}, ${record.contact}, ${record.remarks})
           ON CONFLICT DO NOTHING
         `

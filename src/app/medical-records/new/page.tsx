@@ -82,6 +82,7 @@ export default function NewMedicalRecordPage() {
     const fetchCadets = async () => {
       try {
         const token = localStorage.getItem('jwt_token')
+        console.log('🔑 CADETS API - JWT TOKEN:', token ? 'Token found' : 'No token found')
         if (!token) {
           setError('Authentication required')
           setLoadingCadets(false)
@@ -94,12 +95,18 @@ export default function NewMedicalRecordPage() {
           }
         })
 
+        console.log('📡 CADETS API RESPONSE STATUS:', response.status)
+
         if (response.ok) {
           const cadetsData = await response.json()
+          console.log('✅ CADETS FETCHED:', cadetsData.length, 'cadets')
           setCadets(cadetsData)
         } else if (response.status === 401) {
+          console.error('❌ CADETS API: Authentication failed')
           setError('Authentication required')
         } else {
+          const errorData = await response.json()
+          console.error('❌ CADETS API ERROR:', errorData)
           throw new Error('Failed to fetch cadets')
         }
       } catch (err) {
@@ -113,17 +120,55 @@ export default function NewMedicalRecordPage() {
     fetchCadets()
   }, [])
 
-  // Handle cadetId from URL query parameter
+  // Handle cadetId from URL query parameter - runs when cadets load or URL changes
   useEffect(() => {
     const cadetIdParam = searchParams.get('cadetId')
-    if (cadetIdParam && cadets.length > 0) {
+    if (cadetIdParam && !selectedCadet) {
       const cadetId = parseInt(cadetIdParam)
+
+      // First try to find in already loaded cadets
       const cadet = cadets.find(c => c.id === cadetId)
       if (cadet) {
+        console.log('🔍 Pre-selecting cadet from URL (found in loaded cadets):', cadet.name, '(ID:', cadetId, ')')
         handleCadetSelect(cadet)
+      } else if (cadets.length > 0) {
+        // Cadets are loaded but cadet not found
+        console.warn('⚠️ Cadet with ID', cadetId, 'not found in cadets list')
+      } else {
+        // Cadets not loaded yet, try to fetch this specific cadet
+        console.log('📡 Cadets not loaded yet, fetching specific cadet:', cadetId)
+        fetch(`/api/cadets/${cadetId}`)
+          .then(response => response.json())
+          .then(cadetData => {
+            if (cadetData && !cadetData.error) {
+              console.log('✅ Fetched cadet from API:', cadetData.name)
+              // Create a cadet object from the API response
+              const cadet = {
+                id: cadetData.id,
+                name: cadetData.name,
+                company: cadetData.company,
+                battalion: cadetData.battalion,
+                relegated: cadetData.relegated || 'N'
+              }
+              handleCadetSelect(cadet)
+            } else {
+              console.warn('⚠️ Cadet not found in API:', cadetId)
+            }
+          })
+          .catch(error => {
+            console.error('❌ Error fetching cadet:', error)
+          })
       }
     }
-  }, [cadets, searchParams])
+  }, [cadets, searchParams, selectedCadet])
+
+  // Additional effect to handle the case where component mounts with cadetId but cadets aren't loaded yet
+  useEffect(() => {
+    const cadetIdParam = searchParams.get('cadetId')
+    if (cadetIdParam && !loadingCadets && cadets.length === 0 && !selectedCadet) {
+      console.log('📡 Cadets not loaded yet, will retry selection when they load')
+    }
+  }, [loadingCadets, cadets.length, searchParams, selectedCadet])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -260,7 +305,7 @@ export default function NewMedicalRecordPage() {
   const validateForm = () => {
     const errors: {[key: string]: string} = {}
 
-    if (!formData.cadetId) {
+    if (!formData.cadetId || formData.cadetId.trim() === '') {
       errors.cadetId = 'Please select a cadet'
     }
 
@@ -269,7 +314,15 @@ export default function NewMedicalRecordPage() {
     }
 
     if (!formData.medicalProblem.trim()) {
-      errors.medicalProblem = 'Medical problem is required'
+      errors.medicalProblem = 'Medical problem description is required'
+    }
+
+    // Validate that selected cadet exists
+    if (formData.cadetId && !selectedCadet) {
+      const cadetExists = cadets.find(c => c.id.toString() === formData.cadetId)
+      if (!cadetExists) {
+        errors.cadetId = 'Selected cadet is not valid'
+      }
     }
 
     setFieldErrors(errors)
@@ -288,6 +341,7 @@ export default function NewMedicalRecordPage() {
 
     try {
       const token = localStorage.getItem('jwt_token')
+      console.log('🔑 JWT TOKEN RETRIEVED:', token ? 'Token found' : 'No token found')
       if (!token) {
         setError('Authentication required')
         return
@@ -309,6 +363,9 @@ export default function NewMedicalRecordPage() {
         remarks: formData.remarks,
         monitoringCase: formData.monitoringCase,
       }
+
+      console.log('📝 FRONTEND SENDING MEDICAL RECORD DATA:', submitData)
+      console.log('👤 SELECTED CADET:', selectedCadet)
 
       const response = await fetch('/api/medical-records', {
         method: 'POST',
@@ -347,7 +404,10 @@ export default function NewMedicalRecordPage() {
         }
 
         alert('Medical record added successfully!')
-        router.push('/reports')
+        // Small delay to ensure database commit is complete
+        setTimeout(() => {
+          router.push(`/cadets/${formData.cadetId}?refresh=true`)
+        }, 500)
       } else {
         setError(data.error || 'Failed to add medical record')
       }
@@ -389,7 +449,7 @@ export default function NewMedicalRecordPage() {
                     {loadingCadets ? (
                       <div className="input-field flex items-center">
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-                        Loading cadets...
+                        Loading cadets... {searchParams.get('cadetId') && 'Pre-selecting from cadet details...'}
                       </div>
                     ) : (
                       <>
@@ -476,6 +536,11 @@ export default function NewMedicalRecordPage() {
                         )}
                         - {selectedCadet.company} Company, {selectedCadet.battalion}
                       </span>
+                      {searchParams.get('cadetId') && (
+                        <div className="text-xs text-green-600 dark:text-green-400 mt-1">
+                          ✓ Pre-selected from cadet details
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

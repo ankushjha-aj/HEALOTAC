@@ -11,6 +11,8 @@ export async function GET(
   try {
     const cadetId = parseInt(params.id)
 
+    console.log(`🔍 FETCHING MEDICAL HISTORY FOR CADET ID: ${cadetId} (type: ${typeof cadetId})`)
+
     if (isNaN(cadetId)) {
       return NextResponse.json(
         { error: 'Invalid cadet ID' },
@@ -34,12 +36,37 @@ export async function GET(
       createdAt: cadetResult[0].createdAt.toISOString()
     }
 
-    // Fetch medical records for this cadet
-    const medicalRecordsResult = await db
+    console.log('✅ CADET FOUND:', cadetInfo.name)
+
+    // First, let's try a simple query to see if any records exist
+    const allRecords = await db.select().from(medicalRecords)
+    console.log(`📊 TOTAL MEDICAL RECORDS IN DB: ${allRecords.length}`)
+    console.log('📋 ALL RECORDS:', allRecords.map(r => ({ id: r.id, cadetId: r.cadetId, medicalProblem: r.medicalProblem })))
+
+    // Now query for this specific cadet - try multiple approaches
+    console.log(`🔍 SEARCHING FOR RECORDS WITH cadetId = ${cadetId} (type: ${typeof cadetId})`)
+
+    // Try a simple where query
+    const simpleQuery = await db
       .select()
       .from(medicalRecords)
       .where(eq(medicalRecords.cadetId, cadetId))
-      .orderBy(medicalRecords.dateOfReporting)
+
+    console.log(`📊 SIMPLE QUERY RESULT: ${simpleQuery.length} records`)
+
+    // Try with explicit type conversion
+    const typeQuery = await db
+      .select()
+      .from(medicalRecords)
+      .where(eq(medicalRecords.cadetId, parseInt(cadetId.toString())))
+
+    console.log(`📊 TYPE CONVERSION QUERY RESULT: ${typeQuery.length} records`)
+
+    // Use the simple query result
+    const medicalRecordsResult = simpleQuery
+
+    console.log(`📊 FINAL RESULT: ${medicalRecordsResult.length} MEDICAL RECORDS FOR CADET ${cadetId}`)
+    console.log('📋 RECORDS DETAILS:', medicalRecordsResult.map(r => ({ id: r.id, cadetId: r.cadetId, medicalProblem: r.medicalProblem })))
 
     return NextResponse.json({
       cadet: cadetInfo,

@@ -58,11 +58,26 @@ export default function CadetDetailsPage({
   const [updatingWeight, setUpdatingWeight] = useState(false)
 
   useEffect(() => {
+    console.log(`🔄 USEEFFECT TRIGGERED: cadetId=${cadetId}`)
     fetchCadetData()
   }, [cadetId])
 
+  // Check for refresh parameter on mount to trigger data refresh
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    if (urlParams.get('refresh') === 'true') {
+      console.log('🔄 DETECTED REFRESH PARAMETER - refreshing data directly')
+      // Remove the refresh parameter from URL
+      const newUrl = window.location.pathname
+      window.history.replaceState({}, '', newUrl)
+      // Trigger refresh directly
+      fetchCadetData()
+    }
+  }, [])
+
   const fetchCadetData = async () => {
     try {
+      console.log(`📡 FETCHING CADET DATA for cadet ${cadetId}`)
       setLoading(true)
       setError(null)
 
@@ -70,9 +85,7 @@ export default function CadetDetailsPage({
         fetch(`/api/cadets/${cadetId}`, {
           credentials: 'include'
         }),
-        fetch(`/api/medical-history/${cadetId}`, {
-          credentials: 'include'
-        })
+        fetch(`/api/medical-history/${cadetId}`)
       ])
 
       if (!cadetRes.ok) {
@@ -80,13 +93,19 @@ export default function CadetDetailsPage({
       }
 
       const cadetData: CadetInfo = await cadetRes.json()
-      const { records: medicalRecordsResult } = recordsRes.ok ? await recordsRes.json() : { records: [] }
+      const recordsResponse = recordsRes.ok ? await recordsRes.json() : { records: [] }
+      const { records: medicalRecordsResult } = recordsResponse
+
+      console.log(`✅ RECEIVED CADET DATA:`, cadetData)
+      console.log(`✅ RAW RECORDS RESPONSE:`, recordsResponse)
+      console.log(`✅ RECEIVED MEDICAL RECORDS:`, medicalRecordsResult.length, 'records')
+      console.log(`✅ RECORDS RESPONSE STATUS:`, recordsRes.status, recordsRes.ok)
 
       setCadetInfo(cadetData)
       setMedicalRecords(medicalRecordsResult)
       setWeightInput(cadetData.weight?.toString() || '')
     } catch (err) {
-      console.error('Error loading cadet details:', err)
+      console.error('❌ Error loading cadet details:', err)
       setError(err instanceof Error ? err.message : 'Failed to load cadet details')
     } finally {
       setLoading(false)
