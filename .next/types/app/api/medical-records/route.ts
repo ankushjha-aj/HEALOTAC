@@ -1,4 +1,4 @@
-// File: C:\Users\Ankush\Desktop\CURACADET\src\app\api\medical-records\route.ts
+// File: /Users/ankushjha/Desktop/CURACADET/src/app/api/medical-records/route.ts
 import * as entry from '../../../../../src/app/api/medical-records/route.js'
 import type { NextRequest } from 'next/server.js'
 

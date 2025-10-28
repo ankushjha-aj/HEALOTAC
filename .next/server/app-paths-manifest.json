@@ -1,5 +1,7 @@
 {
   "/page": "app/page.js",
+  "/api/auth/login/route": "app/api/auth/login/route.js",
   "/dashboard/page": "app/dashboard/page.js",
-  "/medical-history/page": "app/medical-history/page.js"
+  "/api/cadets/route": "app/api/cadets/route.js",
+  "/api/medical-records/route": "app/api/medical-records/route.js"
 }

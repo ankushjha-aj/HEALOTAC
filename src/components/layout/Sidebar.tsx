@@ -50,7 +50,6 @@ export default function Sidebar() {
           <ArmyShieldIcon className="w-8 h-8 text-primary" />
           <div>
             <h1 className="text-lg font-bold text-gray-900 dark:text-white">HEALOTAC</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Attendant Portal</p>
           </div>
         </div>
       </div>

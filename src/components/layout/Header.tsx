@@ -50,7 +50,7 @@ export default function Header() {
             <div className="flex items-center gap-3">
               <ArmyShieldIcon className="w-8 h-8 text-primary" />
               <h1 className="text-lg font-bold text-gray-900 dark:text-white">
-                Indian Army Medical Record for OTA Chennai
+                Medical Record for OTA Chennai
               </h1>
             </div>
           </div>

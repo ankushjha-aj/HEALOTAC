@@ -78,7 +78,7 @@ export default function LoginPage() {
             HEALOTAC
           </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Indian Army Medical Records Management System
+            Medical Records Management System
           </p>
         </div>
 
