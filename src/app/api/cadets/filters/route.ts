@@ -11,7 +11,6 @@ export async function GET() {
     // Extract unique values from actual database records
     const battalions = [...new Set(allCadets.map(c => c.battalion))].sort()
     const companies = [...new Set(allCadets.map(c => c.company))].sort()
-    const statuses = [...new Set(allCadets.map(c => c.status))].sort()
 
     // Group companies by battalion based on actual data
     const companiesByBattalion = allCadets.reduce((acc, cadet) => {
@@ -32,14 +31,12 @@ export async function GET() {
     const filters = {
       battalions,
       companies,
-      statuses,
       companiesByBattalion
     }
 
     console.log('📊 FETCHED FILTERS FROM DATABASE:', {
       battalions: filters.battalions.length,
       companies: filters.companies.length,
-      statuses: filters.statuses.length,
       battalionsList: filters.battalions,
       totalCadets: allCadets.length
     })
@@ -52,7 +49,6 @@ export async function GET() {
     const emptyFilters = {
       battalions: [],
       companies: [],
-      statuses: [],
       companiesByBattalion: {}
     }
 

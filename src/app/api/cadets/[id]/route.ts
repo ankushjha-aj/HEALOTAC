@@ -40,7 +40,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { name, battalion, company, joinDate, status, academyNumber, height, weight, age, course, sex } = await request.json()
+    const { name, battalion, company, joinDate, academyNumber, height, weight, age, course, sex } = await request.json()
 
     const [updatedCadet] = await db
       .update(cadets)
@@ -49,7 +49,6 @@ export async function PUT(
         battalion,
         company,
         joinDate: joinDate ? new Date(joinDate) : undefined,
-        status,
         academyNumber: academyNumber ? parseInt(academyNumber) : undefined,
         height: typeof height === 'number' ? height : height ? parseInt(height) : undefined,
         weight: typeof weight === 'number' ? weight : weight ? parseInt(weight) : undefined,

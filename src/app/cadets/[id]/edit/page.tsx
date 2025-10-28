@@ -13,7 +13,6 @@ interface CadetData {
   battalion: string
   company: string
   joinDate: string
-  status: string
   height?: number
   weight?: number
   age?: number
@@ -24,7 +23,6 @@ interface CadetData {
 interface Filters {
   battalions: string[]
   companies: string[]
-  statuses: string[]
   companiesByBattalion: Record<string, string[]>
 }
 

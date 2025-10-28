@@ -108,8 +108,8 @@ export default function MedicalHistoryPage({
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               {error || 'Medical history not found'}
             </h2>
-            <Link href="/dashboard" className="text-primary hover:text-primary/80">
-              Return to Dashboard
+            <Link href="/medical-history" className="text-primary hover:text-primary/80">
+              Return to Medical History
             </Link>
           </div>
         </div>
@@ -123,11 +123,11 @@ export default function MedicalHistoryPage({
         {/* Header */}
         <div className="flex items-center gap-4">
           <Link
-            href="/dashboard"
+            href="/medical-history"
             className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
+            Back to Medical History
           </Link>
         </div>
 

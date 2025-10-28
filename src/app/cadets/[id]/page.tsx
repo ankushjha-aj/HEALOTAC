@@ -30,7 +30,7 @@ interface MedicalRecord {
   dateOfReporting: string
   medicalProblem: string
   diagnosis?: string
-  status: string
+  medicalStatus: string
   attendC: number
   miDetained: number
   exPpg: number
@@ -161,8 +161,8 @@ export default function CadetDetailsPage({
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               {error || 'Cadet not found'}
             </h2>
-            <Link href="/dashboard" className="text-primary hover:text-primary/80">
-              Return to Dashboard
+            <Link href="/cadets" className="text-primary hover:text-primary/80">
+              Return to Cadets Page
             </Link>
           </div>
         </div>
@@ -176,11 +176,11 @@ export default function CadetDetailsPage({
           {/* Header */}
           <div className="flex items-center justify-between">
             <Link
-              href="/dashboard"
+              href="/cadets"
               className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
+              Back to Cadets
             </Link>
 
             <div className="text-right">

@@ -21,25 +21,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/cadets/[id]/page.js"
     ],
-    "/medical-history/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/medical-history/page.js"
-    ],
-    "/cadets/[id]/edit/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/cadets/[id]/edit/page.js"
-    ],
     "/cadets/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/cadets/page.js"
     ],
-    "/reports/page": [
+    "/medical-history/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/reports/page.js"
+      "static/chunks/app/medical-history/page.js"
     ],
     "/medical-history/[id]/page": [
       "static/chunks/webpack.js",
