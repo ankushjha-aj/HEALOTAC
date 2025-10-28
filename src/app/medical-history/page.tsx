@@ -420,7 +420,7 @@ export default function MedicalHistoryPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Link
-                          href={`/medical-history/${record.cadetId}`}
+                          href={`/cadets/${record.cadetId}`}
                           className="text-primary hover:text-primary/80 font-medium text-sm"
                         >
                           View Details

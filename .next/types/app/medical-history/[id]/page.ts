@@ -1,4 +1,4 @@
-// File: /Users/ankushjha/Desktop/CURACADET/src/app/medical-history/[id]/page.tsx
+// File: C:\Users\Ankush\Desktop\CURACADET\src\app\medical-history\[id]\page.tsx
 import * as entry from '../../../../../src/app/medical-history/[id]/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

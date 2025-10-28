@@ -2,12 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { cadets, medicalRecords } from '@/lib/schema'
 import { eq } from 'drizzle-orm'
+import { createAuthMiddleware } from '@/lib/auth'
 
 // GET /api/cadets/[id] - Get single cadet
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // Check authentication
+  const authError = createAuthMiddleware(['admin', 'user'])(request)
+  if (authError) return authError
+
   try {
     const cadetId = parseInt(params.id)
 

@@ -104,6 +104,7 @@ export async function POST(request: NextRequest) {
 
     // Verify cadet exists
     const cadetExists = await db.select().from(cadets).where(eq(cadets.id, parseInt(cadetId))).limit(1)
+    
     if (cadetExists.length === 0) {
       return NextResponse.json(
         { error: 'Selected cadet does not exist' },

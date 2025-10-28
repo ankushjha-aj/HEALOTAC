@@ -82,11 +82,23 @@ export default function CadetDetailsPage({
       setLoading(true)
       setError(null)
 
+      const token = localStorage.getItem('jwt_token')
+      if (!token) {
+        setError('Authentication required')
+        return
+      }
+
+      const headers = {
+        'Authorization': `Bearer ${token}`
+      }
+
       const [cadetRes, recordsRes] = await Promise.all([
         fetch(`/api/cadets/${cadetId}`, {
-          credentials: 'include'
+          headers
         }),
-        fetch(`/api/medical-history/${cadetId}`)
+        fetch(`/api/medical-history/${cadetId}`, {
+          headers
+        })
       ])
 
       if (!cadetRes.ok) {
@@ -419,12 +431,6 @@ export default function CadetDetailsPage({
                         title="Add another medical record"
                       >
                         <Plus className="h-4 w-4" />
-                      </Link>
-                      <Link
-                        href={`/medical-history/${cadetId}`}
-                        className="text-primary hover:text-primary/80 text-sm"
-                      >
-                        View Timeline →
                       </Link>
                     </div>
                   </div>
