@@ -26,6 +26,7 @@ interface Cadet {
   academyNumber?: number
   createdAt: string
   relegated?: string
+  course?: string
 }
 
 // Interface for Filters
@@ -159,6 +160,7 @@ export default function CadetsPage() {
     return (
       cadet.name.toLowerCase().includes(searchLower) ||
       (cadet.academyNumber && cadet.academyNumber.toString().includes(searchLower)) ||
+      (cadet.course && cadet.course.toLowerCase().includes(searchLower)) ||
       cadet.battalion.toLowerCase().includes(searchLower) ||
       cadet.company.toLowerCase().includes(searchLower) ||
       joinDateFormatted.toLowerCase().includes(searchLower)
@@ -235,7 +237,7 @@ export default function CadetsPage() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search by name, academy number, battalion, company, or join date..."
+                placeholder="Search by name, academy number, course, battalion, company, or join date..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="input-field"
@@ -271,6 +273,9 @@ export default function CadetsPage() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Academy Number
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Course
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Join Date
@@ -330,6 +335,11 @@ export default function CadetsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {cadet.academyNumber || 'N/A'}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {cadet.course || 'N/A'}
                       </p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
