@@ -179,7 +179,7 @@ export default function MedicalHistoryPage() {
               <Eye className="h-8 w-8 text-red-500" />
               <div>
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {medicalRecords.filter(r => r.monitoringCase).length}
+                  {medicalRecords.filter(r => r.monitoringCase && r.medicalStatus === 'Active').length}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Monitoring Cases</div>
               </div>
