@@ -30,51 +30,6 @@ interface MedicalRecordsListProps {
 
 export default function MedicalRecordsList({ records: initialRecords, cadetId }: MedicalRecordsListProps) {
   const [records, setRecords] = useState<MedicalRecord[]>(initialRecords)
-  const [updatingRecordId, setUpdatingRecordId] = useState<number | null>(null)
-
-  const handleStatusUpdate = async (recordId: number, newStatus: string) => {
-    // Show confirmation dialog
-    const confirmed = confirm(`Are you sure you want to mark this medical record as ${newStatus.toLowerCase()}?`)
-    if (!confirmed) return
-
-    setUpdatingRecordId(recordId)
-
-    try {
-      const token = localStorage.getItem('jwt_token')
-      if (!token) {
-        alert('Authentication required')
-        return
-      }
-
-      const response = await fetch(`/api/medical-records/${recordId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ medicalStatus: newStatus }),
-      })
-
-      if (response.ok) {
-        // Update the local state immediately to show the new status
-        setRecords(prevRecords =>
-          prevRecords.map(record =>
-            record.id === recordId
-              ? { ...record, medicalStatus: newStatus }
-              : record
-          )
-        )
-      } else {
-        const error = await response.json()
-        alert(`Failed to update status: ${error.error || 'Unknown error'}`)
-      }
-    } catch (error) {
-      console.error('Error updating status:', error)
-      alert('Failed to update medical record status')
-    } finally {
-      setUpdatingRecordId(null)
-    }
-  }
 
   return (
     <div className="space-y-4">
@@ -97,45 +52,6 @@ export default function MedicalRecordsList({ records: initialRecords, cadetId }:
               </div>
             </div>
             <div className="flex gap-2 items-center">
-              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                record.medicalStatus === 'Active'
-                  ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                  : record.medicalStatus === 'Completed'
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                  : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-              }`}>
-                {record.medicalStatus}
-              </span>
-              {record.medicalStatus === 'Active' && (
-                <button
-                  onClick={() => handleStatusUpdate(record.id, 'Completed')}
-                  disabled={updatingRecordId === record.id}
-                  className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed transition-colors"
-                  title="Mark as completed"
-                >
-                  {updatingRecordId === record.id ? (
-                    <>
-                      <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Updating...
-                    </>
-                  ) : (
-                    <>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                      Complete
-                    </>
-                  )}
-                </button>
-              )}
-              {record.monitoringCase && (
-                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
-                  Monitoring Case
-                </span>
-              )}
             </div>
           </div>
 

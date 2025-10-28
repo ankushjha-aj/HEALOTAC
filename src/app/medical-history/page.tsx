@@ -30,6 +30,7 @@ export default function MedicalHistoryPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [currentDateTime, setCurrentDateTime] = useState<string>('')
+  const [updatingRecordId, setUpdatingRecordId] = useState<number | null>(null)
 
   useEffect(() => {
     const fetchMedicalRecords = async () => {
@@ -76,6 +77,50 @@ export default function MedicalHistoryPage() {
 
     return () => clearInterval(interval)
   }, [])
+
+  const handleStatusUpdate = async (recordId: number, newStatus: string) => {
+    // Show confirmation dialog
+    const confirmed = confirm(`Are you sure you want to mark this medical record as ${newStatus.toLowerCase()}?`)
+    if (!confirmed) return
+
+    setUpdatingRecordId(recordId)
+
+    try {
+      const token = localStorage.getItem('jwt_token')
+      if (!token) {
+        alert('Authentication required')
+        return
+      }
+
+      const response = await fetch(`/api/medical-records/${recordId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ medicalStatus: newStatus }),
+      })
+
+      if (response.ok) {
+        // Update the local state immediately to show the new status
+        setMedicalRecords(prevRecords =>
+          prevRecords.map(record =>
+            record.id === recordId
+              ? { ...record, medicalStatus: newStatus }
+              : record
+          )
+        )
+      } else {
+        const error = await response.json()
+        alert(`Failed to update status: ${error.error || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Error updating status:', error)
+      alert('Failed to update medical record status')
+    } finally {
+      setUpdatingRecordId(null)
+    }
+  }
 
   // Filter records based on search and status
   const filteredRecords = medicalRecords.filter(record => {
@@ -325,15 +370,53 @@ export default function MedicalHistoryPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          record.medicalStatus === 'Active'
-                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                            : record.medicalStatus === 'Completed'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-                        }`}>
-                          {record.medicalStatus}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            record.medicalStatus === 'Active'
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                              : record.medicalStatus === 'Completed'
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                          }`}>
+                            {record.medicalStatus}
+                          </span>
+                          <div className="flex gap-1">
+                            {record.medicalStatus !== 'Active' && (
+                              <button
+                                onClick={() => handleStatusUpdate(record.id, 'Active')}
+                                disabled={updatingRecordId === record.id}
+                                className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-yellow-600 text-white rounded hover:bg-yellow-700 disabled:bg-yellow-400 disabled:cursor-not-allowed transition-colors"
+                                title="Mark as Active"
+                              >
+                                {updatingRecordId === record.id ? (
+                                  <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                ) : (
+                                  'A'
+                                )}
+                              </button>
+                            )}
+                            {record.medicalStatus !== 'Completed' && (
+                              <button
+                                onClick={() => handleStatusUpdate(record.id, 'Completed')}
+                                disabled={updatingRecordId === record.id}
+                                className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed transition-colors"
+                                title="Mark as Completed"
+                              >
+                                {updatingRecordId === record.id ? (
+                                  <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                ) : (
+                                  'C'
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Link
