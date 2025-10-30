@@ -1,0 +1,26 @@
+name: 🚀 Deploy Codebase to Hetzner Server (HEALOTAC)
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🧩 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔑 Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HETZNER_SSH_KEY }}" > ~/.ssh/hetzner_key
+          chmod 600 ~/.ssh/hetzner_key
+          ssh-keyscan -H ${{ secrets.HETZNER_SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: 📂 Copy codebase to Hetzner
+        run: |
+          echo "Deploying to /root/HEALOTAC on ${{ secrets.HETZNER_SERVER_IP }} ..."
+          rsync -avz --delete -e "ssh -i ~/.ssh/hetzner_key" ./ root@${{ secrets.HETZNER_SERVER_IP }}:/root/HEALOTAC/
