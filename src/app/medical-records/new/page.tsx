@@ -13,6 +13,7 @@ interface Cadet {
   name: string
   company: string
   battalion: string
+  academyNumber?: number | null
   relegated?: string
 }
 
@@ -227,7 +228,8 @@ function NewMedicalRecordPageInner() {
     cadetSearchTerm.trim() !== '' && (
       cadet.name.toLowerCase().includes(cadetSearchTerm.toLowerCase()) ||
       cadet.company.toLowerCase().includes(cadetSearchTerm.toLowerCase()) ||
-      cadet.battalion.toLowerCase().includes(cadetSearchTerm.toLowerCase())
+      cadet.battalion.toLowerCase().includes(cadetSearchTerm.toLowerCase()) ||
+      (cadet.academyNumber && cadet.academyNumber.toString().includes(cadetSearchTerm))
     )
   )
 
@@ -455,7 +457,7 @@ function NewMedicalRecordPageInner() {
                       <>
                         <input
                           type="text"
-                          placeholder="Search for existing cadet by name, company, or battalion..."
+                          placeholder="Search for existing cadet by name, company, battalion, or academy number..."
                           value={cadetSearchTerm}
                           onChange={handleCadetSearch}
                           onFocus={handleCadetFocus}
