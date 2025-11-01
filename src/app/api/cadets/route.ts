@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server' 
 import { db } from '@/lib/db'
 import { cadets } from '@/lib/schema'
 import { createAuthMiddleware } from '@/lib/auth'
