@@ -29,7 +29,21 @@ export async function POST(request: NextRequest) {
   if (authError) return authError
 
   try {
-    const { name, battalion, company, joinDate, academyNumber, height, weight, age, course, sex, relegated } = await request.json()
+    const {
+      name, battalion, company, joinDate, academyNumber, height, weight, age, course, sex, relegated,
+      // Health Parameters
+      bloodGroup, bmi, bodyFat, calcanealBoneDensity, bp, pulse, so2, bcaFat, ecg, temp, smmKg,
+      // Vaccination Status
+      covidDose1, covidDose2, covidDose3, hepatitisBDose1, hepatitisBDose2, tetanusToxoid,
+      chickenPoxDose1, chickenPoxDose2, chickenPoxSuffered, yellowFever, pastMedicalHistory,
+      // Tests
+      enduranceTest, agilityTest, speedTest,
+      // Strength Tests
+      verticalJump, ballThrow, lowerBackStrength, shoulderDynamometerLeft, shoulderDynamometerRight,
+      handGripDynamometerLeft, handGripDynamometerRight,
+      // Overall Assessment
+      overallAssessment
+    } = await request.json()
 
     // Validate required fields
     if (!name || !battalion || !company || !joinDate) {
@@ -51,6 +65,44 @@ export async function POST(request: NextRequest) {
       course: course ? course.toString() : null,
       sex: sex || null,
       relegated: relegated || 'N',
+      // Health Parameters
+      bloodGroup: bloodGroup || null,
+      bmi: bmi || null,
+      bodyFat: bodyFat || null,
+      calcanealBoneDensity: calcanealBoneDensity || null,
+      bp: bp || null,
+      pulse: pulse || null,
+      so2: so2 || null,
+      bcaFat: bcaFat || null,
+      ecg: ecg || null,
+      temp: temp || null,
+      smmKg: smmKg || null,
+      // Vaccination Status
+      covidDose1: covidDose1 !== undefined ? covidDose1 : false,
+      covidDose2: covidDose2 !== undefined ? covidDose2 : false,
+      covidDose3: covidDose3 !== undefined ? covidDose3 : false,
+      hepatitisBDose1: hepatitisBDose1 !== undefined ? hepatitisBDose1 : false,
+      hepatitisBDose2: hepatitisBDose2 !== undefined ? hepatitisBDose2 : false,
+      tetanusToxoid: tetanusToxoid !== undefined ? tetanusToxoid : false,
+      chickenPoxDose1: chickenPoxDose1 !== undefined ? chickenPoxDose1 : false,
+      chickenPoxDose2: chickenPoxDose2 !== undefined ? chickenPoxDose2 : false,
+      chickenPoxSuffered: chickenPoxSuffered !== undefined ? chickenPoxSuffered : false,
+      yellowFever: yellowFever !== undefined ? yellowFever : false,
+      pastMedicalHistory: pastMedicalHistory || null,
+      // Tests
+      enduranceTest: enduranceTest || null,
+      agilityTest: agilityTest || null,
+      speedTest: speedTest || null,
+      // Strength Tests
+      verticalJump: verticalJump || null,
+      ballThrow: ballThrow || null,
+      lowerBackStrength: lowerBackStrength || null,
+      shoulderDynamometerLeft: shoulderDynamometerLeft || null,
+      shoulderDynamometerRight: shoulderDynamometerRight || null,
+      handGripDynamometerLeft: handGripDynamometerLeft || null,
+      handGripDynamometerRight: handGripDynamometerRight || null,
+      // Overall Assessment
+      overallAssessment: overallAssessment || null,
     }).returning()
 
     console.log('✅ CREATED CADET:', newCadet)

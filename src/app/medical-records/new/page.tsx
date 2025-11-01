@@ -13,7 +13,13 @@ interface Cadet {
   name: string
   company: string
   battalion: string
+  joinDate?: string
   academyNumber?: number | null
+  height?: number | null
+  weight?: number | null
+  age?: number | null
+  course?: string | null
+  sex?: string | null
   relegated?: string
 }
 
@@ -29,6 +35,44 @@ interface CadetFormData {
   course?: string
   sex?: string
   relegated?: string
+  // Health Parameters
+  bloodGroup?: string
+  bmi?: string
+  bodyFat?: string
+  calcanealBoneDensity?: string
+  bp?: string
+  pulse?: string
+  so2?: string
+  bcaFat?: string
+  ecg?: string
+  temp?: string
+  smmKg?: string
+  // Vaccination Status
+  covidDose1?: boolean
+  covidDose2?: boolean
+  covidDose3?: boolean
+  hepatitisBDose1?: boolean
+  hepatitisBDose2?: boolean
+  tetanusToxoid?: boolean
+  chickenPoxDose1?: boolean
+  chickenPoxDose2?: boolean
+  chickenPoxSuffered?: boolean
+  yellowFever?: boolean
+  pastMedicalHistory?: string
+  // Tests
+  enduranceTest?: string
+  agilityTest?: string
+  speedTest?: string
+  // Strength Tests
+  verticalJump?: string
+  ballThrow?: string
+  lowerBackStrength?: string
+  shoulderDynamometerLeft?: string
+  shoulderDynamometerRight?: string
+  handGripDynamometerLeft?: string
+  handGripDynamometerRight?: string
+  // Overall Assessment
+  overallAssessment?: string
 }
 
 function NewMedicalRecordPageInner() {
@@ -72,6 +116,44 @@ function NewMedicalRecordPageInner() {
     course: '',
     sex: '',
     relegated: 'N',
+    // Health Parameters
+    bloodGroup: '',
+    bmi: '',
+    bodyFat: '',
+    calcanealBoneDensity: '',
+    bp: '',
+    pulse: '',
+    so2: '',
+    bcaFat: '',
+    ecg: '',
+    temp: '',
+    smmKg: '',
+    // Vaccination Status
+    covidDose1: false,
+    covidDose2: false,
+    covidDose3: false,
+    hepatitisBDose1: false,
+    hepatitisBDose2: false,
+    tetanusToxoid: false,
+    chickenPoxDose1: false,
+    chickenPoxDose2: false,
+    chickenPoxSuffered: false,
+    yellowFever: false,
+    pastMedicalHistory: '',
+    // Tests
+    enduranceTest: '',
+    agilityTest: '',
+    speedTest: '',
+    // Strength Tests
+    verticalJump: '',
+    ballThrow: '',
+    lowerBackStrength: '',
+    shoulderDynamometerLeft: '',
+    shoulderDynamometerRight: '',
+    handGripDynamometerLeft: '',
+    handGripDynamometerRight: '',
+    // Overall Assessment
+    overallAssessment: '',
   })
 
   const [cadetError, setCadetError] = useState<string | null>(null)
@@ -233,11 +315,13 @@ function NewMedicalRecordPageInner() {
     )
   )
 
-  const handleCadetFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+  const handleCadetFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target
+    const checked = (e.target as HTMLInputElement).checked
+
     setCadetFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }))
   }
 
@@ -290,6 +374,44 @@ function NewMedicalRecordPageInner() {
           course: '',
           sex: '',
           relegated: 'N',
+          // Health Parameters
+          bloodGroup: '',
+          bmi: '',
+          bodyFat: '',
+          calcanealBoneDensity: '',
+          bp: '',
+          pulse: '',
+          so2: '',
+          bcaFat: '',
+          ecg: '',
+          temp: '',
+          smmKg: '',
+          // Vaccination Status
+          covidDose1: false,
+          covidDose2: false,
+          covidDose3: false,
+          hepatitisBDose1: false,
+          hepatitisBDose2: false,
+          tetanusToxoid: false,
+          chickenPoxDose1: false,
+          chickenPoxDose2: false,
+          chickenPoxSuffered: false,
+          yellowFever: false,
+          pastMedicalHistory: '',
+          // Tests
+          enduranceTest: '',
+          agilityTest: '',
+          speedTest: '',
+          // Strength Tests
+          verticalJump: '',
+          ballThrow: '',
+          lowerBackStrength: '',
+          shoulderDynamometerLeft: '',
+          shoulderDynamometerRight: '',
+          handGripDynamometerLeft: '',
+          handGripDynamometerRight: '',
+          // Overall Assessment
+          overallAssessment: '',
         })
 
         alert('Cadet added successfully!')
@@ -554,6 +676,148 @@ function NewMedicalRecordPageInner() {
                 )}
               </div>
 
+              {/* Demographics Section - Display selected cadet's info */}
+              {selectedCadet && (
+                <div className="md:col-span-2">
+                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                    Cadet Demographics
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {/* Battalion */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Battalion
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedCadet.battalion}
+                          readOnly
+                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Company */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Company
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedCadet.company}
+                          readOnly
+                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Academy Number */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Academy Number
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedCadet.academyNumber || 'N/A'}
+                          readOnly
+                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Join Date */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Join Date
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedCadet.joinDate ? new Date(selectedCadet.joinDate).toLocaleDateString() : 'N/A'}
+                          readOnly
+                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Height */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Height (cm)
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedCadet.height ? `${selectedCadet.height} cm` : 'N/A'}
+                          readOnly
+                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Weight */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Weight (kg)
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedCadet.weight ? `${selectedCadet.weight} kg` : 'N/A'}
+                          readOnly
+                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Age */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Age
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedCadet.age || 'N/A'}
+                          readOnly
+                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Course */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Course
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedCadet.course || 'N/A'}
+                          readOnly
+                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Sex */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Sex
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedCadet.sex || 'N/A'}
+                          readOnly
+                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        />
+                      </div>
+
+                      {/* Relegated */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Relegated
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedCadet.relegated === 'Y' ? 'Yes' : 'No'}
+                          readOnly
+                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* 2. Date of reporting */}
               <div>
                 <label htmlFor="dateOfReporting" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -806,7 +1070,7 @@ function NewMedicalRecordPageInner() {
       {/* Add Cadet Modal */}
       {showAddCadetModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
@@ -846,182 +1110,730 @@ function NewMedicalRecordPageInner() {
                     />
                   </div>
 
-                  {/* Battalion */}
-                  <div>
-                    <label htmlFor="cadetBattalion" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Battalion *
-                    </label>
-                    <select
-                      id="cadetBattalion"
-                      name="battalion"
-                      required
-                      value={cadetFormData.battalion}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                    >
-                      <option value="">Select battalion...</option>
-                      <option value="Shivaji">Shivaji</option>
-                      <option value="Ranjit Singh">Ranjit Singh</option>
-                    </select>
+                  {/* Demographics Section */}
+                  <div className="col-span-full">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                      Demographics
+                    </h4>
+                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                      <div className="grid grid-cols-2 gap-4">
+                        {/* Battalion */}
+                        <div>
+                          <label htmlFor="cadetBattalion" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Battalion *
+                          </label>
+                          <select
+                            id="cadetBattalion"
+                            name="battalion"
+                            required
+                            value={cadetFormData.battalion}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                          >
+                            <option value="">Select battalion...</option>
+                            <option value="Shivaji">Shivaji</option>
+                            <option value="Ranjit Singh">Ranjit Singh</option>
+                          </select>
+                        </div>
+
+                        {/* Company */}
+                        <div>
+                          <label htmlFor="cadetCompany" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Company *
+                          </label>
+                          <select
+                            id="cadetCompany"
+                            name="company"
+                            required
+                            value={cadetFormData.company}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                          >
+                            <option value="">Select company...</option>
+                            <option value="M">M</option>
+                            <option value="N">N</option>
+                            <option value="Z">Z</option>
+                            <option value="J">J</option>
+                            <option value="K">K</option>
+                            <option value="P">P</option>
+                          </select>
+                        </div>
+
+                        {/* Academy Number */}
+                        <div>
+                          <label htmlFor="academyNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Academy Number
+                          </label>
+                          <input
+                            type="number"
+                            id="academyNumber"
+                            name="academyNumber"
+                            value={cadetFormData.academyNumber}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 12345"
+                            min={1}
+                          />
+                        </div>
+
+                        {/* Join Date */}
+                        <div>
+                          <label htmlFor="cadetJoinDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Join Date *
+                          </label>
+                          <input
+                            type="date"
+                            id="cadetJoinDate"
+                            name="joinDate"
+                            required
+                            value={cadetFormData.joinDate}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                          />
+                        </div>
+
+                        {/* Height (cm) */}
+                        <div>
+                          <label htmlFor="height" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Height (cm)
+                          </label>
+                          <input
+                            type="number"
+                            id="height"
+                            name="height"
+                            min={0}
+                            value={cadetFormData.height}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 175"
+                          />
+                        </div>
+
+                        {/* Weight (kg) */}
+                        <div>
+                          <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Weight (kg)
+                          </label>
+                          <input
+                            type="number"
+                            id="weight"
+                            name="weight"
+                            min={0}
+                            value={cadetFormData.weight}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 68"
+                          />
+                        </div>
+
+                        {/* Age */}
+                        <div>
+                          <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Age
+                          </label>
+                          <input
+                            type="number"
+                            id="age"
+                            name="age"
+                            min={0}
+                            value={cadetFormData.age}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 21"
+                          />
+                        </div>
+
+                        {/* Course */}
+                        <div>
+                          <label htmlFor="course" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Course
+                          </label>
+                          <input
+                            type="number"
+                            id="course"
+                            name="course"
+                            min={1}
+                            value={cadetFormData.course}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 1, 2, 3"
+                          />
+                        </div>
+
+                        {/* Sex */}
+                        <div>
+                          <label htmlFor="sex" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Sex
+                          </label>
+                          <select
+                            id="sex"
+                            name="sex"
+                            value={cadetFormData.sex}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                          >
+                            <option value="">Select...</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                          </select>
+                        </div>
+
+                        {/* Relegated */}
+                        <div>
+                          <label htmlFor="relegated" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Relegated
+                          </label>
+                          <select
+                            id="relegated"
+                            name="relegated"
+                            value={cadetFormData.relegated}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                          >
+                            <option value="N">N</option>
+                            <option value="Y">Y</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Company */}
-                  <div>
-                    <label htmlFor="cadetCompany" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Company *
-                    </label>
-                    <select
-                      id="cadetCompany"
-                      name="company"
-                      required
-                      value={cadetFormData.company}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                    >
-                      <option value="">Select company...</option>
-                      <option value="M">M</option>
-                      <option value="N">N</option>
-                      <option value="Z">Z</option>
-                      <option value="J">J</option>
-                      <option value="K">K</option>
-                      <option value="P">P</option>
-                    </select>
+                  {/* Health Parameters Section */}
+                  <div className="col-span-full">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                      Health Parameters
+                    </h4>
+                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label htmlFor="bloodGroup" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Blood Group
+                          </label>
+                          <input
+                            type="text"
+                            id="bloodGroup"
+                            name="bloodGroup"
+                            value={cadetFormData.bloodGroup}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., O+, A-"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="bmi" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            BMI
+                          </label>
+                          <input
+                            type="text"
+                            id="bmi"
+                            name="bmi"
+                            value={cadetFormData.bmi}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 22.5"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="bodyFat" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Body Fat %
+                          </label>
+                          <input
+                            type="text"
+                            id="bodyFat"
+                            name="bodyFat"
+                            value={cadetFormData.bodyFat}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 15.2"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="calcanealBoneDensity" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Calcaneal Bone Density
+                          </label>
+                          <input
+                            type="text"
+                            id="calcanealBoneDensity"
+                            name="calcanealBoneDensity"
+                            value={cadetFormData.calcanealBoneDensity}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 0.85"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="bp" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            BP
+                          </label>
+                          <input
+                            type="text"
+                            id="bp"
+                            name="bp"
+                            value={cadetFormData.bp}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 120/80"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="pulse" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Pulse
+                          </label>
+                          <input
+                            type="text"
+                            id="pulse"
+                            name="pulse"
+                            value={cadetFormData.pulse}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 72"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="so2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            SO2
+                          </label>
+                          <input
+                            type="text"
+                            id="so2"
+                            name="so2"
+                            value={cadetFormData.so2}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 98"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="bcaFat" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            BCA Fat (%)
+                          </label>
+                          <input
+                            type="text"
+                            id="bcaFat"
+                            name="bcaFat"
+                            value={cadetFormData.bcaFat}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 12.3"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="ecg" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            ECG
+                          </label>
+                          <input
+                            type="text"
+                            id="ecg"
+                            name="ecg"
+                            value={cadetFormData.ecg}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="Normal/Abnormal"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="temp" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Temperature (TEMP)
+                          </label>
+                          <input
+                            type="text"
+                            id="temp"
+                            name="temp"
+                            value={cadetFormData.temp}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 98.6"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="smmKg" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            SMM (KG)
+                          </label>
+                          <input
+                            type="text"
+                            id="smmKg"
+                            name="smmKg"
+                            value={cadetFormData.smmKg}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 35.2"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Academy Number */}
-                  <div>
-                    <label htmlFor="academyNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Academy Number
-                    </label>
-                    <input
-                      type="number"
-                      id="academyNumber"
-                      name="academyNumber"
-                      value={cadetFormData.academyNumber}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                      placeholder="e.g., 12345"
-                      min={1}
-                    />
+                  {/* Vaccination Status Section */}
+                  <div className="col-span-full">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                      Vaccination Status
+                    </h4>
+                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Covid Vaccine:</h5>
+                        <div className="flex gap-4">
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              name="covidDose1"
+                              checked={cadetFormData.covidDose1}
+                              onChange={handleCadetFormChange}
+                              className="mr-2"
+                            />
+                            1st Dose
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              name="covidDose2"
+                              checked={cadetFormData.covidDose2}
+                              onChange={handleCadetFormChange}
+                              className="mr-2"
+                            />
+                            2nd Dose
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              name="covidDose3"
+                              checked={cadetFormData.covidDose3}
+                              onChange={handleCadetFormChange}
+                              className="mr-2"
+                            />
+                            3rd Dose
+                          </label>
+                        </div>
+                      </div>
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hepatitis B Vaccine:</h5>
+                        <div className="flex gap-4">
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              name="hepatitisBDose1"
+                              checked={cadetFormData.hepatitisBDose1}
+                              onChange={handleCadetFormChange}
+                              className="mr-2"
+                            />
+                            1st Dose
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              name="hepatitisBDose2"
+                              checked={cadetFormData.hepatitisBDose2}
+                              onChange={handleCadetFormChange}
+                              className="mr-2"
+                            />
+                            2nd Dose
+                          </label>
+                        </div>
+                      </div>
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tetanus Toxoid:</h5>
+                        <div className="flex gap-4">
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="tetanusToxoid"
+                              value="true"
+                              checked={cadetFormData.tetanusToxoid === true}
+                              onChange={() => setCadetFormData(prev => ({ ...prev, tetanusToxoid: true }))}
+                              className="mr-2"
+                            />
+                            Yes
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="tetanusToxoid"
+                              value="false"
+                              checked={cadetFormData.tetanusToxoid === false}
+                              onChange={() => setCadetFormData(prev => ({ ...prev, tetanusToxoid: false }))}
+                              className="mr-2"
+                            />
+                            No
+                          </label>
+                        </div>
+                      </div>
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Chicken Pox:</h5>
+                        <div className="flex gap-4 flex-wrap">
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              name="chickenPoxDose1"
+                              checked={cadetFormData.chickenPoxDose1}
+                              onChange={handleCadetFormChange}
+                              className="mr-2"
+                            />
+                            1st Dose
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              name="chickenPoxDose2"
+                              checked={cadetFormData.chickenPoxDose2}
+                              onChange={handleCadetFormChange}
+                              className="mr-2"
+                            />
+                            2nd Dose
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              name="chickenPoxSuffered"
+                              checked={cadetFormData.chickenPoxSuffered}
+                              onChange={handleCadetFormChange}
+                              className="mr-2"
+                            />
+                            Suffered in childhood
+                          </label>
+                        </div>
+                      </div>
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Yellow Fever (Foreign Cadets only):</h5>
+                        <div className="flex gap-4">
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="yellowFever"
+                              value="true"
+                              checked={cadetFormData.yellowFever === true}
+                              onChange={() => setCadetFormData(prev => ({ ...prev, yellowFever: true }))}
+                              className="mr-2"
+                            />
+                            Yes
+                          </label>
+                          <label className="flex items-center">
+                            <input
+                              type="radio"
+                              name="yellowFever"
+                              value="false"
+                              checked={cadetFormData.yellowFever === false}
+                              onChange={() => setCadetFormData(prev => ({ ...prev, yellowFever: false }))}
+                              className="mr-2"
+                            />
+                            No
+                          </label>
+                        </div>
+                      </div>
+                      <div>
+                        <label htmlFor="pastMedicalHistory" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Past Medical History
+                        </label>
+                        <textarea
+                          id="pastMedicalHistory"
+                          name="pastMedicalHistory"
+                          rows={3}
+                          value={cadetFormData.pastMedicalHistory}
+                          onChange={handleCadetFormChange}
+                          className="input-field"
+                          placeholder="Detailed history of injuries, fractures, surgeries, diseases, depression, or suicidal attempts..."
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Join Date */}
-                  <div>
-                    <label htmlFor="cadetJoinDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Join Date *
-                    </label>
-                    <input
-                      type="date"
-                      id="cadetJoinDate"
-                      name="joinDate"
-                      required
-                      value={cadetFormData.joinDate}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                    />
+                  {/* Endurance Test Section */}
+                  <div className="col-span-full">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                      Endurance Test
+                    </h4>
+                    <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                      <div>
+                        <label htmlFor="enduranceTest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Multi-Stage Fitness Test / 800m Running
+                        </label>
+                        <input
+                          type="text"
+                          id="enduranceTest"
+                          name="enduranceTest"
+                          value={cadetFormData.enduranceTest}
+                          onChange={handleCadetFormChange}
+                          className="input-field"
+                          placeholder="e.g., Level 12, 8:45"
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Height (cm) */}
-                  <div>
-                    <label htmlFor="height" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Height (cm)
-                    </label>
-                    <input
-                      type="number"
-                      id="height"
-                      name="height"
-                      min={0}
-                      value={cadetFormData.height}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                      placeholder="e.g., 175"
-                    />
+                  {/* Agility Test Section */}
+                  <div className="col-span-full">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                      Agility Test
+                    </h4>
+                    <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                      <div>
+                        <label htmlFor="agilityTest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Illinois Agility Run Test
+                        </label>
+                        <input
+                          type="text"
+                          id="agilityTest"
+                          name="agilityTest"
+                          value={cadetFormData.agilityTest}
+                          onChange={handleCadetFormChange}
+                          className="input-field"
+                          placeholder="e.g., 15.2 seconds"
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Weight (kg) */}
-                  <div>
-                    <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Weight (kg)
-                    </label>
-                    <input
-                      type="number"
-                      id="weight"
-                      name="weight"
-                      min={0}
-                      value={cadetFormData.weight}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                      placeholder="e.g., 68"
-                    />
+                  {/* Speed Test Section */}
+                  <div className="col-span-full">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                      Speed Test
+                    </h4>
+                    <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                      <div>
+                        <label htmlFor="speedTest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          30 Meter Fly
+                        </label>
+                        <input
+                          type="text"
+                          id="speedTest"
+                          name="speedTest"
+                          value={cadetFormData.speedTest}
+                          onChange={handleCadetFormChange}
+                          className="input-field"
+                          placeholder="e.g., 4.2 seconds"
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Age */}
-                  <div>
-                    <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Age
-                    </label>
-                    <input
-                      type="number"
-                      id="age"
-                      name="age"
-                      min={0}
-                      value={cadetFormData.age}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                      placeholder="e.g., 21"
-                    />
+                  {/* Strength Test Section */}
+                  <div className="col-span-full">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                      Strength Tests
+                    </h4>
+                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label htmlFor="verticalJump" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Vertical Jump
+                          </label>
+                          <input
+                            type="text"
+                            id="verticalJump"
+                            name="verticalJump"
+                            value={cadetFormData.verticalJump}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 45 cm"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="ballThrow" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Ball Throw
+                          </label>
+                          <input
+                            type="text"
+                            id="ballThrow"
+                            name="ballThrow"
+                            value={cadetFormData.ballThrow}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 8.5 m"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="lowerBackStrength" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Lower Back Strength
+                          </label>
+                          <input
+                            type="text"
+                            id="lowerBackStrength"
+                            name="lowerBackStrength"
+                            value={cadetFormData.lowerBackStrength}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 120 kg"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="shoulderDynamometerLeft" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Shoulder Dynamometer (Left)
+                          </label>
+                          <input
+                            type="text"
+                            id="shoulderDynamometerLeft"
+                            name="shoulderDynamometerLeft"
+                            value={cadetFormData.shoulderDynamometerLeft}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 25 kg"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="shoulderDynamometerRight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Shoulder Dynamometer (Right)
+                          </label>
+                          <input
+                            type="text"
+                            id="shoulderDynamometerRight"
+                            name="shoulderDynamometerRight"
+                            value={cadetFormData.shoulderDynamometerRight}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 28 kg"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="handGripDynamometerLeft" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Hand Grip Dynamometer (Left)
+                          </label>
+                          <input
+                            type="text"
+                            id="handGripDynamometerLeft"
+                            name="handGripDynamometerLeft"
+                            value={cadetFormData.handGripDynamometerLeft}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 45 kg"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="handGripDynamometerRight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Hand Grip Dynamometer (Right)
+                          </label>
+                          <input
+                            type="text"
+                            id="handGripDynamometerRight"
+                            name="handGripDynamometerRight"
+                            value={cadetFormData.handGripDynamometerRight}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 48 kg"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Course */}
-                  <div>
-                    <label htmlFor="course" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Course
-                    </label>
-                    <input
-                      type="number"
-                      id="course"
-                      name="course"
-                      min={1}
-                      value={cadetFormData.course}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                      placeholder="e.g., 1, 2, 3"
-                    />
-                  </div>
-
-                  {/* Sex */}
-                  <div>
-                    <label htmlFor="sex" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Sex
-                    </label>
-                    <select
-                      id="sex"
-                      name="sex"
-                      value={cadetFormData.sex}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                    >
-                      <option value="">Select...</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                    </select>
-                  </div>
-
-                  {/* Relegated */}
-                  <div>
-                    <label htmlFor="relegated" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Relegated
-                    </label>
-                    <select
-                      id="relegated"
-                      name="relegated"
-                      value={cadetFormData.relegated}
-                      onChange={handleCadetFormChange}
-                      className="input-field"
-                    >
-                      <option value="N">N</option>
-                      <option value="Y">Y</option>
-                    </select>
+                  {/* Overall Assessment Section */}
+                  <div className="col-span-full">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                      Overall Assessment
+                    </h4>
+                    <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                      <div>
+                        <label htmlFor="overallAssessment" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Overall Assessment
+                        </label>
+                        <textarea
+                          id="overallAssessment"
+                          name="overallAssessment"
+                          rows={3}
+                          value={cadetFormData.overallAssessment}
+                          onChange={handleCadetFormChange}
+                          className="input-field"
+                          placeholder="Overall remarks or grading"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
