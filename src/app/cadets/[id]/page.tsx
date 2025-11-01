@@ -2,11 +2,13 @@
 
 import { notFound } from 'next/navigation'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, useCallback } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Edit, Plus, Save, X } from 'lucide-react'
 import Link from 'next/link'
 import MedicalRecordsList from './MedicalRecordsList'
-import { useState, useEffect, useCallback } from 'react'
+import { usePagination } from '@/hooks/usePagination'
+import PaginationControls from '@/components/PaginationControls'
 
 interface CadetInfo {
   id: number
@@ -110,6 +112,13 @@ export default function CadetDetailsPage({
   const [weightInput, setWeightInput] = useState('')
   const [updatingWeight, setUpdatingWeight] = useState(false)
   const [showMoreCadetInfo, setShowMoreCadetInfo] = useState(false)
+
+  // Pagination for medical records
+  const pagination = usePagination({
+    totalItems: medicalRecords.length,
+    itemsPerPage: 10,
+    initialPage: 1
+  })
 
   const fetchCadetData = useCallback(async () => {
     try {
@@ -761,6 +770,23 @@ export default function CadetDetailsPage({
                       Medical History
                     </h2>
                     <div className="flex items-center gap-3">
+                      {/* Records per page selector */}
+                      <div className="flex items-center gap-2">
+                        <label htmlFor="records-per-page" className="text-sm text-gray-600 dark:text-gray-400">
+                          Records per page:
+                        </label>
+                        <select
+                          id="records-per-page"
+                          value={pagination.itemsPerPage}
+                          onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
+                          className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                        >
+                          <option value={10}>10</option>
+                          <option value={20}>20</option>
+                          <option value={30}>30</option>
+                          <option value={50}>50</option>
+                        </select>
+                      </div>
                       <Link
                         href={`/medical-records/new?cadetId=${cadetId}`}
                         className="inline-flex items-center justify-center p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
@@ -773,6 +799,12 @@ export default function CadetDetailsPage({
                   <p className="text-gray-600 dark:text-gray-400 mt-2">
                     Complete medical record history for {cadetInfo.name}
                   </p>
+                  {/* Record count display */}
+                  {medicalRecords.length > 0 && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, medicalRecords.length)} of {medicalRecords.length} records
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -789,7 +821,20 @@ export default function CadetDetailsPage({
                   </p>
                 </div>
               ) : (
-                <MedicalRecordsList records={medicalRecords} cadetId={cadetId} showAll />
+                <>
+                  <MedicalRecordsList records={pagination.getVisibleItems(medicalRecords)} cadetId={cadetId} />
+
+                  {/* Pagination Controls */}
+                  <div className="mt-6 flex flex-col items-center gap-4">
+                    <PaginationControls
+                      currentPage={pagination.currentPage}
+                      totalPages={pagination.totalPages}
+                      onPageChange={pagination.goToPage}
+                      hasNextPage={pagination.hasNextPage}
+                      hasPrevPage={pagination.hasPrevPage}
+                    />
+                  </div>
+                </>
               )}
             </div>
           </div>

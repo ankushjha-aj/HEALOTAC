@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Calendar, User, MapPin, FileText, Filter, Eye } from 'lucide-react'
 import Link from 'next/link'
+import { usePagination } from '@/hooks/usePagination'
+import PaginationControls from '@/components/PaginationControls'
 
 interface MedicalRecord {
   id: number
@@ -144,6 +146,16 @@ export default function MedicalHistoryPage() {
     return matchesSearch && matchesStatus
   })
 
+  // Pagination for medical records table
+  const pagination = usePagination({
+    totalItems: filteredRecords.length,
+    itemsPerPage: 10,
+    initialPage: 1
+  })
+
+  // Get paginated records
+  const paginatedRecords = pagination.getVisibleItems(filteredRecords)
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -255,12 +267,29 @@ export default function MedicalHistoryPage() {
                 <option value="Completed">Completed</option>
                 <option value="monitoring">Monitoring Cases</option>
               </select>
+              {/* Records per page selector */}
+              <div className="flex items-center gap-2">
+                <label htmlFor="records-per-page" className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                  Records per page:
+                </label>
+                <select
+                  id="records-per-page"
+                  value={pagination.itemsPerPage}
+                  onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
+                  className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={30}>30</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
             </div>
           </div>
 
           {/* Results Count */}
           <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-            Showing {filteredRecords.length} of {medicalRecords.length} medical records
+            Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, filteredRecords.length)} of {filteredRecords.length} medical records
             {searchTerm && ` matching "${searchTerm}"`}
             {statusFilter !== 'all' && ` with status "${statusFilter}"`}
           </div>
@@ -314,7 +343,7 @@ export default function MedicalHistoryPage() {
                     </td>
                   </tr>
                 ) : (
-                  filteredRecords.map((record) => (
+                  paginatedRecords.map((record) => (
                     <tr key={record.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -432,6 +461,19 @@ export default function MedicalHistoryPage() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {filteredRecords.length > 0 && (
+            <div className="mt-6 flex flex-col items-center gap-4">
+              <PaginationControls
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                onPageChange={pagination.goToPage}
+                hasNextPage={pagination.hasNextPage}
+                hasPrevPage={pagination.hasPrevPage}
+              />
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>

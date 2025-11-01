@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Search, Edit, Trash2, Plus, Filter } from 'lucide-react'
 import Link from 'next/link'
+import { usePagination } from '@/hooks/usePagination'
+import PaginationControls from '@/components/PaginationControls'
 
 // Interface for Medical Record
 interface MedicalRecord {
@@ -43,9 +45,7 @@ export default function CadetsPage() {
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
   const [showHighTrainingMissed, setShowHighTrainingMissed] = useState(false)
-  const cadetsPerPage = 10
 
   // Fetch cadets on component mount
   useEffect(() => {
@@ -167,16 +167,20 @@ export default function CadetsPage() {
     )
   })
 
-  // Pagination logic
-  const totalPages = Math.ceil(filteredCadets.length / cadetsPerPage)
-  const startIndex = (currentPage - 1) * cadetsPerPage
-  const endIndex = startIndex + cadetsPerPage
-  const currentCadets = filteredCadets.slice(startIndex, endIndex)
+  // Pagination for cadets table
+  const pagination = usePagination({
+    totalItems: filteredCadets.length,
+    itemsPerPage: 10,
+    initialPage: 1
+  })
 
-  // Reset to page 1 when search or filter changes
+  // Reset pagination to page 1 when search or filter changes
   useEffect(() => {
-    setCurrentPage(1)
-  }, [searchTerm, showHighTrainingMissed])
+    pagination.goToPage(1)
+  }, [searchTerm, showHighTrainingMissed, pagination])
+
+  // Get paginated cadets
+  const paginatedCadets = pagination.getVisibleItems(filteredCadets)
 
   return (
     <DashboardLayout>
@@ -233,22 +237,39 @@ export default function CadetsPage() {
         {/* Search Section */}
         <div className="card p-6">
           <div className="space-y-4">
-            {/* Search Bar */}
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search by name, academy number, course, battalion, company, or join date..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-field"
-              />
+            {/* Search Bar and Records per Page */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  placeholder="Search by name, academy number, course, battalion, company, or join date..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="input-field"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label htmlFor="records-per-page" className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                  Records per page:
+                </label>
+                <select
+                  id="records-per-page"
+                  value={pagination.itemsPerPage}
+                  onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
+                  className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={30}>30</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
             </div>
 
             {/* Results Count */}
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Showing {startIndex + 1}-{Math.min(endIndex, filteredCadets.length)} of {filteredCadets.length} cadets
+              Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, filteredCadets.length)} of {filteredCadets.length} cadets
               {showHighTrainingMissed && ` (filtered: ≥30 days training missed)`}
-              {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
             </p>
           </div>
         </div>
@@ -286,7 +307,7 @@ export default function CadetsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {currentCadets.map((cadet) => (
+                {paginatedCadets.map((cadet) => (
                   <tr key={cadet.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -378,49 +399,15 @@ export default function CadetsPage() {
           </div>
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-700 dark:text-gray-300">
-                  Showing {startIndex + 1} to {Math.min(endIndex, filteredCadets.length)} of {filteredCadets.length} cadets
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Previous
-                  </button>
-
-                  {/* Page Numbers */}
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i
-                    if (pageNum > totalPages) return null
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => setCurrentPage(pageNum)}
-                        className={`px-3 py-1 text-sm border rounded-md ${
-                          currentPage === pageNum
-                            ? 'bg-primary border-primary text-white'
-                            : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    )
-                  })}
-
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
+          {filteredCadets.length > 0 && (
+            <div className="mt-6 flex flex-col items-center gap-4">
+              <PaginationControls
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                onPageChange={pagination.goToPage}
+                hasNextPage={pagination.hasNextPage}
+                hasPrevPage={pagination.hasPrevPage}
+              />
             </div>
           )}
         </div>
