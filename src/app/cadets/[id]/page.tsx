@@ -559,7 +559,7 @@ export default function CadetDetailsPage({
                       </div>
                     )}
                     {cadetInfo.pastMedicalHistory && (
-                      <div className="col-span-full mt-4">
+                      <div className="col-span-full">
                         <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-1">Past Medical History:</span>
                         <p className="text-sm bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">{cadetInfo.pastMedicalHistory}</p>
                       </div>
@@ -574,7 +574,7 @@ export default function CadetDetailsPage({
                 cadetInfo.yellowFever !== undefined) && (
                 <div className="mb-6">
                   <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Vaccination Status</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4 border-l-2 border-green-200 dark:border-green-600">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pl-4 border-l-2 border-green-200 dark:border-green-600">
                     <div>
                       <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">COVID-19</h5>
                       <div className="space-y-1">
@@ -663,7 +663,7 @@ export default function CadetDetailsPage({
                 cadetInfo.handGripDynamometerLeft || cadetInfo.handGripDynamometerRight) && (
                 <div className="mb-6">
                   <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Physical Tests</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-4 border-l-2 border-orange-200 dark:border-orange-600">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4 border-l-2 border-orange-200 dark:border-orange-600">
 
                     {/* Endurance, Agility, Speed Tests */}
                     {(cadetInfo.enduranceTest || cadetInfo.agilityTest || cadetInfo.speedTest) && (
@@ -859,6 +859,7 @@ export default function CadetDetailsPage({
                           onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
                           className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                         >
+                          <option value={5}>5</option>
                           <option value={10}>10</option>
                           <option value={20}>20</option>
                           <option value={30}>30</option>

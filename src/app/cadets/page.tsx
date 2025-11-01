@@ -262,6 +262,7 @@ export default function CadetsPage() {
                   onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
                   className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 >
+                  <option value={5}>5</option>
                   <option value={10}>10</option>
                   <option value={20}>20</option>
                   <option value={30}>30</option>
