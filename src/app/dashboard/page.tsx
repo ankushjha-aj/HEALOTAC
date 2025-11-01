@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Calendar, Users, Activity, TrendingUp, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
@@ -87,6 +88,7 @@ interface MedicalRecord {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [cadets, setCadets] = useState<Cadet[]>([])
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
   const [loading, setLoading] = useState(true)
@@ -98,6 +100,8 @@ export default function DashboardPage() {
   const [jwtToken, setJwtToken] = useState<string | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const [currentDateTime, setCurrentDateTime] = useState<string>('')
+
+  const [navigatingToNewRecord, setNavigatingToNewRecord] = useState(false)
 
   // Check authentication on mount
   useEffect(() => {
@@ -198,6 +202,14 @@ export default function DashboardPage() {
     fetchData()
   }
 
+  const handleAddNewRecord = () => {
+    setNavigatingToNewRecord(true)
+    // Add a smooth scrolling animation before navigation
+    setTimeout(() => {
+      router.push('/medical-records/new')
+    }, 800) // 800ms delay for smooth animation
+  }
+
   // Close tooltip when clicking outside (only needed for click interactions, not hover)
   // Removed for hover-only tooltip functionality
 
@@ -261,15 +273,28 @@ export default function DashboardPage() {
           </div>
           <div className="mt-4 lg:mt-0 flex items-center gap-3">
             <button
-              onClick={refreshData}
+              onClick={() => window.location.reload()}
               className="inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               title="Refresh data"
             >
               <RefreshCw className="h-4 w-4" />
             </button>
-            <Link href="/medical-records/new" className="btn-primary">
-              Add New Record
-            </Link>
+            <button
+              onClick={handleAddNewRecord}
+              disabled={navigatingToNewRecord}
+              className={`btn-primary flex items-center gap-2 ${
+                navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
+              }`}
+            >
+              {navigatingToNewRecord ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Loading...</span>
+                </>
+              ) : (
+                <span>Add New Record</span>
+              )}
+            </button>
           </div>
         </div>
 
@@ -392,9 +417,12 @@ export default function DashboardPage() {
                           </span>
                         </div>
                         <div className="ml-3 flex items-center gap-2">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          <Link
+                            href={`/cadets/${cadet.id}`}
+                            className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary transition-colors"
+                          >
                             {cadet.name}
-                          </p>
+                          </Link>
                           {cadet.relegated === 'Y' && (
                             <>
                               <span className="text-red-600 dark:text-red-400 font-bold">R</span>

@@ -29,7 +29,21 @@ export async function GET(
       )
     }
 
-    return NextResponse.json(cadet)
+    // Parse menstrualAids from JSON string to array if it exists
+    let parsedMenstrualAids = null
+    try {
+      parsedMenstrualAids = cadet.menstrualAids ? JSON.parse(cadet.menstrualAids) : null
+    } catch (parseError) {
+      console.warn('⚠️ Failed to parse menstrualAids JSON for cadet', cadet.id, ':', parseError)
+      parsedMenstrualAids = null
+    }
+
+    const processedCadet = {
+      ...cadet,
+      menstrualAids: parsedMenstrualAids
+    }
+
+    return NextResponse.json(processedCadet)
   } catch (error) {
     console.error('❌ Error fetching cadet:', error)
     return NextResponse.json(

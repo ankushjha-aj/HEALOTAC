@@ -184,7 +184,7 @@ export default function MedicalHistoryPage({
                 </p>
               </div>
             ) : (
-              <MedicalRecordsList records={medicalRecords} cadetId={cadetId} showAll />
+              <MedicalRecordsList records={medicalRecords} cadetId={cadetId} />
             )}
           </div>
         </div>

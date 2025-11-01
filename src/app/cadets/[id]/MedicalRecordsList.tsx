@@ -25,15 +25,13 @@ interface MedicalRecord {
 interface MedicalRecordsListProps {
   records: MedicalRecord[]
   cadetId: number
-  showAll?: boolean
 }
 
-export default function MedicalRecordsList({ records, cadetId, showAll = false }: MedicalRecordsListProps) {
-  const visibleRecords = showAll ? records : records.slice(0, 5)
+export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsListProps) {
 
   return (
     <div className="space-y-4">
-      {visibleRecords.map((record: MedicalRecord) => (
+      {records.map((record: MedicalRecord) => (
         <div key={record.id} className="card p-4">
           <div className="flex items-start justify-between mb-3">
             <div>
@@ -131,17 +129,6 @@ export default function MedicalRecordsList({ records, cadetId, showAll = false }
           )}
         </div>
       ))}
-
-      {!showAll && records.length > 5 && (
-        <div className="text-center pt-4">
-          <Link
-            href={`/medical-history/${cadetId}`}
-            className="text-primary hover:text-primary/80"
-          >
-            View all {records.length} records →
-          </Link>
-        </div>
-      )}
     </div>
   )
 }
