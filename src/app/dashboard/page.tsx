@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Calendar, Users, Activity, TrendingUp, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
@@ -87,6 +88,7 @@ interface MedicalRecord {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [cadets, setCadets] = useState<Cadet[]>([])
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
   const [loading, setLoading] = useState(true)
@@ -261,7 +263,7 @@ export default function DashboardPage() {
           </div>
           <div className="mt-4 lg:mt-0 flex items-center gap-3">
             <button
-              onClick={refreshData}
+              onClick={() => window.location.reload()}
               className="inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               title="Refresh data"
             >
