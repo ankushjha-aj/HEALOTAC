@@ -8,6 +8,13 @@
       "when": 1762005048860,
       "tag": "0000_orange_meteorite",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1762010621932,
+      "tag": "0001_motionless_karma",
+      "breakpoints": true
     }
   ]
 }

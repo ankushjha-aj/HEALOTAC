@@ -73,6 +73,18 @@ interface CadetFormData {
   handGripDynamometerRight?: string
   // Overall Assessment
   overallAssessment?: string
+  // Menstrual & Medical History (Female only)
+  menstrualFrequency?: string
+  menstrualDays?: string
+  lastMenstrualDate?: string
+  menstrualAids?: string[]
+  sexuallyActive?: string
+  maritalStatus?: string
+  pregnancyHistory?: string
+  contraceptiveHistory?: string
+  surgeryHistory?: string
+  medicalCondition?: string
+  hemoglobinLevel?: string
 }
 
 function NewMedicalRecordPageInner() {
@@ -154,6 +166,18 @@ function NewMedicalRecordPageInner() {
     handGripDynamometerRight: '',
     // Overall Assessment
     overallAssessment: '',
+    // Menstrual & Medical History (Female only)
+    menstrualFrequency: '',
+    menstrualDays: '',
+    lastMenstrualDate: '',
+    menstrualAids: [],
+    sexuallyActive: '',
+    maritalStatus: '',
+    pregnancyHistory: '',
+    contraceptiveHistory: '',
+    surgeryHistory: '',
+    medicalCondition: '',
+    hemoglobinLevel: '',
   })
 
   const [cadetError, setCadetError] = useState<string | null>(null)
@@ -319,10 +343,23 @@ function NewMedicalRecordPageInner() {
     const { name, value, type } = e.target
     const checked = (e.target as HTMLInputElement).checked
 
-    setCadetFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }))
+    setCadetFormData(prev => {
+      // Special handling for checkbox arrays
+      if (type === 'checkbox' && name === 'menstrualAids') {
+        return {
+          ...prev,
+          [name]: checked
+            ? [...(prev[name] || []), value]
+            : (prev[name] || []).filter((item: string) => item !== value)
+        }
+      }
+
+      // Default handling for other inputs
+      return {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }
+    })
   }
 
   const handleCreateCadet = async (e: React.FormEvent) => {
@@ -345,6 +382,8 @@ function NewMedicalRecordPageInner() {
         },
         body: JSON.stringify(cadetFormData),
       })
+
+      console.log('📤 SENDING CADET DATA TO API:', cadetFormData)
 
       const data = await response.json()
 
@@ -412,6 +451,18 @@ function NewMedicalRecordPageInner() {
           handGripDynamometerRight: '',
           // Overall Assessment
           overallAssessment: '',
+          // Menstrual & Medical History (Female only)
+          menstrualFrequency: '',
+          menstrualDays: '',
+          lastMenstrualDate: '',
+          menstrualAids: [],
+          sexuallyActive: '',
+          maritalStatus: '',
+          pregnancyHistory: '',
+          contraceptiveHistory: '',
+          surgeryHistory: '',
+          medicalCondition: '',
+          hemoglobinLevel: '',
         })
 
         alert('Cadet added successfully!')
@@ -1835,6 +1886,275 @@ function NewMedicalRecordPageInner() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Menstrual & Medical History Section - Only show for Female cadets */}
+                  {cadetFormData.sex === 'Female' && (
+                    <div className="col-span-full">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                        Menstrual & Medical History (For Female Cadets Only)
+                      </h4>
+                      <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600 bg-pink-50 dark:bg-pink-900/10 p-4 rounded-lg">
+
+                        {/* Menstrual Cycle */}
+                        <div className="col-span-full">
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Menstrual Cycle:</h5>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                              <label htmlFor="menstrualFrequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                How frequently
+                              </label>
+                              <select
+                                id="menstrualFrequency"
+                                name="menstrualFrequency"
+                                value={cadetFormData.menstrualFrequency}
+                                onChange={handleCadetFormChange}
+                                className="input-field"
+                              >
+                                <option value="">Select frequency...</option>
+                                <option value="Regular">Regular</option>
+                                <option value="Irregular">Irregular</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label htmlFor="menstrualDays" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                How many days
+                              </label>
+                              <input
+                                type="number"
+                                id="menstrualDays"
+                                name="menstrualDays"
+                                min="1"
+                                max="10"
+                                value={cadetFormData.menstrualDays}
+                                onChange={handleCadetFormChange}
+                                className="input-field"
+                                placeholder="e.g., 5"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor="lastMenstrualDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Last menstrual period date
+                              </label>
+                              <input
+                                type="date"
+                                id="lastMenstrualDate"
+                                name="lastMenstrualDate"
+                                value={cadetFormData.lastMenstrualDate}
+                                onChange={handleCadetFormChange}
+                                className="input-field"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Menstrual Cycle Aids */}
+                        <div className="col-span-full">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Menstrual Cycle Aids
+                          </label>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            {['Menstrual Cup', 'Sanitary Pads', 'Tampon'].map((aid) => (
+                              <label key={aid} className="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  name="menstrualAids"
+                                  value={aid}
+                                  checked={cadetFormData.menstrualAids?.includes(aid) || false}
+                                  onChange={handleCadetFormChange}
+                                  className="mr-2"
+                                />
+                                {aid}
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Whether Sexually Active */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Whether Sexually Active
+                          </label>
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input
+                                type="radio"
+                                name="sexuallyActive"
+                                value="Yes"
+                                checked={cadetFormData.sexuallyActive === 'Yes'}
+                                onChange={handleCadetFormChange}
+                                className="mr-2"
+                              />
+                              Yes
+                            </label>
+                            <label className="flex items-center">
+                              <input
+                                type="radio"
+                                name="sexuallyActive"
+                                value="No"
+                                checked={cadetFormData.sexuallyActive === 'No'}
+                                onChange={handleCadetFormChange}
+                                className="mr-2"
+                              />
+                              No
+                            </label>
+                          </div>
+                        </div>
+
+                        {/* Marital Status */}
+                        <div>
+                          <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Marital Status
+                          </label>
+                          <select
+                            id="maritalStatus"
+                            name="maritalStatus"
+                            value={cadetFormData.maritalStatus}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                          >
+                            <option value="">Select status...</option>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                            <option value="Divorced">Divorced</option>
+                            <option value="Widowed">Widowed</option>
+                          </select>
+                        </div>
+
+                        {/* History of any Pregnancy / Abortion */}
+                        <div className="col-span-full">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            History of any Pregnancy / Abortion
+                          </label>
+                          <div className="flex gap-4 items-center">
+                            <label className="flex items-center">
+                              <input
+                                type="radio"
+                                name="pregnancyRadio"
+                                value="Yes"
+                                checked={cadetFormData.pregnancyHistory !== '' && cadetFormData.pregnancyHistory !== undefined}
+                                onChange={() => setCadetFormData(prev => ({ ...prev, pregnancyHistory: '' }))}
+                                className="mr-2"
+                              />
+                              Yes
+                            </label>
+                            <label className="flex items-center">
+                              <input
+                                type="radio"
+                                name="pregnancyRadio"
+                                value="No"
+                                checked={cadetFormData.pregnancyHistory === ''}
+                                onChange={() => setCadetFormData(prev => ({ ...prev, pregnancyHistory: '' }))}
+                                className="mr-2"
+                              />
+                              No
+                            </label>
+                          </div>
+                          {(cadetFormData.pregnancyHistory !== '' && cadetFormData.pregnancyHistory !== undefined) && (
+                            <input
+                              type="text"
+                              name="pregnancyHistory"
+                              value={cadetFormData.pregnancyHistory}
+                              onChange={handleCadetFormChange}
+                              className="input-field mt-2"
+                              placeholder="Please specify..."
+                            />
+                          )}
+                        </div>
+
+                        {/* History of Contraceptive Used */}
+                        <div className="col-span-full">
+                          <label htmlFor="contraceptiveHistory" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            History of Contraceptive Used (Past or Present)
+                          </label>
+                          <textarea
+                            id="contraceptiveHistory"
+                            name="contraceptiveHistory"
+                            rows={2}
+                            value={cadetFormData.contraceptiveHistory}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., Oral contraceptives, IUD, etc."
+                          />
+                        </div>
+
+                        {/* Underwent any Surgery */}
+                        <div className="col-span-full">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Underwent any Surgery
+                          </label>
+                          <div className="flex gap-4 items-center">
+                            <label className="flex items-center">
+                              <input
+                                type="radio"
+                                name="surgeryRadio"
+                                value="Yes"
+                                checked={cadetFormData.surgeryHistory !== '' && cadetFormData.surgeryHistory !== undefined}
+                                onChange={() => setCadetFormData(prev => ({ ...prev, surgeryHistory: '' }))}
+                                className="mr-2"
+                              />
+                              Yes
+                            </label>
+                            <label className="flex items-center">
+                              <input
+                                type="radio"
+                                name="surgeryRadio"
+                                value="No"
+                                checked={cadetFormData.surgeryHistory === ''}
+                                onChange={() => setCadetFormData(prev => ({ ...prev, surgeryHistory: '' }))}
+                                className="mr-2"
+                              />
+                              No
+                            </label>
+                          </div>
+                          {(cadetFormData.surgeryHistory !== '' && cadetFormData.surgeryHistory !== undefined) && (
+                            <input
+                              type="text"
+                              name="surgeryHistory"
+                              value={cadetFormData.surgeryHistory}
+                              onChange={handleCadetFormChange}
+                              className="input-field mt-2"
+                              placeholder="Please specify the surgery..."
+                            />
+                          )}
+                        </div>
+
+                        {/* Any Medical Condition under Medication */}
+                        <div className="col-span-full">
+                          <label htmlFor="medicalCondition" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Any Medical Condition under Medication
+                          </label>
+                          <textarea
+                            id="medicalCondition"
+                            name="medicalCondition"
+                            rows={2}
+                            value={cadetFormData.medicalCondition}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., PCOS, Thyroid disorder, etc."
+                          />
+                        </div>
+
+                        {/* Latest Hb % / Hemoglobin Level */}
+                        <div>
+                          <label htmlFor="hemoglobinLevel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Latest Hb % / Hemoglobin Level
+                          </label>
+                          <input
+                            type="number"
+                            id="hemoglobinLevel"
+                            name="hemoglobinLevel"
+                            min="0"
+                            max="20"
+                            step="0.1"
+                            value={cadetFormData.hemoglobinLevel}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 12.5"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Modal Actions */}

@@ -65,6 +65,18 @@ export const cadets = pgTable('cadets', {
   handGripDynamometerRight: varchar('hand_grip_dynamometer_right', { length: 50 }),
   // Overall Assessment
   overallAssessment: varchar('overall_assessment', { length: 100 }),
+  // Menstrual & Medical History (Female only)
+  menstrualFrequency: varchar('menstrual_frequency', { length: 20 }),
+  menstrualDays: integer('menstrual_days'),
+  lastMenstrualDate: timestamp('last_menstrual_date'),
+  menstrualAids: text('menstrual_aids'), // JSON array stored as text
+  sexuallyActive: varchar('sexually_active', { length: 10 }),
+  maritalStatus: varchar('marital_status', { length: 20 }),
+  pregnancyHistory: text('pregnancy_history'),
+  contraceptiveHistory: text('contraceptive_history'),
+  surgeryHistory: text('surgery_history'),
+  medicalCondition: text('medical_condition'),
+  hemoglobinLevel: decimal('hemoglobin_level', { precision: 4, scale: 2 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
