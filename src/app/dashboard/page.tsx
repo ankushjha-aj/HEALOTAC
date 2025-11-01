@@ -417,9 +417,12 @@ export default function DashboardPage() {
                           </span>
                         </div>
                         <div className="ml-3 flex items-center gap-2">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          <Link
+                            href={`/cadets/${cadet.id}`}
+                            className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary transition-colors"
+                          >
                             {cadet.name}
-                          </p>
+                          </Link>
                           {cadet.relegated === 'Y' && (
                             <>
                               <span className="text-red-600 dark:text-red-400 font-bold">R</span>

@@ -395,9 +395,12 @@ export default function MedicalHistoryPage() {
                             </span>
                           </div>
                           <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                            <Link
+                              href={`/cadets/${record.cadetId}`}
+                              className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary transition-colors"
+                            >
                               {record.name}
-                            </p>
+                            </Link>
                             {record.contactNo && (
                               <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {record.contactNo}
