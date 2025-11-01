@@ -53,7 +53,11 @@ export default function MedicalHistoryPage() {
         if (!response.ok) throw new Error('Failed to fetch medical records')
 
         const records = await response.json()
-        setMedicalRecords(records)
+        // Sort medical records by createdAt descending (most recent first)
+        const sortedRecords = records.sort((a: MedicalRecord, b: MedicalRecord) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+        setMedicalRecords(sortedRecords)
       } catch (err) {
         console.error('Error fetching medical records:', err)
         setError(err instanceof Error ? err.message : 'Failed to load medical records')

@@ -80,7 +80,11 @@ export default function CadetsPage() {
 
       const cadetsData = await cadetsRes.json()
       const recordsData = await recordsRes.json()
-      setCadets(cadetsData)
+      // Sort cadets by createdAt descending (most recent first)
+      const sortedCadets = cadetsData.sort((a: Cadet, b: Cadet) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+      setCadets(sortedCadets)
       setMedicalRecords(recordsData)
       console.log('📊 FETCHED CADETS:', cadetsData.length, 'records')
       console.log('📋 FETCHED MEDICAL RECORDS:', recordsData.length, 'records')
