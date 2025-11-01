@@ -6,6 +6,7 @@ import { Calendar, User, MapPin, FileText, Filter, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { usePagination } from '@/hooks/usePagination'
 import PaginationControls from '@/components/PaginationControls'
+import { useRouter } from 'next/navigation'
 
 interface MedicalRecord {
   id: number
@@ -33,6 +34,8 @@ export default function MedicalHistoryPage() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [currentDateTime, setCurrentDateTime] = useState<string>('')
   const [updatingRecordId, setUpdatingRecordId] = useState<number | null>(null)
+
+  const router = useRouter()
 
   useEffect(() => {
     const fetchMedicalRecords = async () => {
@@ -160,6 +163,14 @@ export default function MedicalHistoryPage() {
   // Get paginated records
   const paginatedRecords = pagination.getVisibleItems(filteredRecords)
 
+  const handleAddNewRecord = () => {
+    setUpdatingRecordId(-1) // Use -1 to indicate navigation loading
+    // Add a smooth scrolling animation before navigation
+    setTimeout(() => {
+      router.push('/medical-records/new')
+    }, 800) // 800ms delay for smooth animation
+  }
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -189,9 +200,22 @@ export default function MedicalHistoryPage() {
               {currentDateTime}
             </div>
             <div className="flex gap-2">
-              <Link href="/medical-records/new" className="btn-primary">
-                Add New Record
-              </Link>
+              <button
+                onClick={handleAddNewRecord}
+                disabled={updatingRecordId === -1}
+                className={`btn-primary flex items-center gap-2 ${
+                  updatingRecordId === -1 ? 'cursor-not-allowed opacity-75' : ''
+                }`}
+              >
+                {updatingRecordId === -1 ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Loading...</span>
+                  </>
+                ) : (
+                  <span>Add New Record</span>
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -341,9 +365,22 @@ export default function MedicalHistoryPage() {
                         }
                       </p>
                       {medicalRecords.length === 0 && (
-                        <Link href="/medical-records/new" className="btn-primary">
-                          Add First Record
-                        </Link>
+                        <button
+                          onClick={handleAddNewRecord}
+                          disabled={updatingRecordId === -1}
+                          className={`btn-primary flex items-center gap-2 ${
+                            updatingRecordId === -1 ? 'cursor-not-allowed opacity-75' : ''
+                          }`}
+                        >
+                          {updatingRecordId === -1 ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              <span>Loading...</span>
+                            </>
+                          ) : (
+                            <span>Add First Record</span>
+                          )}
+                        </button>
                       )}
                     </td>
                   </tr>

@@ -101,6 +101,8 @@ export default function DashboardPage() {
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const [currentDateTime, setCurrentDateTime] = useState<string>('')
 
+  const [navigatingToNewRecord, setNavigatingToNewRecord] = useState(false)
+
   // Check authentication on mount
   useEffect(() => {
     const token = localStorage.getItem('jwt_token')
@@ -200,6 +202,14 @@ export default function DashboardPage() {
     fetchData()
   }
 
+  const handleAddNewRecord = () => {
+    setNavigatingToNewRecord(true)
+    // Add a smooth scrolling animation before navigation
+    setTimeout(() => {
+      router.push('/medical-records/new')
+    }, 800) // 800ms delay for smooth animation
+  }
+
   // Close tooltip when clicking outside (only needed for click interactions, not hover)
   // Removed for hover-only tooltip functionality
 
@@ -269,9 +279,22 @@ export default function DashboardPage() {
             >
               <RefreshCw className="h-4 w-4" />
             </button>
-            <Link href="/medical-records/new" className="btn-primary">
-              Add New Record
-            </Link>
+            <button
+              onClick={handleAddNewRecord}
+              disabled={navigatingToNewRecord}
+              className={`btn-primary flex items-center gap-2 ${
+                navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
+              }`}
+            >
+              {navigatingToNewRecord ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Loading...</span>
+                </>
+              ) : (
+                <span>Add New Record</span>
+              )}
+            </button>
           </div>
         </div>
 

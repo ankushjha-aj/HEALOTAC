@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Search, Edit, Trash2, Plus, Filter } from 'lucide-react'
+import { Search, Edit, Trash2, Filter } from 'lucide-react'
 import Link from 'next/link'
 import { usePagination } from '@/hooks/usePagination'
 import PaginationControls from '@/components/PaginationControls'
+import { useRouter } from 'next/navigation'
 
 // Interface for Medical Record
 interface MedicalRecord {
@@ -46,6 +47,9 @@ export default function CadetsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showHighTrainingMissed, setShowHighTrainingMissed] = useState(false)
+  const [navigatingToNewRecord, setNavigatingToNewRecord] = useState(false)
+
+  const router = useRouter()
 
   // Fetch cadets on component mount
   useEffect(() => {
@@ -186,6 +190,14 @@ export default function CadetsPage() {
   // Get paginated cadets
   const paginatedCadets = pagination.getVisibleItems(filteredCadets)
 
+  const handleAddNewRecord = () => {
+    setNavigatingToNewRecord(true)
+    // Add a smooth scrolling animation before navigation
+    setTimeout(() => {
+      router.push('/medical-records/new')
+    }, 800) // 800ms delay for smooth animation
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -232,9 +244,22 @@ export default function CadetsPage() {
                 )}
               </div>
             </button>
-            <Link href="/medical-records/new" className="btn-primary">
-              Add New Record
-            </Link>
+            <button
+              onClick={handleAddNewRecord}
+              disabled={navigatingToNewRecord}
+              className={`btn-primary flex items-center gap-2 ${
+                navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
+              }`}
+            >
+              {navigatingToNewRecord ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Loading...</span>
+                </>
+              ) : (
+                <span>Add New Record</span>
+              )}
+            </button>
           </div>
         </div>
 
