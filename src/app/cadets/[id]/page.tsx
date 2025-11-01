@@ -475,7 +475,7 @@ export default function CadetDetailsPage({
                 onClick={() => setShowMoreCadetInfo(!showMoreCadetInfo)}
                 className="text-primary hover:text-primary/80 text-sm font-medium transition-colors cursor-pointer"
               >
-                {showMoreCadetInfo ? 'Hide more' : 'Show more'}
+                {showMoreCadetInfo ? 'Hide complete info' : 'Show complete info'}
               </button>
             </div>
           </div>
@@ -750,10 +750,88 @@ export default function CadetDetailsPage({
 
               {/* Overall Assessment */}
               {cadetInfo.overallAssessment && (
-                <div>
+                <div className="mb-6">
                   <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Overall Assessment</h4>
                   <div className="pl-4 border-l-2 border-purple-200 dark:border-purple-600">
                     <p className="text-sm bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">{cadetInfo.overallAssessment}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Menstrual & Reproductive Health Section */}
+              {(cadetInfo.menstrualFrequency || cadetInfo.menstrualDays || cadetInfo.lastMenstrualDate ||
+                cadetInfo.menstrualAids || cadetInfo.sexuallyActive || cadetInfo.maritalStatus ||
+                cadetInfo.pregnancyHistory || cadetInfo.contraceptiveHistory || cadetInfo.surgeryHistory ||
+                cadetInfo.medicalCondition || cadetInfo.hemoglobinLevel) && (
+                <div className="mb-6">
+                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Menstrual & Reproductive Health</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pl-4 border-l-2 border-pink-200 dark:border-pink-600">
+                    {cadetInfo.menstrualFrequency && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Menstrual Frequency:</span>
+                        <span className="text-sm font-medium">{cadetInfo.menstrualFrequency}</span>
+                      </div>
+                    )}
+                    {cadetInfo.menstrualDays && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Menstrual Days:</span>
+                        <span className="text-sm font-medium">{cadetInfo.menstrualDays}</span>
+                      </div>
+                    )}
+                    {cadetInfo.lastMenstrualDate && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Menstrual Date:</span>
+                        <span className="text-sm font-medium">{new Date(cadetInfo.lastMenstrualDate).toLocaleDateString()}</span>
+                      </div>
+                    )}
+                    {cadetInfo.menstrualAids && cadetInfo.menstrualAids.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Menstrual Aids:</span>
+                        <span className="text-sm font-medium">{cadetInfo.menstrualAids.join(', ')}</span>
+                      </div>
+                    )}
+                    {cadetInfo.sexuallyActive && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sexually Active:</span>
+                        <span className="text-sm font-medium">{cadetInfo.sexuallyActive}</span>
+                      </div>
+                    )}
+                    {cadetInfo.maritalStatus && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Marital Status:</span>
+                        <span className="text-sm font-medium">{cadetInfo.maritalStatus}</span>
+                      </div>
+                    )}
+                    {cadetInfo.pregnancyHistory && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pregnancy History:</span>
+                        <span className="text-sm font-medium">{cadetInfo.pregnancyHistory}</span>
+                      </div>
+                    )}
+                    {cadetInfo.contraceptiveHistory && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contraceptive History:</span>
+                        <span className="text-sm font-medium">{cadetInfo.contraceptiveHistory}</span>
+                      </div>
+                    )}
+                    {cadetInfo.surgeryHistory && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Surgery History:</span>
+                        <span className="text-sm font-medium">{cadetInfo.surgeryHistory}</span>
+                      </div>
+                    )}
+                    {cadetInfo.medicalCondition && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Medical Condition:</span>
+                        <span className="text-sm font-medium">{cadetInfo.medicalCondition}</span>
+                      </div>
+                    )}
+                    {cadetInfo.hemoglobinLevel && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hemoglobin Level:</span>
+                        <span className="text-sm font-medium">{cadetInfo.hemoglobinLevel}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
