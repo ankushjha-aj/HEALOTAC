@@ -36,24 +36,36 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
         <div key={record.id} className="card p-4">
           {record.admittedInMH === 'Yes' ? (
             // Simplified view for MH/BH/CH admitted records
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
-                  <div className="h-4 w-4 rounded-full bg-purple-500"></div>
+            <>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
+                    <div className="h-4 w-4 rounded-full bg-purple-500"></div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                      Admitted today
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {new Date(record.dateOfReporting).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
-                    Admitted today
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {new Date(record.dateOfReporting).toLocaleDateString()}
-                  </p>
+                <div className="text-sm text-purple-600 dark:text-purple-400 font-medium">
+                  MH/BH/CH Admission
                 </div>
               </div>
-              <div className="text-sm text-purple-600 dark:text-purple-400 font-medium">
-                MH/BH/CH Admission
+              {/* Cadet is back to OTA checkbox */}
+              <div className="mt-3">
+                <label className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200">
+                  <input
+                    type="checkbox"
+                    className="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary"
+                  />
+                  <span>Cadet is back to OTA</span>
+                </label>
               </div>
-            </div>
+            </>
           ) : (
             // Normal detailed view for other records
             <>
