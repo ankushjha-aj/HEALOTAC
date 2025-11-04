@@ -288,7 +288,7 @@ export default function MedicalHistoryPage() {
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
                   {new Set(medicalRecords.filter(r => r.admittedInMH === 'Yes' && r.medicalStatus === 'Active').map(r => r.cadetId)).size}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Active MH/BH/CH Status</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Currently Admitted in MH/BH/CH</div>
               </div>
             </div>
           </div>
