@@ -955,7 +955,7 @@ function NewMedicalRecordPageInner() {
               {/* 4. Weight (kg) */}
               <div>
                 <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Weight (kg)
+                  Weight (kg) *
                 </label>
                 <input
                   type="number"
@@ -963,6 +963,7 @@ function NewMedicalRecordPageInner() {
                   name="weight"
                   min={0}
                   step="0.1"
+                  required
                   value={formData.weight}
                   onChange={handleChange}
                   className="input-field"
@@ -982,7 +983,7 @@ function NewMedicalRecordPageInner() {
                   value={formData.diagnosis}
                   onChange={handleChange}
                   className="input-field"
-                  placeholder="detailed prescription option"
+                  placeholder="Detailed prescription option"
                 />
               </div>
 
@@ -1135,12 +1136,13 @@ function NewMedicalRecordPageInner() {
               {/* 9. Contact No. */}
               <div>
                 <label htmlFor="contactNo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Contact No.
+                  Contact No. *
                 </label>
                 <input
                   type="tel"
                   id="contactNo"
                   name="contactNo"
+                  required
                   value={formData.contactNo}
                   onChange={handleChange}
                   className="input-field"
