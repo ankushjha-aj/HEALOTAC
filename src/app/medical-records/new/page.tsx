@@ -1282,12 +1282,13 @@ function NewMedicalRecordPageInner() {
                         {/* Academy Number */}
                         <div>
                           <label htmlFor="academyNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Academy Number
+                            Academy Number *
                           </label>
                           <input
                             type="number"
                             id="academyNumber"
                             name="academyNumber"
+                            required
                             value={cadetFormData.academyNumber}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1315,12 +1316,13 @@ function NewMedicalRecordPageInner() {
                         {/* Height (cm) */}
                         <div>
                           <label htmlFor="height" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Height (cm)
+                            Height (cm) *
                           </label>
                           <input
                             type="number"
                             id="height"
                             name="height"
+                            required
                             min={0}
                             value={cadetFormData.height}
                             onChange={handleCadetFormChange}
@@ -1332,12 +1334,13 @@ function NewMedicalRecordPageInner() {
                         {/* Weight (kg) */}
                         <div>
                           <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Weight (kg)
+                            Weight (kg) *
                           </label>
                           <input
                             type="number"
                             id="weight"
                             name="weight"
+                            required
                             min={0}
                             value={cadetFormData.weight}
                             onChange={handleCadetFormChange}
@@ -1349,12 +1352,13 @@ function NewMedicalRecordPageInner() {
                         {/* Age */}
                         <div>
                           <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Age
+                            Age *
                           </label>
                           <input
                             type="number"
                             id="age"
                             name="age"
+                            required
                             min={0}
                             value={cadetFormData.age}
                             onChange={handleCadetFormChange}
@@ -1366,12 +1370,13 @@ function NewMedicalRecordPageInner() {
                         {/* Course */}
                         <div>
                           <label htmlFor="course" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Course
+                            Course *
                           </label>
                           <input
                             type="number"
                             id="course"
                             name="course"
+                            required
                             min={1}
                             value={cadetFormData.course}
                             onChange={handleCadetFormChange}
@@ -1383,11 +1388,12 @@ function NewMedicalRecordPageInner() {
                         {/* Sex */}
                         <div>
                           <label htmlFor="sex" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Sex
+                            Sex *
                           </label>
                           <select
                             id="sex"
                             name="sex"
+                            required
                             value={cadetFormData.sex}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1401,11 +1407,12 @@ function NewMedicalRecordPageInner() {
                         {/* Relegated */}
                         <div>
                           <label htmlFor="relegated" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Relegated
+                            Relegated *
                           </label>
                           <select
                             id="relegated"
                             name="relegated"
+                            required
                             value={cadetFormData.relegated}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1427,12 +1434,13 @@ function NewMedicalRecordPageInner() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label htmlFor="bloodGroup" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Blood Group
+                            Blood Group *
                           </label>
                           <input
                             type="text"
                             id="bloodGroup"
                             name="bloodGroup"
+                            required
                             value={cadetFormData.bloodGroup}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1833,12 +1841,13 @@ function NewMedicalRecordPageInner() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label htmlFor="verticalJump" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Vertical Jump
+                            Vertical Jump *
                           </label>
                           <input
                             type="text"
                             id="verticalJump"
                             name="verticalJump"
+                            required
                             value={cadetFormData.verticalJump}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1847,12 +1856,13 @@ function NewMedicalRecordPageInner() {
                         </div>
                         <div>
                           <label htmlFor="ballThrow" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Ball Throw
+                            Ball Throw *
                           </label>
                           <input
                             type="text"
                             id="ballThrow"
                             name="ballThrow"
+                            required
                             value={cadetFormData.ballThrow}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1861,12 +1871,13 @@ function NewMedicalRecordPageInner() {
                         </div>
                         <div>
                           <label htmlFor="lowerBackStrength" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Lower Back Strength
+                            Lower Back Strength *
                           </label>
                           <input
                             type="text"
                             id="lowerBackStrength"
                             name="lowerBackStrength"
+                            required
                             value={cadetFormData.lowerBackStrength}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1875,12 +1886,13 @@ function NewMedicalRecordPageInner() {
                         </div>
                         <div>
                           <label htmlFor="shoulderDynamometerLeft" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Shoulder Dynamometer (Left)
+                            Shoulder Dynamometer (Left) *
                           </label>
                           <input
                             type="text"
                             id="shoulderDynamometerLeft"
                             name="shoulderDynamometerLeft"
+                            required
                             value={cadetFormData.shoulderDynamometerLeft}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1889,12 +1901,13 @@ function NewMedicalRecordPageInner() {
                         </div>
                         <div>
                           <label htmlFor="shoulderDynamometerRight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Shoulder Dynamometer (Right)
+                            Shoulder Dynamometer (Right) *
                           </label>
                           <input
                             type="text"
                             id="shoulderDynamometerRight"
                             name="shoulderDynamometerRight"
+                            required
                             value={cadetFormData.shoulderDynamometerRight}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1903,12 +1916,13 @@ function NewMedicalRecordPageInner() {
                         </div>
                         <div>
                           <label htmlFor="handGripDynamometerLeft" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Hand Grip Dynamometer (Left)
+                            Hand Grip Dynamometer (Left) *
                           </label>
                           <input
                             type="text"
                             id="handGripDynamometerLeft"
                             name="handGripDynamometerLeft"
+                            required
                             value={cadetFormData.handGripDynamometerLeft}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1917,12 +1931,13 @@ function NewMedicalRecordPageInner() {
                         </div>
                         <div>
                           <label htmlFor="handGripDynamometerRight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Hand Grip Dynamometer (Right)
+                            Hand Grip Dynamometer (Right) *
                           </label>
                           <input
                             type="text"
                             id="handGripDynamometerRight"
                             name="handGripDynamometerRight"
+                            required
                             value={cadetFormData.handGripDynamometerRight}
                             onChange={handleCadetFormChange}
                             className="input-field"
