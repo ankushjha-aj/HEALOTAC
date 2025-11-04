@@ -217,7 +217,30 @@ export default function CadetDetailsPage({
     }
   }
 
-  // Calculate total training days missed
+  const handleReturn = useCallback(async (recordId: number, daysMissed: number) => {
+    try {
+      const token = localStorage.getItem('jwt_token')
+      if (!token) return
+
+      const response = await fetch(`/api/medical-history/${recordId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ totalTrainingDaysMissed: daysMissed })
+      })
+
+      if (response.ok) {
+        // Update local state only after successful API update
+        setMedicalRecords(prev => prev.map(record =>
+          record.id === recordId ? { ...record, totalTrainingDaysMissed: daysMissed } : record
+        ))
+      }
+    } catch (error) {
+      console.error('Error updating return status:', error)
+    }
+  }, [])
   const totalTrainingDaysMissed = medicalRecords.reduce((total: number, record: MedicalRecord) => {
     let days = record.totalTrainingDaysMissed || 0
 
@@ -902,7 +925,7 @@ export default function CadetDetailsPage({
                 </div>
               ) : (
                 <>
-                  <MedicalRecordsList records={pagination.getVisibleItems(medicalRecords)} cadetId={cadetId} />
+                  <MedicalRecordsList records={pagination.getVisibleItems(medicalRecords)} cadetId={cadetId} onReturn={handleReturn} />
 
                   {/* Pagination Controls */}
                   <div className="mt-6 flex flex-col items-center gap-4">

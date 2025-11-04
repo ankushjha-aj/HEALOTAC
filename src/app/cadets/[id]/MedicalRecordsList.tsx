@@ -2,6 +2,7 @@
 
 import { Calendar, Clock, FileText } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
 interface MedicalRecord {
   id: number
@@ -26,13 +27,21 @@ interface MedicalRecord {
 interface MedicalRecordsListProps {
   records: MedicalRecord[]
   cadetId: number
+  onReturn?: (recordId: number, daysMissed: number) => void
 }
 
-export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsListProps) {
+export default function MedicalRecordsList({ records, cadetId, onReturn }: MedicalRecordsListProps) {
 
   return (
     <div className="space-y-4">
-      {records.map((record: MedicalRecord) => (
+      {records.map((record: MedicalRecord) => {
+        const admissionDate = new Date(record.dateOfReporting)
+        const timeDiff = Date.now() - admissionDate.getTime()
+        const canCheck = timeDiff >= 24 * 60 * 60 * 1000
+        const daysMissed = Math.floor(timeDiff / (24 * 60 * 60 * 1000))
+        const isChecked = record.admittedInMH === 'Yes' && (record.totalTrainingDaysMissed || 0) > 0
+
+        return (
         <div key={record.id} className="card p-4">
           {record.admittedInMH === 'Yes' ? (
             // Simplified view for MH/BH/CH admitted records
@@ -55,15 +64,31 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
                   MH/BH/CH Admission
                 </div>
               </div>
-              {/* Cadet is back to OTA checkbox */}
-              <div className="mt-3">
-                <label className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200">
-                  <input
-                    type="checkbox"
-                    className="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary"
-                  />
-                  <span>Cadet is back to OTA</span>
-                </label>
+              {/* Cadet Return Status */}
+              <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-900 dark:text-white">Cadet Return Status</span>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Track when cadet returns to OTA</p>
+                    </div>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" checked={isChecked} onChange={(e) => {
+                      if (onReturn) {
+                        onReturn(record.id, e.target.checked ? daysMissed : 0)
+                      }
+                    }} disabled={!canCheck} />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
+                    <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Returned</span>
+                  </label>
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">{isChecked ? `Training days missed by cadet: ${daysMissed} days` : 'Click the toggle when cadet returns from MH/BH/CH facility'}</p>
               </div>
             </>
           ) : (
@@ -111,18 +136,6 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
                       <div>Attend C: {record.attendC}</div>
                     ) : null}
 
-                    {/* Only show MI Detained if > 0 */}
-                    {record.attendC === 0 && record.totalTrainingDaysMissed && Number(record.totalTrainingDaysMissed) > 0 ? (
-                      <div className="font-medium text-orange-600 dark:text-orange-400">
-                        MI Detained: {record.totalTrainingDaysMissed} days
-                      </div>
-                    ) : null}
-                    {record.attendC && Number(record.attendC) > 0 && record.totalTrainingDaysMissed && Number(record.totalTrainingDaysMissed) > Number(record.attendC) ? (
-                      <div className="font-medium text-orange-600 dark:text-orange-400">
-                        MI Detained: {record.totalTrainingDaysMissed - record.attendC} days
-                      </div>
-                    ) : null}
-
                     {/* Only show Ex-PPG if > 0 */}
                     {record.exPpg && Number(record.exPpg) > 0 ? (
                       <div>Ex-PPG: {record.exPpg} (+{(record.exPpg * 0.25).toFixed(1)} day{(record.exPpg * 0.25) !== 1 ? 's' : ''} missed)</div>
@@ -166,7 +179,7 @@ export default function MedicalRecordsList({ records, cadetId }: MedicalRecordsL
             </>
           )}
         </div>
-      ))}
+      )})}
     </div>
   )
 }

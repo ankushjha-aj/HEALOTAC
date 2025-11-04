@@ -282,7 +282,7 @@ export default function MedicalHistoryPage() {
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
                   {medicalRecords.filter(r => r.admittedInMH === 'Yes' && r.medicalStatus === 'Active').length}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Admitted in MH/BH/CH</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Active MH/BH/CH Cases</div>
               </div>
             </div>
           </div>
@@ -448,17 +448,6 @@ export default function MedicalHistoryPage() {
                         <div className="text-sm text-gray-900 dark:text-white">
                           {new Date(record.dateOfReporting).toLocaleDateString()}
                         </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {record.attendC > 0 ? (
-                            <>Attend C: {record.attendC}</>
-                          ) : record.totalTrainingDaysMissed && record.totalTrainingDaysMissed > 0 ? (
-                            <span className="font-medium text-orange-600 dark:text-orange-400">
-                              MI Detained: {record.totalTrainingDaysMissed}
-                            </span>
-                          ) : (
-                            <>Attend C: {record.attendC}</>
-                          )}
-                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
@@ -467,6 +456,8 @@ export default function MedicalHistoryPage() {
                               ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
                               : record.medicalStatus === 'Completed'
                               ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                              : record.medicalStatus === 'Returned'
+                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
                               : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
                           }`}>
                             {record.medicalStatus}
@@ -489,22 +480,42 @@ export default function MedicalHistoryPage() {
                                 )}
                               </button>
                             )}
-                            {record.medicalStatus !== 'Completed' && (
-                              <button
-                                onClick={() => handleStatusUpdate(record.id, 'Completed')}
-                                disabled={updatingRecordId === record.id}
-                                className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed transition-colors"
-                                title="Mark as Completed"
-                              >
-                                {updatingRecordId === record.id ? (
-                                  <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                  </svg>
-                                ) : (
-                                  'C'
-                                )}
-                              </button>
+                            {record.admittedInMH === 'Yes' ? (
+                              record.medicalStatus !== 'Returned' && (
+                                <button
+                                  onClick={() => handleStatusUpdate(record.id, 'Returned')}
+                                  disabled={updatingRecordId === record.id}
+                                  className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-purple-600 text-white rounded hover:bg-purple-700 disabled:bg-purple-400 disabled:cursor-not-allowed transition-colors"
+                                  title="Mark as Returned"
+                                >
+                                  {updatingRecordId === record.id ? (
+                                    <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                  ) : (
+                                    'R'
+                                  )}
+                                </button>
+                              )
+                            ) : (
+                              record.medicalStatus !== 'Completed' && (
+                                <button
+                                  onClick={() => handleStatusUpdate(record.id, 'Completed')}
+                                  disabled={updatingRecordId === record.id}
+                                  className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed transition-colors"
+                                  title="Mark as Completed"
+                                >
+                                  {updatingRecordId === record.id ? (
+                                    <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                  ) : (
+                                    'C'
+                                  )}
+                                </button>
+                              )
                             )}
                           </div>
                         </div>
