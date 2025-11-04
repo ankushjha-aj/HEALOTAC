@@ -78,7 +78,10 @@ export default function MedicalRecordsList({ records, cadetId, onReturn }: Medic
                       <p className="text-sm text-gray-600 dark:text-gray-400">Track when cadet returns to OTA</p>
                     </div>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label 
+                    className="relative inline-flex items-center cursor-pointer" 
+                    title={!canCheck ? "Please come back after 24 hours in order to change status to returned" : isChecked ? "Cadet has been marked as returned" : "Double-click to mark cadet as returned"}
+                  >
                     <input type="checkbox" className="sr-only peer" checked={isChecked} onDoubleClick={(e) => {
                       if (!isChecked && canCheck && onReturn) {
                         onReturn(record.id, daysMissed)

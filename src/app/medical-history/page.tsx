@@ -93,6 +93,40 @@ export default function MedicalHistoryPage() {
     const confirmed = confirm(`Are you sure you want to mark this medical record as ${newStatus.toLowerCase()}?`)
     if (!confirmed) return
 
+    // For status changes to "Completed", check if cadet is still admitted
+    if (newStatus === 'Completed') {
+      const record = medicalRecords.find(r => r.id === recordId)
+      if (record && record.admittedInMH === 'Yes') {
+        // Check if cadet still has active admissions
+        try {
+          const token = localStorage.getItem('jwt_token')
+          if (token) {
+            const medicalRecordsResponse = await fetch(`/api/medical-history/${record.cadetId}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            })
+
+            if (medicalRecordsResponse.ok) {
+              const { records } = await medicalRecordsResponse.json()
+              const hasActiveAdmission = records.some((rec: any) =>
+                rec.admittedInMH === 'Yes' && rec.medicalStatus === 'Active'
+              )
+
+              if (hasActiveAdmission) {
+                alert('Please mark the cadet as returned in their details page first before changing status to Completed.')
+                return
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error checking cadet admission status:', error)
+          alert('Unable to verify cadet return status. Please try again.')
+          return
+        }
+      }
+    }
+
     setUpdatingRecordId(recordId)
 
     try {
