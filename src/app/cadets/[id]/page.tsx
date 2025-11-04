@@ -113,6 +113,7 @@ export default function CadetDetailsPage({
   const [weightInput, setWeightInput] = useState('')
   const [updatingWeight, setUpdatingWeight] = useState(false)
   const [showMoreCadetInfo, setShowMoreCadetInfo] = useState(false)
+  const [showMenstrualHealth, setShowMenstrualHealth] = useState(false)
 
   // Pagination for medical records
   const pagination = usePagination({
@@ -200,6 +201,12 @@ export default function CadetDetailsPage({
     }
   }, [searchParams, fetchCadetData, router])
 
+  useEffect(() => {
+    if (!showMoreCadetInfo) {
+      setShowMenstrualHealth(false)
+    }
+  }, [showMoreCadetInfo])
+
   const handleUpdateWeight = async () => {
     if (!cadetInfo) return
 
@@ -281,6 +288,33 @@ export default function CadetDetailsPage({
     medicalRecords.some(record => record.admittedInMH === 'Yes' && record.medicalStatus === 'Active'),
     [medicalRecords]
   )
+
+  const isFemaleCadet = cadetInfo?.sex?.toLowerCase?.() === 'female'
+
+  const hasMenstrualData = useMemo(() => {
+    if (!isFemaleCadet || !cadetInfo) return false
+
+    const hasValue = (value: unknown) => {
+      if (value === null || value === undefined) return false
+      if (Array.isArray(value)) return value.length > 0
+      if (typeof value === 'string') return value.trim().length > 0
+      return true
+    }
+
+    return (
+      hasValue(cadetInfo.menstrualFrequency) ||
+      hasValue(cadetInfo.menstrualDays) ||
+      hasValue(cadetInfo.lastMenstrualDate) ||
+      hasValue(cadetInfo.menstrualAids) ||
+      hasValue(cadetInfo.sexuallyActive) ||
+      hasValue(cadetInfo.maritalStatus) ||
+      hasValue(cadetInfo.pregnancyHistory) ||
+      hasValue(cadetInfo.contraceptiveHistory) ||
+      hasValue(cadetInfo.surgeryHistory) ||
+      hasValue(cadetInfo.medicalCondition) ||
+      hasValue(cadetInfo.hemoglobinLevel)
+    )
+  }, [cadetInfo, isFemaleCadet])
 
   if (loading) {
     return (
@@ -530,7 +564,17 @@ export default function CadetDetailsPage({
           {/* Expanded Cadet Information */}
           {showMoreCadetInfo && (
             <div className="card p-6 animate-in slide-in-from-top-2 duration-300">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Complete Cadet Information</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Complete Cadet Information</h3>
+                {isFemaleCadet && hasMenstrualData && (
+                  <button
+                    onClick={() => setShowMenstrualHealth(prev => !prev)}
+                    className="text-primary hover:text-primary/80 text-sm font-medium transition-colors cursor-pointer"
+                  >
+                    {showMenstrualHealth ? 'Hide Menstrual health' : 'Show Menstrual health'}
+                  </button>
+                )}
+              </div>
 
               {/* Health Parameters Section */}
               {(cadetInfo.bloodGroup || cadetInfo.bmi || cadetInfo.bodyFat || cadetInfo.calcanealBoneDensity ||
@@ -805,96 +849,6 @@ export default function CadetDetailsPage({
                 </div>
               )}
 
-              {/* Menstrual Health Section */}
-              {(cadetInfo.menstrualFrequency || cadetInfo.menstrualDays || cadetInfo.lastMenstrualDate ||
-                cadetInfo.menstrualAids || cadetInfo.sexuallyActive || cadetInfo.maritalStatus ||
-                cadetInfo.pregnancyHistory || cadetInfo.contraceptiveHistory || cadetInfo.surgeryHistory ||
-                cadetInfo.medicalCondition || cadetInfo.hemoglobinLevel) && (
-                <div className="mb-6">
-                  {console.log('🔍 MENSTRUAL SECTION RENDERING - cadetInfo:', {
-                    menstrualFrequency: cadetInfo.menstrualFrequency,
-                    menstrualDays: cadetInfo.menstrualDays,
-                    lastMenstrualDate: cadetInfo.lastMenstrualDate,
-                    menstrualAids: cadetInfo.menstrualAids,
-                    sexuallyActive: cadetInfo.sexuallyActive,
-                    maritalStatus: cadetInfo.maritalStatus,
-                    pregnancyHistory: cadetInfo.pregnancyHistory,
-                    contraceptiveHistory: cadetInfo.contraceptiveHistory,
-                    surgeryHistory: cadetInfo.surgeryHistory,
-                    medicalCondition: cadetInfo.medicalCondition,
-                    hemoglobinLevel: cadetInfo.hemoglobinLevel
-                  })}
-                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Menstrual Health</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pl-4 border-l-2 border-pink-200 dark:border-pink-600">
-                    {cadetInfo.menstrualFrequency && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Menstrual Frequency:</span>
-                        <span className="text-sm font-medium">{cadetInfo.menstrualFrequency}</span>
-                      </div>
-                    )}
-                    {cadetInfo.menstrualDays && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Menstrual Days:</span>
-                        <span className="text-sm font-medium">{cadetInfo.menstrualDays}</span>
-                      </div>
-                    )}
-                    {(cadetInfo.lastMenstrualDate !== undefined && cadetInfo.lastMenstrualDate !== null) && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Menstrual Date:</span>
-                        <span className="text-sm font-medium">{cadetInfo.lastMenstrualDate ? new Date(cadetInfo.lastMenstrualDate).toLocaleDateString() : 'Not specified'}</span>
-                      </div>
-                    )}
-                    {(cadetInfo.menstrualAids && Array.isArray(cadetInfo.menstrualAids) && cadetInfo.menstrualAids.length > 0) && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Menstrual Aids:</span>
-                        <span className="text-sm font-medium">{cadetInfo.menstrualAids.join(', ')}</span>
-                      </div>
-                    )}
-                    {(cadetInfo.sexuallyActive !== undefined && cadetInfo.sexuallyActive !== null) && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sexually Active:</span>
-                        <span className="text-sm font-medium">{cadetInfo.sexuallyActive || 'Not specified'}</span>
-                      </div>
-                    )}
-                    {(cadetInfo.maritalStatus !== undefined && cadetInfo.maritalStatus !== null && cadetInfo.maritalStatus !== '') && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Marital Status:</span>
-                        <span className="text-sm font-medium">{cadetInfo.maritalStatus || 'Not specified'}</span>
-                      </div>
-                    )}
-                    {(cadetInfo.pregnancyHistory !== undefined && cadetInfo.pregnancyHistory !== null && cadetInfo.pregnancyHistory !== '') && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pregnancy History:</span>
-                        <span className="text-sm font-medium">{cadetInfo.pregnancyHistory || 'None'}</span>
-                      </div>
-                    )}
-                    {(cadetInfo.contraceptiveHistory !== undefined && cadetInfo.contraceptiveHistory !== null && cadetInfo.contraceptiveHistory !== '') && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contraceptive History:</span>
-                        <span className="text-sm font-medium">{cadetInfo.contraceptiveHistory || 'None'}</span>
-                      </div>
-                    )}
-                    {(cadetInfo.surgeryHistory !== undefined && cadetInfo.surgeryHistory !== null && cadetInfo.surgeryHistory !== '') && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Underwent any Surgery:</span>
-                        <span className="text-sm font-medium">{cadetInfo.surgeryHistory || 'None'}</span>
-                      </div>
-                    )}
-                    {(cadetInfo.medicalCondition !== undefined && cadetInfo.medicalCondition !== null && cadetInfo.medicalCondition !== '') && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Medical Condition:</span>
-                        <span className="text-sm font-medium">{cadetInfo.medicalCondition || 'None'}</span>
-                      </div>
-                    )}
-                    {(cadetInfo.hemoglobinLevel !== undefined && cadetInfo.hemoglobinLevel !== null) && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hemoglobin Level:</span>
-                        <span className="text-sm font-medium">{cadetInfo.hemoglobinLevel}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           )}
 

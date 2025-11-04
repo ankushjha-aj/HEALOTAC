@@ -15,6 +15,8 @@ export const users = pgTable('users', {
 export const cadets = pgTable('cadets', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
+  isForeign: boolean('is_foreign').default(false).notNull(),
+  country: varchar('country', { length: 100 }),
   battalion: varchar('battalion', { length: 100 }).notNull(),
   company: varchar('company', { length: 50 }).notNull(),
   joinDate: timestamp('join_date').notNull(),
