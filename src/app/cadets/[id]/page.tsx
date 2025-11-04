@@ -2,7 +2,7 @@
 
 import { notFound } from 'next/navigation'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Edit, Plus, Save, X } from 'lucide-react'
 import Link from 'next/link'
@@ -228,13 +228,16 @@ export default function CadetDetailsPage({
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ totalTrainingDaysMissed: daysMissed })
+        body: JSON.stringify({ 
+          totalTrainingDaysMissed: daysMissed,
+          medicalStatus: 'Completed' // Mark the admission as completed when cadet returns
+        })
       })
 
       if (response.ok) {
         // Update local state only after successful API update
         setMedicalRecords(prev => prev.map(record =>
-          record.id === recordId ? { ...record, totalTrainingDaysMissed: daysMissed } : record
+          record.id === recordId ? { ...record, totalTrainingDaysMissed: daysMissed, medicalStatus: 'Completed' } : record
         ))
       }
     } catch (error) {
@@ -258,6 +261,12 @@ export default function CadetDetailsPage({
 
     return total + days
   }, 0)
+
+  // Memoize active admission check to prevent unnecessary re-renders
+  const hasActiveAdmission = useMemo(() => 
+    medicalRecords.some(record => record.admittedInMH === 'Yes' && record.medicalStatus === 'Active'),
+    [medicalRecords]
+  )
 
   if (loading) {
     return (
@@ -891,7 +900,6 @@ export default function CadetDetailsPage({
                         </select>
                       </div>
                       {(() => {
-                        const hasActiveAdmission = medicalRecords.some(record => record.admittedInMH === 'Yes' && record.medicalStatus === 'Active')
                         return hasActiveAdmission ? (
                           <div
                             className="inline-flex items-center justify-center p-2 bg-gray-400 text-gray-200 rounded-lg cursor-not-allowed"

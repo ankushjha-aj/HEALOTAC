@@ -58,14 +58,19 @@ export default function CadetsPage() {
 
   const fetchCadets = async () => {
     try {
+      console.log('🔄 Starting to fetch cadets...')
       setLoading(true)
       setError(null)
       const token = localStorage.getItem('jwt_token')
+      console.log('🔑 JWT Token:', token ? 'Present' : 'Missing')
+      
       if (!token) {
+        console.log('❌ No JWT token found, setting error')
         setError('Authentication required')
         return
       }
 
+      console.log('📡 Making API calls...')
       const [cadetsRes, recordsRes] = await Promise.all([
         fetch('/api/cadets', {
           headers: {
@@ -79,23 +84,37 @@ export default function CadetsPage() {
         })
       ])
 
-      if (!cadetsRes.ok) throw new Error('Failed to fetch cadets')
-      if (!recordsRes.ok) throw new Error('Failed to fetch medical records')
+      console.log('📊 API Responses - Cadets:', cadetsRes.status, cadetsRes.ok)
+      console.log('📋 API Responses - Records:', recordsRes.status, recordsRes.ok)
+
+      if (!cadetsRes.ok) {
+        console.log('❌ Cadets API failed:', cadetsRes.status)
+        throw new Error('Failed to fetch cadets')
+      }
+      if (!recordsRes.ok) {
+        console.log('❌ Records API failed:', recordsRes.status)
+        throw new Error('Failed to fetch medical records')
+      }
 
       const cadetsData = await cadetsRes.json()
       const recordsData = await recordsRes.json()
+      
+      console.log('✅ Cadets data received:', cadetsData.length, 'cadets')
+      console.log('✅ Records data received:', recordsData.length, 'records')
+      
       // Sort cadets by createdAt descending (most recent first)
       const sortedCadets = cadetsData.sort((a: Cadet, b: Cadet) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       )
       setCadets(sortedCadets)
       setMedicalRecords(recordsData)
-      console.log('📊 FETCHED CADETS:', cadetsData.length, 'records')
-      console.log('📋 FETCHED MEDICAL RECORDS:', recordsData.length, 'records')
+      
+      console.log('✅ Data set successfully, loading should be false')
     } catch (err) {
       console.error('❌ Error fetching data:', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch cadets')
     } finally {
+      console.log('🏁 Setting loading to false')
       setLoading(false)
     }
   }

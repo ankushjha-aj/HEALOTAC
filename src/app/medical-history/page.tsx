@@ -89,42 +89,14 @@ export default function MedicalHistoryPage() {
   }, [])
 
   const handleStatusUpdate = async (recordId: number, newStatus: string) => {
-    // Show confirmation dialog
-    const confirmed = confirm(`Are you sure you want to mark this medical record as ${newStatus.toLowerCase()}?`)
-    if (!confirmed) return
-
-    // For status changes to "Completed", check if cadet is still admitted
+    // For status changes to "Completed", show confirmation about checking return status
     if (newStatus === 'Completed') {
-      const record = medicalRecords.find(r => r.id === recordId)
-      if (record && record.admittedInMH === 'Yes') {
-        // Check if cadet still has active admissions
-        try {
-          const token = localStorage.getItem('jwt_token')
-          if (token) {
-            const medicalRecordsResponse = await fetch(`/api/medical-history/${record.cadetId}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            })
-
-            if (medicalRecordsResponse.ok) {
-              const { records } = await medicalRecordsResponse.json()
-              const hasActiveAdmission = records.some((rec: any) =>
-                rec.admittedInMH === 'Yes' && rec.medicalStatus === 'Active'
-              )
-
-              if (hasActiveAdmission) {
-                alert('Please mark the cadet as returned in their details page first before changing status to Completed.')
-                return
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Error checking cadet admission status:', error)
-          alert('Unable to verify cadet return status. Please try again.')
-          return
-        }
-      }
+      const confirmed = confirm('Please first verify whether the cadet has returned. If the cadet has not returned, do not mark it as completed, as this action cannot be changed later.\n\nDo you want to proceed?')
+      if (!confirmed) return
+    } else {
+      // Show regular confirmation for other status changes
+      const confirmed = confirm(`Are you sure you want to mark this medical record as ${newStatus.toLowerCase()}?`)
+      if (!confirmed) return
     }
 
     setUpdatingRecordId(recordId)
@@ -486,7 +458,7 @@ export default function MedicalHistoryPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            record.admittedInMH === 'Yes'
+                            record.admittedInMH === 'Yes' && record.medicalStatus === 'Active'
                               ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
                               : record.medicalStatus === 'Active'
                               ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
@@ -496,7 +468,7 @@ export default function MedicalHistoryPage() {
                               ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
                               : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
                           }`}>
-                            {record.admittedInMH === 'Yes' ? 'Admitted in MH' : record.medicalStatus}
+                            {record.admittedInMH === 'Yes' && record.medicalStatus === 'Active' ? 'Admitted in MH' : record.medicalStatus}
                           </span>
                           <div className="flex gap-1">
                             {record.admittedInMH !== 'Yes' && record.medicalStatus !== 'Active' && (
