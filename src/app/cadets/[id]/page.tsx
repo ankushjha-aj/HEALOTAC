@@ -155,6 +155,20 @@ export default function CadetDetailsPage({
       const { records: medicalRecordsResult } = recordsResponse
 
       console.log(`✅ RECEIVED CADET DATA:`, cadetData)
+      console.log(`🔍 MENSTRUAL DATA CHECK:`, {
+        menstrualFrequency: cadetData.menstrualFrequency,
+        menstrualDays: cadetData.menstrualDays,
+        lastMenstrualDate: cadetData.lastMenstrualDate,
+        menstrualAids: cadetData.menstrualAids,
+        sexuallyActive: cadetData.sexuallyActive,
+        maritalStatus: cadetData.maritalStatus,
+        pregnancyHistory: cadetData.pregnancyHistory,
+        contraceptiveHistory: cadetData.contraceptiveHistory,
+        surgeryHistory: cadetData.surgeryHistory,
+        medicalCondition: cadetData.medicalCondition,
+        hemoglobinLevel: cadetData.hemoglobinLevel
+      })
+      console.log(`🔍 MENSTRUAL AIDS TYPE:`, typeof cadetData.menstrualAids, Array.isArray(cadetData.menstrualAids))
       console.log(`✅ RAW RECORDS RESPONSE:`, recordsResponse)
       console.log(`✅ RECEIVED MEDICAL RECORDS:`, medicalRecordsResult.length, 'records')
       console.log(`✅ RECORDS RESPONSE STATUS:`, recordsRes.status, recordsRes.ok)
@@ -797,6 +811,19 @@ export default function CadetDetailsPage({
                 cadetInfo.pregnancyHistory || cadetInfo.contraceptiveHistory || cadetInfo.surgeryHistory ||
                 cadetInfo.medicalCondition || cadetInfo.hemoglobinLevel) && (
                 <div className="mb-6">
+                  {console.log('🔍 MENSTRUAL SECTION RENDERING - cadetInfo:', {
+                    menstrualFrequency: cadetInfo.menstrualFrequency,
+                    menstrualDays: cadetInfo.menstrualDays,
+                    lastMenstrualDate: cadetInfo.lastMenstrualDate,
+                    menstrualAids: cadetInfo.menstrualAids,
+                    sexuallyActive: cadetInfo.sexuallyActive,
+                    maritalStatus: cadetInfo.maritalStatus,
+                    pregnancyHistory: cadetInfo.pregnancyHistory,
+                    contraceptiveHistory: cadetInfo.contraceptiveHistory,
+                    surgeryHistory: cadetInfo.surgeryHistory,
+                    medicalCondition: cadetInfo.medicalCondition,
+                    hemoglobinLevel: cadetInfo.hemoglobinLevel
+                  })}
                   <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Menstrual Health</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pl-4 border-l-2 border-pink-200 dark:border-pink-600">
                     {cadetInfo.menstrualFrequency && (
