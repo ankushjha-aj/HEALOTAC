@@ -24,6 +24,7 @@ interface MedicalRecord {
   remarks: string
   createdAt: string
   monitoringCase: boolean
+  admittedInMH?: string // New field for admission in MH/BH/CH
 }
 
 export default function MedicalHistoryPage() {
@@ -146,6 +147,8 @@ export default function MedicalHistoryPage() {
       matchesStatus = record.medicalStatus === 'Completed'
     } else if (statusFilter === 'monitoring') {
       matchesStatus = record.monitoringCase === true
+    } else if (statusFilter === 'admitted') {
+      matchesStatus = record.admittedInMH === 'Yes'
     } else if (statusFilter !== 'all') {
       matchesStatus = record.medicalStatus === statusFilter
     }
@@ -221,7 +224,7 @@ export default function MedicalHistoryPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="card p-4">
             <div className="flex items-center gap-3">
               <FileText className="h-8 w-8 text-primary" />
@@ -266,7 +269,20 @@ export default function MedicalHistoryPage() {
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
                   {medicalRecords.filter(r => r.monitoringCase && r.medicalStatus === 'Active').length}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Monitoring Cases</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Active Monitoring Case</div>
+              </div>
+            </div>
+          </div>
+          <div className="card p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
+                <div className="h-3 w-3 rounded-full bg-purple-500"></div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {medicalRecords.filter(r => r.admittedInMH === 'Yes' && r.medicalStatus === 'Active').length}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Admitted in MH/BH/CH</div>
               </div>
             </div>
           </div>
@@ -294,6 +310,7 @@ export default function MedicalHistoryPage() {
                 <option value="Active">Active</option>
                 <option value="Completed">Completed</option>
                 <option value="monitoring">Monitoring Cases</option>
+                <option value="admitted">Admitted in MH/BH/CH</option>
               </select>
               {/* Records per page selector */}
               <div className="flex items-center gap-2">

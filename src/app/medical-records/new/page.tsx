@@ -113,6 +113,7 @@ function NewMedicalRecordPageInner() {
     contactNo: '',
     remarks: '',
     monitoringCase: 'No',
+    admittedInMH: 'No', // New field for admission in MH/BH/CH
     weight: '',
   })
 
@@ -293,6 +294,16 @@ function NewMedicalRecordPageInner() {
         } else if (value !== prev.trainingType) {
           // Reset training days when switching between attendC and miDetained
           newData.trainingDays = '0'
+        }
+      }
+
+      // Handle admittedInMH changes
+      if (name === 'admittedInMH') {
+        if (value === 'Yes') {
+          newData.monitoringCase = 'Yes'
+        } else if (prev.admittedInMH === 'Yes') {
+          // Reset monitoring case when changing from Yes to No
+          newData.monitoringCase = 'No'
         }
       }
 
@@ -537,6 +548,7 @@ function NewMedicalRecordPageInner() {
         contactNo: formData.contactNo,
         remarks: formData.remarks,
         monitoringCase: formData.monitoringCase,
+        admittedInMH: formData.admittedInMH,
       }
 
       console.log('📝 FRONTEND SENDING MEDICAL RECORD DATA:', submitData)
@@ -970,7 +982,8 @@ function NewMedicalRecordPageInner() {
                     name="trainingType"
                     value={formData.trainingType}
                     onChange={handleChange}
-                    className="input-field"
+                    disabled={formData.admittedInMH === 'Yes'}
+                    className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
                   >
                     <option value="none">None</option>
                     <option value="attendC">Attend C</option>
@@ -990,7 +1003,8 @@ function NewMedicalRecordPageInner() {
                         max={formData.trainingType === 'attendC' ? '10' : '30'}
                         value={formData.trainingDays}
                         onChange={handleChange}
-                        className="input-field flex-1"
+                        disabled={formData.admittedInMH === 'Yes'}
+                        className={`input-field flex-1 ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
                         placeholder="0"
                       />
                     </div>
@@ -1010,7 +1024,8 @@ function NewMedicalRecordPageInner() {
                   min="0"
                   value={formData.exPpg}
                   onChange={handleChange}
-                  className="input-field"
+                  disabled={formData.admittedInMH === 'Yes'}
+                  className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
                   placeholder="0"
                 />
               </div>
@@ -1027,7 +1042,8 @@ function NewMedicalRecordPageInner() {
                   min="0"
                   value={formData.attendB}
                   onChange={handleChange}
-                  className="input-field"
+                  disabled={formData.admittedInMH === 'Yes'}
+                  className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
                   placeholder="0"
                 />
               </div>
@@ -1044,7 +1060,8 @@ function NewMedicalRecordPageInner() {
                   min="0"
                   value={formData.physiotherapy}
                   onChange={handleChange}
-                  className="input-field"
+                  disabled={formData.admittedInMH === 'Yes'}
+                  className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
                   placeholder="0"
                 />
               </div>
@@ -1057,6 +1074,24 @@ function NewMedicalRecordPageInner() {
                   id="monitoringCase"
                   name="monitoringCase"
                   value={formData.monitoringCase}
+                  onChange={handleChange}
+                  disabled={formData.admittedInMH === 'Yes'}
+                  className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                >
+                  <option value="No">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+              </div>
+
+              {/* 8. Admitted in MH/BH/CH */}
+              <div>
+                <label htmlFor="admittedInMH" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Admitted in MH/BH/CH
+                </label>
+                <select
+                  id="admittedInMH"
+                  name="admittedInMH"
+                  value={formData.admittedInMH}
                   onChange={handleChange}
                   className="input-field"
                 >

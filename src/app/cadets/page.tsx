@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Search, Edit, Trash2, Filter } from 'lucide-react'
 import Link from 'next/link'
@@ -185,10 +185,13 @@ export default function CadetsPage() {
   // Reset pagination to page 1 when search or filter changes
   useEffect(() => {
     pagination.goToPage(1)
-  }, [searchTerm, showHighTrainingMissed, pagination])
+  }, [searchTerm, showHighTrainingMissed])
 
   // Get paginated cadets
-  const paginatedCadets = pagination.getVisibleItems(filteredCadets)
+  const paginatedCadets = useMemo(
+    () => pagination.getVisibleItems(filteredCadets),
+    [pagination, filteredCadets]
+  )
 
   const handleAddNewRecord = () => {
     setNavigatingToNewRecord(true)

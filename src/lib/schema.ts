@@ -98,6 +98,7 @@ export const medicalRecords = pgTable('medical_records', {
   physiotherapy: integer('physiotherapy').default(0).notNull(),
   totalTrainingDaysMissed: integer('total_training_days_missed').default(0).notNull(),
   monitoringCase: boolean('monitoring_case').default(false).notNull(),
+  admittedInMH: varchar('admitted_in_mh', { length: 10 }), // New field for MH/BH/CH admission
   contactNo: varchar('contact_no', { length: 20 }),
   remarks: text('remarks'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
