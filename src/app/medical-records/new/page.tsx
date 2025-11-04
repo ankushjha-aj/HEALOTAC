@@ -281,10 +281,10 @@ function NewMedicalRecordPageInner() {
     }
   }, [loadingCadets, cadets.length, searchParams, selectedCadet])
 
-  // Clear country when foreign candidate is unchecked
+  // Clear country and yellowFever when foreign candidate is unchecked
   useEffect(() => {
     if (!cadetFormData.isForeign) {
-      setCadetFormData(prev => ({ ...prev, country: '' }))
+      setCadetFormData(prev => ({ ...prev, country: '', yellowFever: false }))
     }
   }, [cadetFormData.isForeign])
 
@@ -1962,6 +1962,7 @@ function NewMedicalRecordPageInner() {
                           </label>
                         </div>
                       </div>
+                      {cadetFormData.isForeign && (
                       <div>
                         <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Yellow Fever (Foreign Cadets only):</h5>
                         <div className="flex gap-4">
@@ -1989,10 +1990,9 @@ function NewMedicalRecordPageInner() {
                           </label>
                         </div>
                       </div>
+                      )}
                       <div>
-                        <label htmlFor="pastMedicalHistory" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Past Medical History
-                        </label>
+                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Past Medical History:</h5>
                         <textarea
                           id="pastMedicalHistory"
                           name="pastMedicalHistory"
