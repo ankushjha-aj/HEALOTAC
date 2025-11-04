@@ -791,13 +791,13 @@ export default function CadetDetailsPage({
                 </div>
               )}
 
-              {/* Menstrual & Reproductive Health Section */}
+              {/* Menstrual Health Section */}
               {(cadetInfo.menstrualFrequency || cadetInfo.menstrualDays || cadetInfo.lastMenstrualDate ||
                 cadetInfo.menstrualAids || cadetInfo.sexuallyActive || cadetInfo.maritalStatus ||
                 cadetInfo.pregnancyHistory || cadetInfo.contraceptiveHistory || cadetInfo.surgeryHistory ||
                 cadetInfo.medicalCondition || cadetInfo.hemoglobinLevel) && (
                 <div className="mb-6">
-                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Menstrual & Reproductive Health</h4>
+                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Menstrual Health</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pl-4 border-l-2 border-pink-200 dark:border-pink-600">
                     {cadetInfo.menstrualFrequency && (
                       <div className="flex items-center gap-2">
@@ -811,7 +811,7 @@ export default function CadetDetailsPage({
                         <span className="text-sm font-medium">{cadetInfo.menstrualDays}</span>
                       </div>
                     )}
-                    {cadetInfo.lastMenstrualDate && (
+                    {(cadetInfo.lastMenstrualDate) && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Menstrual Date:</span>
                         <span className="text-sm font-medium">{new Date(cadetInfo.lastMenstrualDate).toLocaleDateString()}</span>
@@ -823,43 +823,43 @@ export default function CadetDetailsPage({
                         <span className="text-sm font-medium">{cadetInfo.menstrualAids.join(', ')}</span>
                       </div>
                     )}
-                    {cadetInfo.sexuallyActive && (
+                    {(cadetInfo.sexuallyActive !== undefined && cadetInfo.sexuallyActive !== null) && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sexually Active:</span>
-                        <span className="text-sm font-medium">{cadetInfo.sexuallyActive}</span>
+                        <span className="text-sm font-medium">{cadetInfo.sexuallyActive || 'Not specified'}</span>
                       </div>
                     )}
-                    {cadetInfo.maritalStatus && (
+                    {(cadetInfo.maritalStatus !== undefined && cadetInfo.maritalStatus !== null && cadetInfo.maritalStatus !== '') && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Marital Status:</span>
-                        <span className="text-sm font-medium">{cadetInfo.maritalStatus}</span>
+                        <span className="text-sm font-medium">{cadetInfo.maritalStatus || 'Not specified'}</span>
                       </div>
                     )}
-                    {cadetInfo.pregnancyHistory && (
+                    {(cadetInfo.pregnancyHistory !== undefined && cadetInfo.pregnancyHistory !== null && cadetInfo.pregnancyHistory !== '') && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pregnancy History:</span>
-                        <span className="text-sm font-medium">{cadetInfo.pregnancyHistory}</span>
+                        <span className="text-sm font-medium">{cadetInfo.pregnancyHistory || 'None'}</span>
                       </div>
                     )}
-                    {cadetInfo.contraceptiveHistory && (
+                    {(cadetInfo.contraceptiveHistory !== undefined && cadetInfo.contraceptiveHistory !== null && cadetInfo.contraceptiveHistory !== '') && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contraceptive History:</span>
-                        <span className="text-sm font-medium">{cadetInfo.contraceptiveHistory}</span>
+                        <span className="text-sm font-medium">{cadetInfo.contraceptiveHistory || 'None'}</span>
                       </div>
                     )}
-                    {cadetInfo.surgeryHistory && (
+                    {(cadetInfo.surgeryHistory !== undefined && cadetInfo.surgeryHistory !== null && cadetInfo.surgeryHistory !== '') && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Surgery History:</span>
-                        <span className="text-sm font-medium">{cadetInfo.surgeryHistory}</span>
+                        <span className="text-sm font-medium">{cadetInfo.surgeryHistory || 'None'}</span>
                       </div>
                     )}
-                    {cadetInfo.medicalCondition && (
+                    {(cadetInfo.medicalCondition !== undefined && cadetInfo.medicalCondition !== null && cadetInfo.medicalCondition !== '') && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Medical Condition:</span>
-                        <span className="text-sm font-medium">{cadetInfo.medicalCondition}</span>
+                        <span className="text-sm font-medium">{cadetInfo.medicalCondition || 'None'}</span>
                       </div>
                     )}
-                    {cadetInfo.hemoglobinLevel && (
+                    {(cadetInfo.hemoglobinLevel !== undefined && cadetInfo.hemoglobinLevel !== null) && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hemoglobin Level:</span>
                         <span className="text-sm font-medium">{cadetInfo.hemoglobinLevel}</span>
