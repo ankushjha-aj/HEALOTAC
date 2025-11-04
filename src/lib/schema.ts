@@ -15,6 +15,8 @@ export const users = pgTable('users', {
 export const cadets = pgTable('cadets', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }).notNull(),
+  isForeign: boolean('is_foreign').default(false).notNull(),
+  country: varchar('country', { length: 100 }),
   battalion: varchar('battalion', { length: 100 }).notNull(),
   company: varchar('company', { length: 50 }).notNull(),
   joinDate: timestamp('join_date').notNull(),
@@ -98,6 +100,7 @@ export const medicalRecords = pgTable('medical_records', {
   physiotherapy: integer('physiotherapy').default(0).notNull(),
   totalTrainingDaysMissed: integer('total_training_days_missed').default(0).notNull(),
   monitoringCase: boolean('monitoring_case').default(false).notNull(),
+  admittedInMH: varchar('admitted_in_mh', { length: 10 }), // New field for MH/BH/CH admission
   contactNo: varchar('contact_no', { length: 20 }),
   remarks: text('remarks'),
   createdAt: timestamp('created_at').defaultNow().notNull(),

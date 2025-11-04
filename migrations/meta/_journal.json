@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1762005048860,
-      "tag": "0000_orange_meteorite",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1762010621932,
-      "tag": "0001_motionless_karma",
+      "when": 1762275079271,
+      "tag": "0000_cold_caretaker",
       "breakpoints": true
     }
   ]

@@ -1,5 +1,5 @@
 {
-  "id": "7742ee71-05f5-45b6-bde4-94ef0ce1dc7a",
+  "id": "92037451-1e56-4236-bc4f-3aed7321957d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -19,6 +19,19 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
+        },
+        "is_foreign": {
+          "name": "is_foreign",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "country": {
+          "name": "country",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
         },
         "battalion": {
           "name": "battalion",
@@ -289,6 +302,72 @@
           "primaryKey": false,
           "notNull": false
         },
+        "menstrual_frequency": {
+          "name": "menstrual_frequency",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "menstrual_days": {
+          "name": "menstrual_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_menstrual_date": {
+          "name": "last_menstrual_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "menstrual_aids": {
+          "name": "menstrual_aids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sexually_active": {
+          "name": "sexually_active",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "marital_status": {
+          "name": "marital_status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pregnancy_history": {
+          "name": "pregnancy_history",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "contraceptive_history": {
+          "name": "contraceptive_history",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "surgery_history": {
+          "name": "surgery_history",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "medical_condition": {
+          "name": "medical_condition",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hemoglobin_level": {
+          "name": "hemoglobin_level",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -401,6 +480,12 @@
           "primaryKey": false,
           "notNull": true,
           "default": false
+        },
+        "admitted_in_mh": {
+          "name": "admitted_in_mh",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
         },
         "contact_no": {
           "name": "contact_no",

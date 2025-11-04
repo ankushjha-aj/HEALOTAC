@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
         physiotherapy: medicalRecords.physiotherapy,
         totalTrainingDaysMissed: medicalRecords.totalTrainingDaysMissed,
         monitoringCase: medicalRecords.monitoringCase,
+        admittedInMH: medicalRecords.admittedInMH,
         contactNo: medicalRecords.contactNo,
         remarks: medicalRecords.remarks,
         createdAt: medicalRecords.createdAt,
@@ -83,6 +84,7 @@ export async function POST(request: NextRequest) {
       physiotherapy,
       totalTrainingDaysMissed,
       monitoringCase,
+      admittedInMH,
       contactNo,
       remarks
     } = await request.json()
@@ -132,6 +134,7 @@ export async function POST(request: NextRequest) {
       physiotherapy: physiotherapy ? parseInt(physiotherapy) : 0,
       totalTrainingDaysMissed: totalDaysMissed,
       monitoringCase: !!(monitoringCase === true || monitoringCase === 'Yes' || monitoringCase === 'yes' || monitoringCase === 'true'),
+      admittedInMH,
       contactNo,
       remarks,
     }).returning()

@@ -75,3 +75,40 @@ export async function GET(
     )
   }
 }
+
+// PATCH /api/medical-history/[id] - Update a specific medical record
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  // Check authentication
+  const authError = createAuthMiddleware(['admin', 'user'])(request)
+  if (authError) return authError
+
+  try {
+    const recordId = parseInt(params.id)
+
+    if (isNaN(recordId)) {
+      return NextResponse.json(
+        { error: 'Invalid record ID' },
+        { status: 400 }
+      )
+    }
+
+    const body = await request.json()
+    const { totalTrainingDaysMissed } = body
+
+    // Update the record
+    await db.update(medicalRecords)
+      .set({ totalTrainingDaysMissed })
+      .where(eq(medicalRecords.id, recordId))
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('❌ Error updating medical record:', error)
+    return NextResponse.json(
+      { error: 'Failed to update medical record' },
+      { status: 500 }
+    )
+  }
+}

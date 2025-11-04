@@ -24,6 +24,7 @@ interface MedicalRecord {
   remarks: string
   createdAt: string
   monitoringCase: boolean
+  admittedInMH?: string // New field for admission in MH/BH/CH
 }
 
 export default function MedicalHistoryPage() {
@@ -88,9 +89,15 @@ export default function MedicalHistoryPage() {
   }, [])
 
   const handleStatusUpdate = async (recordId: number, newStatus: string) => {
-    // Show confirmation dialog
-    const confirmed = confirm(`Are you sure you want to mark this medical record as ${newStatus.toLowerCase()}?`)
-    if (!confirmed) return
+    // For status changes to "Completed", show confirmation about checking return status
+    if (newStatus === 'Completed') {
+      const confirmed = confirm('Please first verify whether the cadet has returned. If the cadet has not returned, do not mark it as completed, as this action cannot be changed later.\n\nDo you want to proceed?')
+      if (!confirmed) return
+    } else {
+      // Show regular confirmation for other status changes
+      const confirmed = confirm(`Are you sure you want to mark this medical record as ${newStatus.toLowerCase()}?`)
+      if (!confirmed) return
+    }
 
     setUpdatingRecordId(recordId)
 
@@ -146,6 +153,8 @@ export default function MedicalHistoryPage() {
       matchesStatus = record.medicalStatus === 'Completed'
     } else if (statusFilter === 'monitoring') {
       matchesStatus = record.monitoringCase === true
+    } else if (statusFilter === 'admitted') {
+      matchesStatus = record.admittedInMH === 'Yes'
     } else if (statusFilter !== 'all') {
       matchesStatus = record.medicalStatus === statusFilter
     }
@@ -221,7 +230,7 @@ export default function MedicalHistoryPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="card p-4">
             <div className="flex items-center gap-3">
               <FileText className="h-8 w-8 text-primary" />
@@ -266,7 +275,20 @@ export default function MedicalHistoryPage() {
                 <div className="text-2xl font-bold text-gray-900 dark:text-white">
                   {medicalRecords.filter(r => r.monitoringCase && r.medicalStatus === 'Active').length}
                 </div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Monitoring Cases</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Active Monitoring Case</div>
+              </div>
+            </div>
+          </div>
+          <div className="card p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
+                <div className="h-3 w-3 rounded-full bg-purple-500"></div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {new Set(medicalRecords.filter(r => r.admittedInMH === 'Yes' && r.medicalStatus === 'Active').map(r => r.cadetId)).size}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Currently Admitted in MH/BH/CH</div>
               </div>
             </div>
           </div>
@@ -294,6 +316,7 @@ export default function MedicalHistoryPage() {
                 <option value="Active">Active</option>
                 <option value="Completed">Completed</option>
                 <option value="monitoring">Monitoring Cases</option>
+                <option value="admitted">Admitted in MH/BH/CH</option>
               </select>
               {/* Records per page selector */}
               <div className="flex items-center gap-2">
@@ -431,31 +454,24 @@ export default function MedicalHistoryPage() {
                         <div className="text-sm text-gray-900 dark:text-white">
                           {new Date(record.dateOfReporting).toLocaleDateString()}
                         </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {record.attendC > 0 ? (
-                            <>Attend C: {record.attendC}</>
-                          ) : record.totalTrainingDaysMissed && record.totalTrainingDaysMissed > 0 ? (
-                            <span className="font-medium text-orange-600 dark:text-orange-400">
-                              MI Detained: {record.totalTrainingDaysMissed}
-                            </span>
-                          ) : (
-                            <>Attend C: {record.attendC}</>
-                          )}
-                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            record.medicalStatus === 'Active'
+                            record.admittedInMH === 'Yes' && record.medicalStatus === 'Active'
+                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
+                              : record.medicalStatus === 'Active'
                               ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
                               : record.medicalStatus === 'Completed'
                               ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                              : record.medicalStatus === 'Returned'
+                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
                               : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
                           }`}>
-                            {record.medicalStatus}
+                            {record.admittedInMH === 'Yes' && record.medicalStatus === 'Active' ? 'Admitted in MH' : record.medicalStatus}
                           </span>
                           <div className="flex gap-1">
-                            {record.medicalStatus !== 'Active' && (
+                            {record.admittedInMH !== 'Yes' && record.medicalStatus !== 'Active' && (
                               <button
                                 onClick={() => handleStatusUpdate(record.id, 'Active')}
                                 disabled={updatingRecordId === record.id}

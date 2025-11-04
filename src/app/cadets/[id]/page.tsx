@@ -2,7 +2,7 @@
 
 import { notFound } from 'next/navigation'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Edit, Plus, Save, X } from 'lucide-react'
 import Link from 'next/link'
@@ -91,6 +91,7 @@ interface MedicalRecord {
   physiotherapy: number
   totalTrainingDaysMissed: number
   monitoringCase: boolean
+  admittedInMH?: string
   contactNo: string
   remarks: string
   createdAt: string
@@ -112,6 +113,7 @@ export default function CadetDetailsPage({
   const [weightInput, setWeightInput] = useState('')
   const [updatingWeight, setUpdatingWeight] = useState(false)
   const [showMoreCadetInfo, setShowMoreCadetInfo] = useState(false)
+  const [showMenstrualHealth, setShowMenstrualHealth] = useState(false)
 
   // Pagination for medical records
   const pagination = usePagination({
@@ -154,6 +156,20 @@ export default function CadetDetailsPage({
       const { records: medicalRecordsResult } = recordsResponse
 
       console.log(`✅ RECEIVED CADET DATA:`, cadetData)
+      console.log(`🔍 MENSTRUAL DATA CHECK:`, {
+        menstrualFrequency: cadetData.menstrualFrequency,
+        menstrualDays: cadetData.menstrualDays,
+        lastMenstrualDate: cadetData.lastMenstrualDate,
+        menstrualAids: cadetData.menstrualAids,
+        sexuallyActive: cadetData.sexuallyActive,
+        maritalStatus: cadetData.maritalStatus,
+        pregnancyHistory: cadetData.pregnancyHistory,
+        contraceptiveHistory: cadetData.contraceptiveHistory,
+        surgeryHistory: cadetData.surgeryHistory,
+        medicalCondition: cadetData.medicalCondition,
+        hemoglobinLevel: cadetData.hemoglobinLevel
+      })
+      console.log(`🔍 MENSTRUAL AIDS TYPE:`, typeof cadetData.menstrualAids, Array.isArray(cadetData.menstrualAids))
       console.log(`✅ RAW RECORDS RESPONSE:`, recordsResponse)
       console.log(`✅ RECEIVED MEDICAL RECORDS:`, medicalRecordsResult.length, 'records')
       console.log(`✅ RECORDS RESPONSE STATUS:`, recordsRes.status, recordsRes.ok)
@@ -184,6 +200,12 @@ export default function CadetDetailsPage({
       fetchCadetData()
     }
   }, [searchParams, fetchCadetData, router])
+
+  useEffect(() => {
+    if (!showMoreCadetInfo) {
+      setShowMenstrualHealth(false)
+    }
+  }, [showMoreCadetInfo])
 
   const handleUpdateWeight = async () => {
     if (!cadetInfo) return
@@ -216,7 +238,33 @@ export default function CadetDetailsPage({
     }
   }
 
-  // Calculate total training days missed
+  const handleReturn = useCallback(async (recordId: number, daysMissed: number) => {
+    try {
+      const token = localStorage.getItem('jwt_token')
+      if (!token) return
+
+      const response = await fetch(`/api/medical-history/${recordId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          totalTrainingDaysMissed: daysMissed,
+          medicalStatus: 'Completed' // Mark the admission as completed when cadet returns
+        })
+      })
+
+      if (response.ok) {
+        // Update local state only after successful API update
+        setMedicalRecords(prev => prev.map(record =>
+          record.id === recordId ? { ...record, totalTrainingDaysMissed: daysMissed, medicalStatus: 'Completed' } : record
+        ))
+      }
+    } catch (error) {
+      console.error('Error updating return status:', error)
+    }
+  }, [])
   const totalTrainingDaysMissed = medicalRecords.reduce((total: number, record: MedicalRecord) => {
     let days = record.totalTrainingDaysMissed || 0
 
@@ -234,6 +282,39 @@ export default function CadetDetailsPage({
 
     return total + days
   }, 0)
+
+  // Memoize active admission check to prevent unnecessary re-renders
+  const hasActiveAdmission = useMemo(() => 
+    medicalRecords.some(record => record.admittedInMH === 'Yes' && record.medicalStatus === 'Active'),
+    [medicalRecords]
+  )
+
+  const isFemaleCadet = cadetInfo?.sex?.toLowerCase?.() === 'female'
+
+  const hasMenstrualData = useMemo(() => {
+    if (!isFemaleCadet || !cadetInfo) return false
+
+    const hasValue = (value: unknown) => {
+      if (value === null || value === undefined) return false
+      if (Array.isArray(value)) return value.length > 0
+      if (typeof value === 'string') return value.trim().length > 0
+      return true
+    }
+
+    return (
+      hasValue(cadetInfo.menstrualFrequency) ||
+      hasValue(cadetInfo.menstrualDays) ||
+      hasValue(cadetInfo.lastMenstrualDate) ||
+      hasValue(cadetInfo.menstrualAids) ||
+      hasValue(cadetInfo.sexuallyActive) ||
+      hasValue(cadetInfo.maritalStatus) ||
+      hasValue(cadetInfo.pregnancyHistory) ||
+      hasValue(cadetInfo.contraceptiveHistory) ||
+      hasValue(cadetInfo.surgeryHistory) ||
+      hasValue(cadetInfo.medicalCondition) ||
+      hasValue(cadetInfo.hemoglobinLevel)
+    )
+  }, [cadetInfo, isFemaleCadet])
 
   if (loading) {
     return (
@@ -483,7 +564,17 @@ export default function CadetDetailsPage({
           {/* Expanded Cadet Information */}
           {showMoreCadetInfo && (
             <div className="card p-6 animate-in slide-in-from-top-2 duration-300">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Complete Cadet Information</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Complete Cadet Information</h3>
+                {isFemaleCadet && hasMenstrualData && (
+                  <button
+                    onClick={() => setShowMenstrualHealth(prev => !prev)}
+                    className="text-primary hover:text-primary/80 text-sm font-medium transition-colors cursor-pointer"
+                  >
+                    {showMenstrualHealth ? 'Hide Menstrual health' : 'Show Menstrual health'}
+                  </button>
+                )}
+              </div>
 
               {/* Health Parameters Section */}
               {(cadetInfo.bloodGroup || cadetInfo.bmi || cadetInfo.bodyFat || cadetInfo.calcanealBoneDensity ||
@@ -758,83 +849,6 @@ export default function CadetDetailsPage({
                 </div>
               )}
 
-              {/* Menstrual & Reproductive Health Section */}
-              {(cadetInfo.menstrualFrequency || cadetInfo.menstrualDays || cadetInfo.lastMenstrualDate ||
-                cadetInfo.menstrualAids || cadetInfo.sexuallyActive || cadetInfo.maritalStatus ||
-                cadetInfo.pregnancyHistory || cadetInfo.contraceptiveHistory || cadetInfo.surgeryHistory ||
-                cadetInfo.medicalCondition || cadetInfo.hemoglobinLevel) && (
-                <div className="mb-6">
-                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Menstrual & Reproductive Health</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pl-4 border-l-2 border-pink-200 dark:border-pink-600">
-                    {cadetInfo.menstrualFrequency && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Menstrual Frequency:</span>
-                        <span className="text-sm font-medium">{cadetInfo.menstrualFrequency}</span>
-                      </div>
-                    )}
-                    {cadetInfo.menstrualDays && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Menstrual Days:</span>
-                        <span className="text-sm font-medium">{cadetInfo.menstrualDays}</span>
-                      </div>
-                    )}
-                    {cadetInfo.lastMenstrualDate && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Menstrual Date:</span>
-                        <span className="text-sm font-medium">{new Date(cadetInfo.lastMenstrualDate).toLocaleDateString()}</span>
-                      </div>
-                    )}
-                    {cadetInfo.menstrualAids && cadetInfo.menstrualAids.length > 0 && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Menstrual Aids:</span>
-                        <span className="text-sm font-medium">{cadetInfo.menstrualAids.join(', ')}</span>
-                      </div>
-                    )}
-                    {cadetInfo.sexuallyActive && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sexually Active:</span>
-                        <span className="text-sm font-medium">{cadetInfo.sexuallyActive}</span>
-                      </div>
-                    )}
-                    {cadetInfo.maritalStatus && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Marital Status:</span>
-                        <span className="text-sm font-medium">{cadetInfo.maritalStatus}</span>
-                      </div>
-                    )}
-                    {cadetInfo.pregnancyHistory && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pregnancy History:</span>
-                        <span className="text-sm font-medium">{cadetInfo.pregnancyHistory}</span>
-                      </div>
-                    )}
-                    {cadetInfo.contraceptiveHistory && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contraceptive History:</span>
-                        <span className="text-sm font-medium">{cadetInfo.contraceptiveHistory}</span>
-                      </div>
-                    )}
-                    {cadetInfo.surgeryHistory && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Surgery History:</span>
-                        <span className="text-sm font-medium">{cadetInfo.surgeryHistory}</span>
-                      </div>
-                    )}
-                    {cadetInfo.medicalCondition && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Medical Condition:</span>
-                        <span className="text-sm font-medium">{cadetInfo.medicalCondition}</span>
-                      </div>
-                    )}
-                    {cadetInfo.hemoglobinLevel && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hemoglobin Level:</span>
-                        <span className="text-sm font-medium">{cadetInfo.hemoglobinLevel}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
@@ -866,13 +880,24 @@ export default function CadetDetailsPage({
                           <option value={50}>50</option>
                         </select>
                       </div>
-                      <Link
-                        href={`/medical-records/new?cadetId=${cadetId}`}
-                        className="inline-flex items-center justify-center p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                        title="Add another medical record"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Link>
+                      {(() => {
+                        return hasActiveAdmission ? (
+                          <div
+                            className="inline-flex items-center justify-center p-2 bg-gray-400 text-gray-200 rounded-lg cursor-not-allowed"
+                            title="Cannot add new records while cadet is admitted to MH/BH/CH. Mark as returned first."
+                          >
+                            <Plus className="h-4 w-4" />
+                          </div>
+                        ) : (
+                          <Link
+                            href={`/medical-records/new?cadetId=${cadetId}`}
+                            className="inline-flex items-center justify-center p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                            title="Add another medical record"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Link>
+                        )
+                      })()}
                     </div>
                   </div>
                   <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -901,7 +926,7 @@ export default function CadetDetailsPage({
                 </div>
               ) : (
                 <>
-                  <MedicalRecordsList records={pagination.getVisibleItems(medicalRecords)} cadetId={cadetId} />
+                  <MedicalRecordsList records={pagination.getVisibleItems(medicalRecords)} cadetId={cadetId} onReturn={handleReturn} />
 
                   {/* Pagination Controls */}
                   <div className="mt-6 flex flex-col items-center gap-4">
