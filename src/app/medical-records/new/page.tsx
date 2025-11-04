@@ -1238,7 +1238,7 @@ function NewMedicalRecordPageInner() {
                       required
                       value={cadetFormData.name}
                       onChange={handleCadetFormChange}
-                      className="input-field"
+                      className="input-field" 
                       placeholder="Enter full name"
                     />
                   </div>
