@@ -811,13 +811,13 @@ export default function CadetDetailsPage({
                         <span className="text-sm font-medium">{cadetInfo.menstrualDays}</span>
                       </div>
                     )}
-                    {(cadetInfo.lastMenstrualDate) && (
+                    {(cadetInfo.lastMenstrualDate !== undefined && cadetInfo.lastMenstrualDate !== null) && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Menstrual Date:</span>
-                        <span className="text-sm font-medium">{new Date(cadetInfo.lastMenstrualDate).toLocaleDateString()}</span>
+                        <span className="text-sm font-medium">{cadetInfo.lastMenstrualDate ? new Date(cadetInfo.lastMenstrualDate).toLocaleDateString() : 'Not specified'}</span>
                       </div>
                     )}
-                    {cadetInfo.menstrualAids && cadetInfo.menstrualAids.length > 0 && (
+                    {(cadetInfo.menstrualAids && Array.isArray(cadetInfo.menstrualAids) && cadetInfo.menstrualAids.length > 0) && (
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Menstrual Aids:</span>
                         <span className="text-sm font-medium">{cadetInfo.menstrualAids.join(', ')}</span>
@@ -849,7 +849,7 @@ export default function CadetDetailsPage({
                     )}
                     {(cadetInfo.surgeryHistory !== undefined && cadetInfo.surgeryHistory !== null && cadetInfo.surgeryHistory !== '') && (
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Surgery History:</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Underwent any Surgery:</span>
                         <span className="text-sm font-medium">{cadetInfo.surgeryHistory || 'None'}</span>
                       </div>
                     )}
