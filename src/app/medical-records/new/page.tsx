@@ -1374,7 +1374,7 @@ function NewMedicalRecordPageInner() {
                             value={cadetFormData.course}
                             onChange={handleCadetFormChange}
                             className="input-field"
-                            placeholder="e.g., 1, 2, 3"
+                            placeholder="e.g., 121, 122, 123"
                           />
                         </div>
 
