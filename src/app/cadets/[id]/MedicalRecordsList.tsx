@@ -79,16 +79,16 @@ export default function MedicalRecordsList({ records, cadetId, onReturn }: Medic
                     </div>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" checked={isChecked} onChange={(e) => {
-                      if (onReturn) {
-                        onReturn(record.id, e.target.checked ? daysMissed : 0)
+                    <input type="checkbox" className="sr-only peer" checked={isChecked} onDoubleClick={(e) => {
+                      if (!isChecked && canCheck && onReturn) {
+                        onReturn(record.id, daysMissed)
                       }
-                    }} disabled={!canCheck} />
+                    }} disabled={isChecked || !canCheck} />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                     <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Returned</span>
                   </label>
                 </div>
-                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">{isChecked ? `Training days missed by cadet: ${daysMissed} days` : 'Click the toggle when cadet returns from MH/BH/CH facility'}</p>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">{isChecked ? `Training days missed by cadet: ${daysMissed} days` : 'Double-click the toggle when cadet returns from MH/BH/CH facility (cannot be unset once marked)'}</p>
               </div>
             </>
           ) : (

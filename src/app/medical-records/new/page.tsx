@@ -332,11 +332,43 @@ function NewMedicalRecordPageInner() {
   }
 
   // Handle cadet selection from suggestions
-  const handleCadetSelect = (cadet: Cadet) => {
-    setSelectedCadet(cadet)
-    setCadetSearchTerm(`${cadet.name} - ${cadet.company} Company, ${cadet.battalion}`)
-    setFormData(prev => ({ ...prev, cadetId: cadet.id.toString() }))
-    setShowCadetSuggestions(false)
+  const handleCadetSelect = async (cadet: Cadet) => {
+    try {
+      // Check if cadet has active MH/BH/CH admissions
+      const token = localStorage.getItem('jwt_token')
+      if (token) {
+        const medicalRecordsResponse = await fetch(`/api/medical-history/${cadet.id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+
+        if (medicalRecordsResponse.ok) {
+          const { records } = await medicalRecordsResponse.json()
+          const hasActiveAdmission = records.some((record: any) =>
+            record.admittedInMH === 'Yes' && record.medicalStatus === 'Active'
+          )
+
+          if (hasActiveAdmission) {
+            alert('Cannot select this cadet for a new medical record as they have active MH/BH/CH admissions. Please mark them as returned first.')
+            return
+          }
+        }
+      }
+
+      // Proceed with selection if no active admissions
+      setSelectedCadet(cadet)
+      setCadetSearchTerm(`${cadet.name} - ${cadet.company} Company, ${cadet.battalion}`)
+      setFormData(prev => ({ ...prev, cadetId: cadet.id.toString() }))
+      setShowCadetSuggestions(false)
+    } catch (error) {
+      console.error('Error checking cadet admission status:', error)
+      // Allow selection if check fails to avoid blocking functionality
+      setSelectedCadet(cadet)
+      setCadetSearchTerm(`${cadet.name} - ${cadet.company} Company, ${cadet.battalion}`)
+      setFormData(prev => ({ ...prev, cadetId: cadet.id.toString() }))
+      setShowCadetSuggestions(false)
+    }
   }
 
   // Filter cadets based on search term (only when there's text)

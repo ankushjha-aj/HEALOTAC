@@ -890,13 +890,25 @@ export default function CadetDetailsPage({
                           <option value={50}>50</option>
                         </select>
                       </div>
-                      <Link
-                        href={`/medical-records/new?cadetId=${cadetId}`}
-                        className="inline-flex items-center justify-center p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                        title="Add another medical record"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Link>
+                      {(() => {
+                        const hasActiveAdmission = medicalRecords.some(record => record.admittedInMH === 'Yes' && record.medicalStatus === 'Active')
+                        return hasActiveAdmission ? (
+                          <div
+                            className="inline-flex items-center justify-center p-2 bg-gray-400 text-gray-200 rounded-lg cursor-not-allowed"
+                            title="Cannot add new records while cadet is admitted to MH/BH/CH. Mark as returned first."
+                          >
+                            <Plus className="h-4 w-4" />
+                          </div>
+                        ) : (
+                          <Link
+                            href={`/medical-records/new?cadetId=${cadetId}`}
+                            className="inline-flex items-center justify-center p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                            title="Add another medical record"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Link>
+                        )
+                      })()}
                     </div>
                   </div>
                   <p className="text-gray-600 dark:text-gray-400 mt-2">
