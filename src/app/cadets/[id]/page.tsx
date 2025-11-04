@@ -91,6 +91,7 @@ interface MedicalRecord {
   physiotherapy: number
   totalTrainingDaysMissed: number
   monitoringCase: boolean
+  admittedInMH?: string
   contactNo: string
   remarks: string
   createdAt: string

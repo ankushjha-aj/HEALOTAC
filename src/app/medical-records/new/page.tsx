@@ -99,9 +99,8 @@ function NewMedicalRecordPageInner() {
   const [showCadetSuggestions, setShowCadetSuggestions] = useState(false)
   const [selectedCadet, setSelectedCadet] = useState<Cadet | null>(null)
   const [formData, setFormData] = useState({
-    // Form fields in required order
     cadetId: '',
-    dateOfReporting: '',
+    dateOfReporting: new Date().toISOString().split('T')[0], // Default to today's date
     medicalProblem: '',
     diagnosis: '',
     status: 'Active',
@@ -893,6 +892,7 @@ function NewMedicalRecordPageInner() {
                   required
                   value={formData.dateOfReporting}
                   onChange={handleChange}
+                  max={new Date().toISOString().split('T')[0]} // Prevent future dates
                   className={`input-field ${fieldErrors.dateOfReporting ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                 />
                 {fieldErrors.dateOfReporting && (
