@@ -97,6 +97,8 @@ function NewMedicalRecordPageInner() {
   const [loadingCadets, setLoadingCadets] = useState(true)
   const [showAddCadetModal, setShowAddCadetModal] = useState(false)
   const [isCreatingCadet, setIsCreatingCadet] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [showRecordConfirmation, setShowRecordConfirmation] = useState(false)
   const [cadetSearchTerm, setCadetSearchTerm] = useState('')
   const [showCadetSuggestions, setShowCadetSuggestions] = useState(false)
   const [selectedCadet, setSelectedCadet] = useState<Cadet | null>(null)
@@ -281,12 +283,21 @@ function NewMedicalRecordPageInner() {
     }
   }, [loadingCadets, cadets.length, searchParams, selectedCadet])
 
-  // Clear country and yellowFever when foreign candidate is unchecked
+  // ESC key handler for confirmation modals
   useEffect(() => {
-    if (!cadetFormData.isForeign) {
-      setCadetFormData(prev => ({ ...prev, country: '', yellowFever: false }))
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showConfirmation) {
+          setShowConfirmation(false)
+        } else if (showRecordConfirmation) {
+          setShowRecordConfirmation(false)
+        }
+      }
     }
-  }, [cadetFormData.isForeign])
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [showConfirmation, showRecordConfirmation])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -418,6 +429,11 @@ function NewMedicalRecordPageInner() {
   const handleCreateCadet = async (e: React.FormEvent) => {
     e.preventDefault()
     setCadetError(null)
+    setShowConfirmation(true)
+  }
+
+  const confirmCreateCadet = async () => {
+    setShowConfirmation(false)
     setIsCreatingCadet(true)
 
     try {
@@ -567,6 +583,11 @@ function NewMedicalRecordPageInner() {
     }
 
     setError(null)
+    setShowRecordConfirmation(true)
+  }
+
+  const confirmSubmit = async () => {
+    setShowRecordConfirmation(false)
     setIsSubmitting(true)
 
     try {
@@ -2510,6 +2531,86 @@ function NewMedicalRecordPageInner() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Medical Record Confirmation Modal */}
+      {showRecordConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowRecordConfirmation(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <svg className="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  Confirm Medical Record Addition
+                </h3>
+              </div>
+              <div className="mb-6">
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  Please confirm your action. <br />
+                  Adding this Medical record is a permanent operation and cannot be reversed. <br />
+                  Ensure all information has been verified before proceeding.
+                </p>
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowRecordConfirmation(false)}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmSubmit}
+                  disabled={isSubmitting}
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Adding...' : 'Confirm'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowConfirmation(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <svg className="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  Confirm Cadet Addition
+                </h3>
+              </div>
+              <div className="mb-6">
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  Please confirm your action. <br />
+                  Adding this cadet record is a permanent operation and cannot be reversed. <br />
+                  Ensure all information has been verified before proceeding.
+                </p>
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowConfirmation(false)}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmCreateCadet}
+                  disabled={isCreatingCadet}
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isCreatingCadet ? 'Adding...' : 'Confirm'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
