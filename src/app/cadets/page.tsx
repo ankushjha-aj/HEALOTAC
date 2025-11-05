@@ -224,7 +224,7 @@ export default function CadetsPage() {
   // Reset pagination to page 1 when search or filter changes
   useEffect(() => {
     pagination.goToPage(1)
-  }, [searchTerm, showHighTrainingMissed])
+  }, [searchTerm, showHighTrainingMissed, pagination])
 
   // Get paginated cadets
   const paginatedCadets = useMemo(
@@ -500,7 +500,7 @@ export default function CadetsPage() {
               </div>
               <div className="mb-6">
                 <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Are you sure you want to delete cadet "{cadetToDelete.name}"? <br />
+                  Are you sure you want to delete cadet &quot;{cadetToDelete.name}&quot;? <br />
                   <strong className="text-red-600 dark:text-red-400">⚠️ WARNING:</strong> This will also delete all associated medical records for this cadet. <br />
                   This action cannot be undone.
                 </p>

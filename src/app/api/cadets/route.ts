@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       // Menstrual & Medical History (Female only)
       menstrualFrequency: menstrualFrequency ? menstrualFrequency.toString() : null,
       menstrualDays: menstrualDays ? menstrualDays.toString() : null,
-      lastMenstrualDate: lastMenstrualDate ? new Date(lastMenstrualDate) : null,
+      lastMenstrualDate: lastMenstrualDate ? lastMenstrualDate : null,
       menstrualAids: menstrualAids && menstrualAids.length > 0 ? JSON.stringify(menstrualAids) : null,
       sexuallyActive: sexuallyActive ? sexuallyActive.toString() : null,
       maritalStatus: maritalStatus ? maritalStatus.toString() : null,
