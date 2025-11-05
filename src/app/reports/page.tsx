@@ -38,6 +38,19 @@ export default function ReportsPage() {
   const [customStartDate, setCustomStartDate] = useState('')
   const [customEndDate, setCustomEndDate] = useState('')
   const [useCustomRange, setUseCustomRange] = useState(false)
+  const [showDownloadConfirmation, setShowDownloadConfirmation] = useState(false)
+
+  // ESC key handler for download confirmation modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showDownloadConfirmation) {
+        setShowDownloadConfirmation(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [showDownloadConfirmation])
 
   // Fetch real data from API
   const fetchReportData = async () => {
@@ -176,6 +189,11 @@ export default function ReportsPage() {
       return
     }
 
+    setShowDownloadConfirmation(true)
+  }
+
+  const confirmDownloadCSV = () => {
+    setShowDownloadConfirmation(false)
     setIsGenerating(true)
 
     // Simulate processing time
@@ -525,6 +543,44 @@ export default function ReportsPage() {
           )}
         </div>
       </div>
+
+      {/* Download Confirmation Modal */}
+      {showDownloadConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowDownloadConfirmation(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <svg className="h-5 w-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                  Confirm CSV Download
+                </h3>
+              </div>
+              <div className="mb-6">
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  Proceed with downloading the CSV file containing {reportData.length} medical records for the selected time period?
+                </p>
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDownloadConfirmation(false)}
+                  className="btn-secondary"
+                >
+                  No, Cancel
+                </button>
+                <button
+                  onClick={confirmDownloadCSV}
+                  disabled={isGenerating}
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? 'Downloading...' : 'Yes, Download'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   )
 }

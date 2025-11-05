@@ -70,7 +70,7 @@ export const cadets = pgTable('cadets', {
   // Menstrual & Medical History (Female only)
   menstrualFrequency: varchar('menstrual_frequency', { length: 20 }),
   menstrualDays: integer('menstrual_days'),
-  lastMenstrualDate: timestamp('last_menstrual_date'),
+  lastMenstrualDate: text('last_menstrual_date'),
   menstrualAids: text('menstrual_aids'), // JSON array stored as text
   sexuallyActive: varchar('sexually_active', { length: 10 }),
   maritalStatus: varchar('marital_status', { length: 20 }),

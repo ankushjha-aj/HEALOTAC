@@ -48,8 +48,22 @@ export default function CadetsPage() {
   const [error, setError] = useState<string | null>(null)
   const [showHighTrainingMissed, setShowHighTrainingMissed] = useState(false)
   const [navigatingToNewRecord, setNavigatingToNewRecord] = useState(false)
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
+  const [cadetToDelete, setCadetToDelete] = useState<Cadet | null>(null)
 
   const router = useRouter()
+
+  // ESC key handler for delete confirmation modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showDeleteConfirmation) {
+        setShowDeleteConfirmation(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [showDeleteConfirmation])
 
   // Fetch cadets on component mount
   useEffect(() => {
@@ -119,10 +133,15 @@ export default function CadetsPage() {
     }
   }
 
-  const handleDeleteCadet = async (id: number, name: string) => {
-    if (!confirm(`Are you sure you want to delete cadet "${name}"?\n\n⚠️ WARNING: This will also delete all associated medical records for this cadet.\n\nThis action cannot be undone.`)) {
-      return
-    }
+  const handleDeleteCadet = (cadet: Cadet) => {
+    setCadetToDelete(cadet)
+    setShowDeleteConfirmation(true)
+  }
+
+  const confirmDeleteCadet = async () => {
+    if (!cadetToDelete) return
+
+    setShowDeleteConfirmation(false)
 
     try {
       const token = localStorage.getItem('jwt_token')
@@ -130,7 +149,7 @@ export default function CadetsPage() {
         alert('Authentication required')
         return
       }
-      const response = await fetch(`/api/cadets/${id}`, {
+      const response = await fetch(`/api/cadets/${cadetToDelete.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -139,9 +158,10 @@ export default function CadetsPage() {
 
       if (!response.ok) throw new Error('Failed to delete cadet')
 
-      console.log('🗑️ DELETED CADET:', name)
+      console.log('🗑️ DELETED CADET:', cadetToDelete.name)
       // Refresh the list
       await fetchCadets()
+      setCadetToDelete(null)
     } catch (err) {
       console.error('❌ Error deleting cadet:', err)
       alert('Failed to delete cadet. Please try again.')
@@ -437,7 +457,7 @@ export default function CadetsPage() {
                           <Edit className="h-4 w-4" />
                         </Link>
                         <button 
-                          onClick={() => handleDeleteCadet(cadet.id, cadet.name)}
+                          onClick={() => handleDeleteCadet(cadet)}
                           className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -464,6 +484,45 @@ export default function CadetsPage() {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirmation && cadetToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowDeleteConfirmation(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  Confirm Cadet Deletion
+                </h3>
+              </div>
+              <div className="mb-6">
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  Are you sure you want to delete cadet "{cadetToDelete.name}"? <br />
+                  <strong className="text-red-600 dark:text-red-400">⚠️ WARNING:</strong> This will also delete all associated medical records for this cadet. <br />
+                  This action cannot be undone.
+                </p>
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirmation(false)}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeleteCadet}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   )
 }

@@ -29,13 +29,16 @@ export async function GET(
       )
     }
 
-    // Parse menstrualAids from JSON string to array if it exists
+    // Parse menstrualAids from JSON string to array/string if it exists
     let parsedMenstrualAids = null
-    try {
-      parsedMenstrualAids = cadet.menstrualAids ? JSON.parse(cadet.menstrualAids) : null
-    } catch (parseError) {
-      console.warn('⚠️ Failed to parse menstrualAids JSON for cadet', cadet.id, ':', parseError)
-      parsedMenstrualAids = null
+    if (cadet.menstrualAids) {
+      try {
+        parsedMenstrualAids = JSON.parse(cadet.menstrualAids)
+      } catch (parseError) {
+        // If JSON parsing fails, treat it as a plain string
+        console.warn('⚠️ Failed to parse menstrualAids JSON for cadet', cadet.id, ':', parseError, '- treating as plain string')
+        parsedMenstrualAids = cadet.menstrualAids
+      }
     }
 
     const processedCadet = {
@@ -98,7 +101,7 @@ export async function PUT(
   }
 }
 
-// PATCH /api/cadets/[id] - Partial update cadet (for weight updates)
+// PATCH /api/cadets/[id] - Partial update cadet (for weight and menstrual data updates)
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -107,9 +110,44 @@ export async function PATCH(
     const updates = await request.json()
     const updateData: any = {}
 
-    // Only allow updating weight for now
+    // Handle weight updates
     if ('weight' in updates) {
       updateData.weight = typeof updates.weight === 'number' ? updates.weight : updates.weight ? parseInt(updates.weight) : undefined
+    }
+
+    // Handle menstrual health data updates
+    if ('menstrualFrequency' in updates) {
+      updateData.menstrualFrequency = updates.menstrualFrequency || null
+    }
+    if ('menstrualDays' in updates) {
+      updateData.menstrualDays = updates.menstrualDays ? parseInt(updates.menstrualDays) : null
+    }
+    if ('lastMenstrualDate' in updates) {
+      updateData.lastMenstrualDate = updates.lastMenstrualDate || null
+    }
+    if ('menstrualAids' in updates) {
+      updateData.menstrualAids = updates.menstrualAids && updates.menstrualAids.length > 0 ? JSON.stringify(updates.menstrualAids) : null
+    }
+    if ('sexuallyActive' in updates) {
+      updateData.sexuallyActive = updates.sexuallyActive || null
+    }
+    if ('maritalStatus' in updates) {
+      updateData.maritalStatus = updates.maritalStatus || null
+    }
+    if ('pregnancyHistory' in updates) {
+      updateData.pregnancyHistory = updates.pregnancyHistory || null
+    }
+    if ('contraceptiveHistory' in updates) {
+      updateData.contraceptiveHistory = updates.contraceptiveHistory || null
+    }
+    if ('surgeryHistory' in updates) {
+      updateData.surgeryHistory = updates.surgeryHistory || null
+    }
+    if ('medicalCondition' in updates) {
+      updateData.medicalCondition = updates.medicalCondition || null
+    }
+    if ('hemoglobinLevel' in updates) {
+      updateData.hemoglobinLevel = updates.hemoglobinLevel ? parseFloat(updates.hemoglobinLevel) : null
     }
 
     if (Object.keys(updateData).length === 0) {
@@ -134,8 +172,25 @@ export async function PATCH(
       )
     }
 
-    console.log('🔄 PARTIALLY UPDATED CADET:', updatedCadet)
-    return NextResponse.json(updatedCadet)
+    // Parse menstrualAids from JSON string to array/string if it exists
+    let parsedMenstrualAids = null
+    if (updatedCadet.menstrualAids) {
+      try {
+        parsedMenstrualAids = JSON.parse(updatedCadet.menstrualAids)
+      } catch (parseError) {
+        // If JSON parsing fails, treat it as a plain string
+        console.warn('⚠️ Failed to parse menstrualAids JSON for updated cadet:', parseError, '- treating as plain string')
+        parsedMenstrualAids = updatedCadet.menstrualAids
+      }
+    }
+
+    const processedCadet = {
+      ...updatedCadet,
+      menstrualAids: parsedMenstrualAids
+    }
+
+    console.log('🔄 PARTIALLY UPDATED CADET:', processedCadet)
+    return NextResponse.json(processedCadet)
   } catch (error) {
     console.error('❌ Error partially updating cadet:', error)
     return NextResponse.json(
