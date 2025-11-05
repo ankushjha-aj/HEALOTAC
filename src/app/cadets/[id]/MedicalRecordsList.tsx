@@ -94,6 +94,28 @@ export default function MedicalRecordsList({ records, cadetId, onReturn }: Medic
                 </div>
                 <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">{isChecked ? `Training days missed by cadet: ${daysMissed} days` : 'Double-click the toggle when cadet returns from MH/BH/CH facility (cannot be unset once marked)'}</p>
               </div>
+
+              {record.diagnosis && (
+                <div className="mt-3">
+                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Diagnosis
+                  </label>
+                  <p className="text-sm text-gray-900 dark:text-white mt-1">
+                    {record.diagnosis}
+                  </p>
+                </div>
+              )}
+
+              {record.remarks && (
+                <div className="mt-3">
+                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Remarks
+                  </label>
+                  <p className="text-sm text-gray-900 dark:text-white mt-1">
+                    {record.remarks}
+                  </p>
+                </div>
+              )}
             </>
           ) : (
             // Normal detailed view for other records
