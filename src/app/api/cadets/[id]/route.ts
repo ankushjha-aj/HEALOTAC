@@ -29,13 +29,16 @@ export async function GET(
       )
     }
 
-    // Parse menstrualAids from JSON string to array if it exists
+    // Parse menstrualAids from JSON string to array/string if it exists
     let parsedMenstrualAids = null
-    try {
-      parsedMenstrualAids = cadet.menstrualAids ? JSON.parse(cadet.menstrualAids) : null
-    } catch (parseError) {
-      console.warn('⚠️ Failed to parse menstrualAids JSON for cadet', cadet.id, ':', parseError)
-      parsedMenstrualAids = null
+    if (cadet.menstrualAids) {
+      try {
+        parsedMenstrualAids = JSON.parse(cadet.menstrualAids)
+      } catch (parseError) {
+        // If JSON parsing fails, treat it as a plain string
+        console.warn('⚠️ Failed to parse menstrualAids JSON for cadet', cadet.id, ':', parseError, '- treating as plain string')
+        parsedMenstrualAids = cadet.menstrualAids
+      }
     }
 
     const processedCadet = {
@@ -169,13 +172,16 @@ export async function PATCH(
       )
     }
 
-    // Parse menstrualAids from JSON string to array if it exists
+    // Parse menstrualAids from JSON string to array/string if it exists
     let parsedMenstrualAids = null
-    try {
-      parsedMenstrualAids = updatedCadet.menstrualAids ? JSON.parse(updatedCadet.menstrualAids) : null
-    } catch (parseError) {
-      console.warn('⚠️ Failed to parse menstrualAids JSON for updated cadet:', parseError)
-      parsedMenstrualAids = null
+    if (updatedCadet.menstrualAids) {
+      try {
+        parsedMenstrualAids = JSON.parse(updatedCadet.menstrualAids)
+      } catch (parseError) {
+        // If JSON parsing fails, treat it as a plain string
+        console.warn('⚠️ Failed to parse menstrualAids JSON for updated cadet:', parseError, '- treating as plain string')
+        parsedMenstrualAids = updatedCadet.menstrualAids
+      }
     }
 
     const processedCadet = {

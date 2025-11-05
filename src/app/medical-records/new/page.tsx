@@ -418,18 +418,6 @@ function NewMedicalRecordPageInner() {
     return numericValue
   }
 
-  // Helper function to validate DD-MM-YYYY date format
-  const validateDateFormat = (dateString: string) => {
-    const dateRegex = /^(\d{2})-(\d{2})-(\d{4})$/
-    if (!dateRegex.test(dateString)) return false
-    
-    const [, day, month, year] = dateString.match(dateRegex)!
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
-    
-    return date.getFullYear() === parseInt(year) && 
-           date.getMonth() === parseInt(month) - 1 && 
-           date.getDate() === parseInt(day)
-  }
 
   const handleCadetFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target
@@ -611,8 +599,10 @@ function NewMedicalRecordPageInner() {
 
     // Validate date format for lastMenstrualDate if provided
     if (cadetFormData.lastMenstrualDate && cadetFormData.lastMenstrualDate.trim() !== '') {
-      if (!validateDateFormat(cadetFormData.lastMenstrualDate)) {
-        errors.lastMenstrualDate = 'Please enter date in DD-MM-YYYY format (e.g., 25-10-2025)'
+      // HTML5 date input handles validation, just check if it's a valid date string
+      const date = new Date(cadetFormData.lastMenstrualDate);
+      if (isNaN(date.getTime())) {
+        errors.lastMenstrualDate = 'Please enter a valid date'
       }
     }
 
@@ -2329,14 +2319,12 @@ function NewMedicalRecordPageInner() {
                                 Last menstrual period date
                               </label>
                               <input
-                                type="text"
+                                type="date"
                                 id="lastMenstrualDate"
                                 name="lastMenstrualDate"
                                 value={cadetFormData.lastMenstrualDate}
                                 onChange={handleCadetFormChange}
                                 className={`input-field ${fieldErrors.lastMenstrualDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
-                                placeholder="e.g., 25-10-2025"
-                                pattern="\d{2}-\d{2}-\d{4}"
                               />
                               {fieldErrors.lastMenstrualDate && (
                                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.lastMenstrualDate}</p>

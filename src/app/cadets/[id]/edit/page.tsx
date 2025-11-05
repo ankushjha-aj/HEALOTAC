@@ -24,7 +24,7 @@ interface CadetData {
   menstrualFrequency?: string
   menstrualDays?: string
   lastMenstrualDate?: string
-  menstrualAidsDropdown?: string
+  menstrualAids?: string | string[]
   sexuallyActive?: string
   maritalStatus?: string
   pregnancyHistory?: string
@@ -64,7 +64,7 @@ export default function EditCadetPage({
     menstrualFrequency: '',
     menstrualDays: '',
     lastMenstrualDate: '',
-    menstrualAidsDropdown: '',
+    menstrualAids: '',
     sexuallyActive: '',
     maritalStatus: '',
     pregnancyHistory: '',
@@ -115,8 +115,32 @@ export default function EditCadetPage({
         // Menstrual & Medical History (Female only)
         menstrualFrequency: cadetData.menstrualFrequency || '',
         menstrualDays: cadetData.menstrualDays || '',
-        lastMenstrualDate: cadetData.lastMenstrualDate || '',
-        menstrualAidsDropdown: cadetData.menstrualAidsDropdown || '',
+        lastMenstrualDate: cadetData.lastMenstrualDate ? cadetData.lastMenstrualDate.split('T')[0] : '',
+        menstrualAids: (() => {
+          const aids = cadetData.menstrualAids;
+          if (Array.isArray(aids)) {
+            // Convert array back to select value
+            const sortedAids = [...aids].sort();
+            const aidsMap: { [key: string]: string } = {
+              'Menstrual Cup': '1',
+              'Sanitary Pads': '2', 
+              'Tampon': '3'
+            }
+            const numericValue = sortedAids.map(aid => aidsMap[aid]).join('');
+            // Reverse map to combined option
+            const reverseMap: { [key: string]: string } = {
+              '1': 'Menstrual Cup',
+              '2': 'Sanitary Pads',
+              '3': 'Tampon',
+              '12': 'Menstrual Cup + Sanitary Pads',
+              '13': 'Menstrual Cup + Tampon',
+              '23': 'Sanitary Pads + Tampon',
+              '123': 'All (Menstrual Cup + Sanitary Pads + Tampon)'
+            }
+            return reverseMap[numericValue] || '';
+          }
+          return aids || '';
+        })(),
         sexuallyActive: cadetData.sexuallyActive || '',
         maritalStatus: cadetData.maritalStatus || '',
         pregnancyHistory: cadetData.pregnancyHistory || '',
@@ -183,8 +207,24 @@ export default function EditCadetPage({
         // Menstrual & Medical History (Female only)
         menstrualFrequency: formData.menstrualFrequency || undefined,
         menstrualDays: formData.menstrualDays ? parseInt(formData.menstrualDays) : undefined,
-        lastMenstrualDate: formData.lastMenstrualDate || undefined,
-        menstrualAidsDropdown: formData.menstrualAidsDropdown || undefined,
+        lastMenstrualDate: formData.lastMenstrualDate ? (() => {
+          const date = new Date(formData.lastMenstrualDate);
+          return isNaN(date.getTime()) ? null : date;
+        })() : null,
+        menstrualAids: formData.menstrualAids ? (() => {
+          // Convert select value back to array
+          const value = formData.menstrualAids;
+          const aidsMap: { [key: string]: string[] } = {
+            'Menstrual Cup': ['Menstrual Cup'],
+            'Sanitary Pads': ['Sanitary Pads'],
+            'Tampon': ['Tampon'],
+            'Menstrual Cup + Sanitary Pads': ['Menstrual Cup', 'Sanitary Pads'],
+            'Menstrual Cup + Tampon': ['Menstrual Cup', 'Tampon'],
+            'Sanitary Pads + Tampon': ['Sanitary Pads', 'Tampon'],
+            'All (Menstrual Cup + Sanitary Pads + Tampon)': ['Menstrual Cup', 'Sanitary Pads', 'Tampon']
+          }
+          return aidsMap[value] || [];
+        })() : null,
         sexuallyActive: formData.sexuallyActive || undefined,
         maritalStatus: formData.maritalStatus || undefined,
         pregnancyHistory: formData.pregnancyHistory || undefined,
@@ -542,9 +582,7 @@ export default function EditCadetPage({
                         <input
                           id="lastMenstrualDate"
                           className="input-field"
-                          placeholder="e.g., 25-10-2025"
-                          pattern="\d{2}-\d{2}-\d{4}"
-                          type="text"
+                          type="date"
                           name="lastMenstrualDate"
                           value={formData.lastMenstrualDate}
                           onChange={handleInputChange}
@@ -558,9 +596,9 @@ export default function EditCadetPage({
                     </label>
                     <select
                       id="menstrualAidsDropdown"
-                      name="menstrualAidsDropdown"
+                      name="menstrualAids"
                       className="input-field"
-                      value={formData.menstrualAidsDropdown}
+                      value={formData.menstrualAids}
                       onChange={handleInputChange}
                     >
                       <option value="">Select...</option>
@@ -606,6 +644,7 @@ export default function EditCadetPage({
                         value={formData.maritalStatus}
                         onChange={handleInputChange}
                         className="input-field"
+                        required
                       >
                         <option value="">Select</option>
                         <option value="Single">Single</option>

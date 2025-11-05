@@ -67,7 +67,7 @@ interface CadetInfo {
   menstrualFrequency?: string
   menstrualDays?: string
   lastMenstrualDate?: string
-  menstrualAids?: string[]
+  menstrualAids?: string | string[]
   sexuallyActive?: string
   maritalStatus?: string
   pregnancyHistory?: string
@@ -322,7 +322,11 @@ export default function CadetDetailsPage({
       hasValue(cadetInfo.contraceptiveHistory) ||
       hasValue(cadetInfo.surgeryHistory) ||
       hasValue(cadetInfo.medicalCondition) ||
-      hasValue(cadetInfo.hemoglobinLevel)
+      hasValue(cadetInfo.hemoglobinLevel) ||
+      hasValue(cadetInfo.menstrualFrequency) ||
+      hasValue(cadetInfo.menstrualDays) ||
+      hasValue(cadetInfo.lastMenstrualDate) ||
+      hasValue(cadetInfo.menstrualAids)
     )
   }, [cadetInfo, isFemaleCadet])
 
@@ -974,6 +978,47 @@ export default function CadetDetailsPage({
               </div>
 
               <div className="space-y-4">
+                {/* Menstrual Cycle */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
+                    Menstrual Cycle
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">How frequently</h5>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {cadetInfo!.menstrualFrequency || 'Not recorded'}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">How many days</h5>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {cadetInfo!.menstrualDays ? `${cadetInfo!.menstrualDays} days` : 'Not recorded'}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Last menstrual period date</h5>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {cadetInfo!.lastMenstrualDate ? (() => {
+                          const date = new Date(cadetInfo!.lastMenstrualDate);
+                          return isNaN(date.getTime()) ? cadetInfo!.lastMenstrualDate : `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                        })() : 'Not recorded'}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Menstrual Cycle Aids</h5>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {(() => {
+                          const aids = cadetInfo!.menstrualAids;
+                          if (!aids) return 'Not recorded';
+                          if (Array.isArray(aids)) return aids.join(', ');
+                          return aids;
+                        })()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Sexual & Reproductive Health */}
                 <div>
                   <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
