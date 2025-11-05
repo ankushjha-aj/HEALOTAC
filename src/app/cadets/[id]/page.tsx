@@ -113,7 +113,7 @@ export default function CadetDetailsPage({
   const [weightInput, setWeightInput] = useState('')
   const [updatingWeight, setUpdatingWeight] = useState(false)
   const [showMoreCadetInfo, setShowMoreCadetInfo] = useState(false)
-  const [showMenstrualHealth, setShowMenstrualHealth] = useState(false)
+  const [showMenstrualModal, setShowMenstrualModal] = useState(false)
 
   // Pagination for medical records
   const pagination = usePagination({
@@ -152,6 +152,8 @@ export default function CadetDetailsPage({
       }
 
       const cadetData: CadetInfo = await cadetRes.json()
+      console.log(`🔍 RAW CADET DATA:`, cadetData)
+      console.log(`🔍 MENSTRUAL AIDS RAW FROM DB:`, cadetData.menstrualAids)
       const recordsResponse = recordsRes.ok ? await recordsRes.json() : { records: [] }
       const { records: medicalRecordsResult } = recordsResponse
 
@@ -203,9 +205,21 @@ export default function CadetDetailsPage({
 
   useEffect(() => {
     if (!showMoreCadetInfo) {
-      setShowMenstrualHealth(false)
+      setShowMenstrualModal(false)
     }
   }, [showMoreCadetInfo])
+
+  // ESC key handler for menstrual modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showMenstrualModal) {
+        setShowMenstrualModal(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [showMenstrualModal])
 
   const handleUpdateWeight = async () => {
     if (!cadetInfo) return
@@ -302,10 +316,6 @@ export default function CadetDetailsPage({
     }
 
     return (
-      hasValue(cadetInfo.menstrualFrequency) ||
-      hasValue(cadetInfo.menstrualDays) ||
-      hasValue(cadetInfo.lastMenstrualDate) ||
-      hasValue(cadetInfo.menstrualAids) ||
       hasValue(cadetInfo.sexuallyActive) ||
       hasValue(cadetInfo.maritalStatus) ||
       hasValue(cadetInfo.pregnancyHistory) ||
@@ -552,7 +562,6 @@ export default function CadetDetailsPage({
             <div className="flex justify-end mt-4">
               <button
                 id="showMoreCadetInfo"
-                data-component-name="CadetDetailsPage"
                 onClick={() => setShowMoreCadetInfo(!showMoreCadetInfo)}
                 className="text-primary hover:text-primary/80 text-sm font-medium transition-colors cursor-pointer"
               >
@@ -568,10 +577,10 @@ export default function CadetDetailsPage({
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Complete Cadet Information</h3>
                 {isFemaleCadet && hasMenstrualData && (
                   <button
-                    onClick={() => setShowMenstrualHealth(prev => !prev)}
+                    onClick={() => setShowMenstrualModal(true)}
                     className="text-primary hover:text-primary/80 text-sm font-medium transition-colors cursor-pointer"
                   >
-                    {showMenstrualHealth ? 'Hide Menstrual health' : 'Show Menstrual health'}
+                    Show Menstrual health
                   </button>
                 )}
               </div>
@@ -943,6 +952,102 @@ export default function CadetDetailsPage({
             </div>
           </div>
         </div>
-      </DashboardLayout>
+
+      {/* Menstrual Health Modal */}
+      {showMenstrualModal && cadetInfo && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowMenstrualModal(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <svg className="h-6 w-6 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 011.414 1.414L8.414 9.5H5a1 1 0 100 2h3.414l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
+                  </svg>
+                  Menstrual Health Records
+                </h3>
+                <button
+                  onClick={() => setShowMenstrualModal(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Sexual & Reproductive Health */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
+                    Sexual & Reproductive Health
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Sexually Active</h5>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {cadetInfo!.sexuallyActive || 'Not recorded'}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Marital Status</h5>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {cadetInfo!.maritalStatus || 'Not recorded'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pregnancy & Contraceptive History */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
+                    Pregnancy & Contraceptive History
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Pregnancy History</h5>
+                      <p className="text-xs text-gray-900 dark:text-gray-100">
+                        {cadetInfo!.pregnancyHistory || 'Not recorded'}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Contraceptive History</h5>
+                      <p className="text-xs text-gray-900 dark:text-gray-100">
+                        {cadetInfo!.contraceptiveHistory || 'Not recorded'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Medical History */}
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
+                    Medical History
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Surgery History</h5>
+                      <p className="text-xs text-gray-900 dark:text-gray-100">
+                        {cadetInfo!.surgeryHistory || 'Not recorded'}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Medical Condition</h5>
+                      <p className="text-xs text-gray-900 dark:text-gray-100">
+                        {cadetInfo!.medicalCondition || 'Not recorded'}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Hemoglobin Level</h5>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {cadetInfo!.hemoglobinLevel ? `${cadetInfo!.hemoglobinLevel} g/dL` : 'Not recorded'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </DashboardLayout>
     )
 }

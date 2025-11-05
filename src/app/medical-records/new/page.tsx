@@ -403,11 +403,57 @@ function NewMedicalRecordPageInner() {
     )
   )
 
+  // Helper function to convert menstrual aids array to dropdown value
+  const getMenstrualAidsDropdownValue = (aids: string[]) => {
+    if (!aids || aids.length === 0) return ''
+    
+    const sortedAids = [...aids].sort()
+    const aidsMap: { [key: string]: string } = {
+      'Menstrual Cup': '1',
+      'Sanitary Pads': '2', 
+      'Tampon': '3'
+    }
+    
+    const numericValue = sortedAids.map(aid => aidsMap[aid]).join('')
+    return numericValue
+  }
+
+  // Helper function to validate DD-MM-YYYY date format
+  const validateDateFormat = (dateString: string) => {
+    const dateRegex = /^(\d{2})-(\d{2})-(\d{4})$/
+    if (!dateRegex.test(dateString)) return false
+    
+    const [, day, month, year] = dateString.match(dateRegex)!
+    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+    
+    return date.getFullYear() === parseInt(year) && 
+           date.getMonth() === parseInt(month) - 1 && 
+           date.getDate() === parseInt(day)
+  }
+
   const handleCadetFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target
     const checked = (e.target as HTMLInputElement).checked
 
     setCadetFormData(prev => {
+      // Special handling for menstrual aids dropdown
+      if (name === 'menstrualAidsDropdown') {
+        // Convert numeric value to array of aids
+        const aidsMap: { [key: string]: string[] } = {
+          '1': ['Menstrual Cup'],
+          '2': ['Sanitary Pads'],
+          '3': ['Tampon'],
+          '12': ['Menstrual Cup', 'Sanitary Pads'],
+          '13': ['Menstrual Cup', 'Tampon'],
+          '23': ['Sanitary Pads', 'Tampon'],
+          '123': ['Menstrual Cup', 'Sanitary Pads', 'Tampon']
+        }
+        return {
+          ...prev,
+          menstrualAids: aidsMap[value] || []
+        }
+      }
+
       // Special handling for checkbox arrays
       if (type === 'checkbox' && name === 'menstrualAids') {
         return {
@@ -563,11 +609,10 @@ function NewMedicalRecordPageInner() {
       errors.medicalProblem = 'Medical problem description is required'
     }
 
-    // Validate that selected cadet exists
-    if (formData.cadetId && !selectedCadet) {
-      const cadetExists = cadets.find(c => c.id.toString() === formData.cadetId)
-      if (!cadetExists) {
-        errors.cadetId = 'Selected cadet is not valid'
+    // Validate date format for lastMenstrualDate if provided
+    if (cadetFormData.lastMenstrualDate && cadetFormData.lastMenstrualDate.trim() !== '') {
+      if (!validateDateFormat(cadetFormData.lastMenstrualDate)) {
+        errors.lastMenstrualDate = 'Please enter date in DD-MM-YYYY format (e.g., 25-10-2025)'
       }
     }
 
@@ -2284,37 +2329,43 @@ function NewMedicalRecordPageInner() {
                                 Last menstrual period date
                               </label>
                               <input
-                                type="date"
+                                type="text"
                                 id="lastMenstrualDate"
                                 name="lastMenstrualDate"
                                 value={cadetFormData.lastMenstrualDate}
                                 onChange={handleCadetFormChange}
-                                className="input-field"
+                                className={`input-field ${fieldErrors.lastMenstrualDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                                placeholder="e.g., 25-10-2025"
+                                pattern="\d{2}-\d{2}-\d{4}"
                               />
+                              {fieldErrors.lastMenstrualDate && (
+                                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.lastMenstrualDate}</p>
+                              )}
                             </div>
                           </div>
                         </div>
 
                         {/* Menstrual Cycle Aids */}
                         <div className="col-span-full">
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          <label htmlFor="menstrualAidsDropdown" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Menstrual Cycle Aids
                           </label>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                            {['Menstrual Cup', 'Sanitary Pads', 'Tampon'].map((aid) => (
-                              <label key={aid} className="flex items-center">
-                                <input
-                                  type="checkbox"
-                                  name="menstrualAids"
-                                  value={aid}
-                                  checked={cadetFormData.menstrualAids?.includes(aid) || false}
-                                  onChange={handleCadetFormChange}
-                                  className="mr-2"
-                                />
-                                {aid}
-                              </label>
-                            ))}
-                          </div>
+                          <select
+                            id="menstrualAidsDropdown"
+                            name="menstrualAidsDropdown"
+                            value={getMenstrualAidsDropdownValue(cadetFormData.menstrualAids || [])}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                          >
+                            <option value="">Select menstrual aids...</option>
+                            <option value="1">Menstrual Cup</option>
+                            <option value="2">Sanitary Pads</option>
+                            <option value="3">Tampon</option>
+                            <option value="12">Menstrual Cup + Sanitary Pads</option>
+                            <option value="13">Menstrual Cup + Tampon</option>
+                            <option value="23">Sanitary Pads + Tampon</option>
+                            <option value="123">All (Menstrual Cup + Sanitary Pads + Tampon)</option>
+                          </select>
                         </div>
 
                         {/* Whether Sexually Active */}
@@ -2380,7 +2431,7 @@ function NewMedicalRecordPageInner() {
                                 name="pregnancyRadio"
                                 value="Yes"
                                 checked={cadetFormData.pregnancyHistory !== '' && cadetFormData.pregnancyHistory !== undefined}
-                                onChange={() => setCadetFormData(prev => ({ ...prev, pregnancyHistory: '' }))}
+                                onChange={() => setCadetFormData(prev => ({ ...prev, pregnancyHistory: 'Please specify...' }))}
                                 className="mr-2"
                               />
                               Yes
@@ -2437,7 +2488,7 @@ function NewMedicalRecordPageInner() {
                                 name="surgeryRadio"
                                 value="Yes"
                                 checked={cadetFormData.surgeryHistory !== '' && cadetFormData.surgeryHistory !== undefined}
-                                onChange={() => setCadetFormData(prev => ({ ...prev, surgeryHistory: '' }))}
+                                onChange={() => setCadetFormData(prev => ({ ...prev, surgeryHistory: 'Please specify the surgery...' }))}
                                 className="mr-2"
                               />
                               Yes
