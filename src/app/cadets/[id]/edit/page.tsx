@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+
 import { useRouter } from 'next/navigation'
 import { notFound } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
@@ -48,6 +49,28 @@ export default function EditCadetPage({
   const [error, setError] = useState<string | null>(null)
 
   // Form state
+  const normalizeDateInput = (value?: string | Date | null) => {
+    if (!value) return ''
+
+    // If it's already a string in YYYY-MM-DD format, return as is
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return value
+    }
+
+    // If it's a Date object, convert to YYYY-MM-DD
+    if (value instanceof Date) {
+      return value.toISOString().split('T')[0]
+    }
+
+    // For any other string, try to parse and format
+    const parsed = new Date(value)
+    if (!isNaN(parsed.getTime())) {
+      return parsed.toISOString().split('T')[0]
+    }
+
+    return ''
+  }
+
   const [formData, setFormData] = useState({
     name: '',
     battalion: '',
@@ -104,7 +127,8 @@ export default function EditCadetPage({
         name: cadetData.name || '',
         battalion: cadetData.battalion || '',
         company: cadetData.company || '',
-        joinDate: cadetData.joinDate ? cadetData.joinDate.split('T')[0] : '',
+        joinDate: normalizeDateInput(cadetData.joinDate),
+
         height: cadetData.height ? cadetData.height.toString() : '',
         weight: cadetData.weight ? cadetData.weight.toString() : '',
         age: cadetData.age ? cadetData.age.toString() : '',
@@ -115,7 +139,8 @@ export default function EditCadetPage({
         // Menstrual & Medical History (Female only)
         menstrualFrequency: cadetData.menstrualFrequency || '',
         menstrualDays: cadetData.menstrualDays || '',
-        lastMenstrualDate: cadetData.lastMenstrualDate ? cadetData.lastMenstrualDate.split('T')[0] : '',
+        lastMenstrualDate: normalizeDateInput(cadetData.lastMenstrualDate),
+
         menstrualAids: (() => {
           const aids = cadetData.menstrualAids;
           if (Array.isArray(aids)) {
@@ -207,10 +232,7 @@ export default function EditCadetPage({
         // Menstrual & Medical History (Female only)
         menstrualFrequency: formData.menstrualFrequency || undefined,
         menstrualDays: formData.menstrualDays ? parseInt(formData.menstrualDays) : undefined,
-        lastMenstrualDate: formData.lastMenstrualDate ? (() => {
-          const date = new Date(formData.lastMenstrualDate);
-          return isNaN(date.getTime()) ? null : date;
-        })() : null,
+        lastMenstrualDate: formData.lastMenstrualDate || null,
         menstrualAids: formData.menstrualAids ? (() => {
           // Convert select value back to array
           const value = formData.menstrualAids;

@@ -123,7 +123,7 @@ export async function PATCH(
       updateData.menstrualDays = updates.menstrualDays ? parseInt(updates.menstrualDays) : null
     }
     if ('lastMenstrualDate' in updates) {
-      updateData.lastMenstrualDate = updates.lastMenstrualDate ? new Date(updates.lastMenstrualDate) : null
+      updateData.lastMenstrualDate = updates.lastMenstrualDate || null
     }
     if ('menstrualAids' in updates) {
       updateData.menstrualAids = updates.menstrualAids && updates.menstrualAids.length > 0 ? JSON.stringify(updates.menstrualAids) : null
