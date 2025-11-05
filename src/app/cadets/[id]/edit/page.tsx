@@ -24,7 +24,7 @@ interface CadetData {
   menstrualFrequency?: string
   menstrualDays?: string
   lastMenstrualDate?: string
-  menstrualAids?: string[]
+  menstrualAidsDropdown?: string
   sexuallyActive?: string
   maritalStatus?: string
   pregnancyHistory?: string
@@ -64,7 +64,7 @@ export default function EditCadetPage({
     menstrualFrequency: '',
     menstrualDays: '',
     lastMenstrualDate: '',
-    menstrualAids: [] as string[],
+    menstrualAidsDropdown: '',
     sexuallyActive: '',
     maritalStatus: '',
     pregnancyHistory: '',
@@ -115,8 +115,8 @@ export default function EditCadetPage({
         // Menstrual & Medical History (Female only)
         menstrualFrequency: cadetData.menstrualFrequency || '',
         menstrualDays: cadetData.menstrualDays || '',
-        lastMenstrualDate: cadetData.lastMenstrualDate ? cadetData.lastMenstrualDate.split('T')[0] : '',
-        menstrualAids: cadetData.menstrualAids || [],
+        lastMenstrualDate: cadetData.lastMenstrualDate || '',
+        menstrualAidsDropdown: cadetData.menstrualAidsDropdown || '',
         sexuallyActive: cadetData.sexuallyActive || '',
         maritalStatus: cadetData.maritalStatus || '',
         pregnancyHistory: cadetData.pregnancyHistory || '',
@@ -142,15 +142,6 @@ export default function EditCadetPage({
     const checked = (e.target as HTMLInputElement).checked
 
     setFormData(prev => {
-      // Special handling for checkbox arrays
-      if (type === 'checkbox' && name === 'menstrualAids') {
-        return {
-          ...prev,
-          [name]: checked
-            ? [...(prev[name] || []), value]
-            : (prev[name] || []).filter((item: string) => item !== value)
-        }
-      }
 
       // Default handling
       return {
@@ -193,7 +184,7 @@ export default function EditCadetPage({
         menstrualFrequency: formData.menstrualFrequency || undefined,
         menstrualDays: formData.menstrualDays ? parseInt(formData.menstrualDays) : undefined,
         lastMenstrualDate: formData.lastMenstrualDate || undefined,
-        menstrualAids: formData.menstrualAids.length > 0 ? formData.menstrualAids : undefined,
+        menstrualAidsDropdown: formData.menstrualAidsDropdown || undefined,
         sexuallyActive: formData.sexuallyActive || undefined,
         maritalStatus: formData.maritalStatus || undefined,
         pregnancyHistory: formData.pregnancyHistory || undefined,
@@ -502,81 +493,85 @@ export default function EditCadetPage({
             {/* Menstrual & Medical History (Female only) */}
             {formData.sex === 'Female' && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
-                  Menstrual & Medical History
-                </h3>
+                <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                  Menstrual & Medical History (For Female Cadets Only)
+                </h4>
 
-                {/* Menstrual Cycle Information */}
-                <div className="space-y-4">
-                  <h4 className="text-md font-medium text-gray-900 dark:text-white">Menstrual Cycle Information</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label htmlFor="lastMenstrualDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Last Period Date
-                      </label>
-                      <input
-                        type="date"
-                        id="lastMenstrualDate"
-                        name="lastMenstrualDate"
-                        value={formData.lastMenstrualDate}
-                        onChange={handleInputChange}
-                        className="input-field"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="menstrualDays" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Cycle Duration (days)
-                      </label>
-                      <input
-                        type="number"
-                        id="menstrualDays"
-                        name="menstrualDays"
-                        value={formData.menstrualDays}
-                        onChange={handleInputChange}
-                        className="input-field"
-                        placeholder="e.g. 5"
-                        min="1"
-                        max="10"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="menstrualFrequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Cycle Frequency
-                      </label>
-                      <select
-                        id="menstrualFrequency"
-                        name="menstrualFrequency"
-                        value={formData.menstrualFrequency}
-                        onChange={handleInputChange}
-                        className="input-field"
-                      >
-                        <option value="">Select Frequency</option>
-                        <option value="Regular">Regular</option>
-                        <option value="Irregular">Irregular</option>
-                      </select>
+                <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600 p-4 rounded-lg">
+                  <div className="col-span-full">
+                    <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      Menstrual Cycle:
+                    </h5>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label htmlFor="menstrualFrequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          How frequently
+                        </label>
+                        <select
+                          id="menstrualFrequency"
+                          name="menstrualFrequency"
+                          className="input-field"
+                          value={formData.menstrualFrequency}
+                          onChange={handleInputChange}
+                        >
+                          <option value="">Select frequency...</option>
+                          <option value="Regular">Regular</option>
+                          <option value="Irregular">Irregular</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label htmlFor="menstrualDays" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          How many days
+                        </label>
+                        <input
+                          id="menstrualDays"
+                          min="1"
+                          max="10"
+                          className="input-field"
+                          placeholder="e.g., 5"
+                          type="number"
+                          name="menstrualDays"
+                          value={formData.menstrualDays}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="lastMenstrualDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Last menstrual period date
+                        </label>
+                        <input
+                          id="lastMenstrualDate"
+                          className="input-field"
+                          placeholder="e.g., 25-10-2025"
+                          pattern="\d{2}-\d{2}-\d{4}"
+                          type="text"
+                          name="lastMenstrualDate"
+                          value={formData.lastMenstrualDate}
+                          onChange={handleInputChange}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Menstrual Cycle Aids */}
-                <div className="space-y-4">
-                  <h4 className="text-md font-medium text-gray-900 dark:text-white">Menstrual Cycle Aids</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                    {['Menstrual Cup', 'Sanitary Pads', 'Tampon'].map((aid) => (
-                      <label key={aid} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          name="menstrualAids"
-                          value={aid}
-                          checked={formData.menstrualAids?.includes(aid) || false}
-                          onChange={handleInputChange}
-                          className="mr-2 h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">{aid}</span>
-                      </label>
-                    ))}
+                  <div className="col-span-full">
+                    <label htmlFor="menstrualAidsDropdown" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Menstrual Cycle Aids
+                    </label>
+                    <select
+                      id="menstrualAidsDropdown"
+                      name="menstrualAidsDropdown"
+                      className="input-field"
+                      value={formData.menstrualAidsDropdown}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select...</option>
+                      <option value="Menstrual Cup">Menstrual Cup</option>
+                      <option value="Sanitary Pads">Sanitary Pads</option>
+                      <option value="Tampon">Tampon</option>
+                      <option value="Menstrual Cup + Sanitary Pads">Menstrual Cup + Sanitary Pads</option>
+                      <option value="Menstrual Cup + Tampon">Menstrual Cup + Tampon</option>
+                      <option value="Sanitary Pads + Tampon">Sanitary Pads + Tampon</option>
+                      <option value="All (Menstrual Cup + Sanitary Pads + Tampon)">All (Menstrual Cup + Sanitary Pads + Tampon)</option>
+                    </select>
                   </div>
                 </div>
 
