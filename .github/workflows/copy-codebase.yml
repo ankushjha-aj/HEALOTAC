@@ -25,22 +25,24 @@ jobs:
           echo "Deploying to /root/HEALOTAC on ${{ secrets.HETZNER_SERVER_IP }} ..."
           rsync -avz --delete -e "ssh -i ~/.ssh/hetzner_key" ./ root@${{ secrets.HETZNER_SERVER_IP }}:/root/HEALOTAC/
 
-      - name: 🚀 Restart Application via PM2
+      - name: 🚀 Restart Application via PM2 (Production Mode)
         run: |
           ssh -i ~/.ssh/hetzner_key root@${{ secrets.HETZNER_SERVER_IP }} << 'EOF'
             cd /root/HEALOTAC
-            echo "🛑 Stopping all PM2 processes..."
+            echo "🛑 Stopping existing PM2 processes..."
             pm2 delete all || true
 
             echo "📦 Installing dependencies..."
-            npm install
+            npm i
 
-            echo "⚙️ Running dev build..."
-            npm run dev & sleep 10
+            echo "🏗️ Building the project..."
+            npm run build
 
             echo "🚀 Starting app with PM2..."
             pm2 start npm --name "healotac" -- run start
 
             echo "💾 Saving PM2 process list..."
             pm2 save
+
+            echo "✅ Deployment completed successfully!"
           EOF
