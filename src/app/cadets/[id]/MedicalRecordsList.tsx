@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, Clock, FileText } from 'lucide-react'
+import { Calendar, Clock, FileText, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -31,6 +31,7 @@ interface MedicalRecordsListProps {
 }
 
 export default function MedicalRecordsList({ records, cadetId, onReturn }: MedicalRecordsListProps) {
+  const [showModal, setShowModal] = useState(false)
 
   return (
     <div className="space-y-4">
@@ -84,6 +85,7 @@ export default function MedicalRecordsList({ records, cadetId, onReturn }: Medic
                     onDoubleClick={(e) => {
                       if (!isChecked && canCheck && onReturn) {
                         onReturn(record.id, daysMissed)
+                        setShowModal(true)
                       }
                     }}
                   >
@@ -206,6 +208,44 @@ export default function MedicalRecordsList({ records, cadetId, onReturn }: Medic
           )}
         </div>
       )})}
+
+      {/* Custom Modal for Return Confirmation */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowModal(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <svg className="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  Cadet Return Confirmed
+                </h3>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="mb-6">
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  Now please visit the respective medical history and mark this as completed from there also. <br />
+                  Otherwise you will not be able to add medical records for this cadet.
+                </p>
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="btn-primary"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

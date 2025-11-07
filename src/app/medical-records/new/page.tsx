@@ -381,14 +381,22 @@ function NewMedicalRecordPageInner() {
       // Proceed with selection if no active admissions
       setSelectedCadet(cadet)
       setCadetSearchTerm(`${cadet.name} - ${cadet.company} Company, ${cadet.battalion}`)
-      setFormData(prev => ({ ...prev, cadetId: cadet.id.toString() }))
+      setFormData(prev => ({ 
+        ...prev, 
+        cadetId: cadet.id.toString(),
+        weight: cadet.weight ? cadet.weight.toString() : ''
+      }))
       setShowCadetSuggestions(false)
     } catch (error) {
       console.error('Error checking cadet admission status:', error)
       // Allow selection if check fails to avoid blocking functionality
       setSelectedCadet(cadet)
       setCadetSearchTerm(`${cadet.name} - ${cadet.company} Company, ${cadet.battalion}`)
-      setFormData(prev => ({ ...prev, cadetId: cadet.id.toString() }))
+      setFormData(prev => ({ 
+        ...prev, 
+        cadetId: cadet.id.toString(),
+        weight: cadet.weight ? cadet.weight.toString() : ''
+      }))
       setShowCadetSuggestions(false)
     }
   }
@@ -1216,6 +1224,7 @@ function NewMedicalRecordPageInner() {
                   onChange={handleChange}
                   className="input-field"
                   placeholder="Phone number"
+                  maxLength={10}
                 />
               </div>
 
@@ -1735,16 +1744,24 @@ function NewMedicalRecordPageInner() {
                           <label htmlFor="bloodGroup" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Blood Group *
                           </label>
-                          <input
-                            type="text"
+                          <select
                             id="bloodGroup"
                             name="bloodGroup"
                             required
                             value={cadetFormData.bloodGroup}
                             onChange={handleCadetFormChange}
                             className="input-field"
-                            placeholder="e.g., O+, A-"
-                          />
+                          >
+                            <option value="">Select blood group...</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                          </select>
                         </div>
                         <div>
                           <label htmlFor="bmi" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -1818,7 +1835,7 @@ function NewMedicalRecordPageInner() {
                         </div>
                         <div>
                           <label htmlFor="so2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            SO2
+                            SpO2
                           </label>
                           <input
                             type="text"
