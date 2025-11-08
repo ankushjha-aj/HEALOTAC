@@ -164,6 +164,11 @@ export default function MedicalRecordsList({ records, cadetId, onReturn }: Medic
                       <div>Attend C: {record.attendC}</div>
                     ) : null}
 
+                    {/* Only show MI Detained if > 0 */}
+                    {record.miDetained && Number(record.miDetained) > 0 ? (
+                      <div>MI Detained: {record.miDetained}</div>
+                    ) : null}
+
                     {/* Only show Ex-PPG if > 0 */}
                     {record.exPpg && Number(record.exPpg) > 0 ? (
                       <div>Ex-PPG: {record.exPpg} (+{(record.exPpg * 0.25).toFixed(1)} day{(record.exPpg * 0.25) !== 1 ? 's' : ''} missed)</div>
