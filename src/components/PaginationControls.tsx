@@ -64,10 +64,10 @@ export default function PaginationControls({
         <button
           key={index}
           onClick={() => typeof page === 'number' && onPageChange(page)}
-          disabled={page === '...'}
+          disabled={page === '...' || page === currentPage}
           className={`px-3 py-1 text-sm border rounded-md transition-colors ${
             page === currentPage
-              ? 'bg-primary text-white border-primary'
+              ? 'bg-primary text-white border-primary cursor-default'
               : page === '...'
               ? 'bg-transparent border-transparent cursor-default'
               : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
