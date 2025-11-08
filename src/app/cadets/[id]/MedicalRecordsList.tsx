@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, Clock, FileText, X } from 'lucide-react'
+import { Calendar, Clock, FileText, X, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -181,7 +181,15 @@ export default function MedicalRecordsList({ records, cadetId, onReturn }: Medic
 
                     {/* Only show Physiotherapy if > 0 */}
                     {record.physiotherapy && Number(record.physiotherapy) > 0 ? (
-                      <div>Physiotherapy: {record.physiotherapy}</div>
+                      <div className="flex items-center gap-2">
+                        <span>Physiotherapy: {record.physiotherapy}</span>
+                        <div className="relative group">
+                          <Info className="h-3 w-3 text-gray-400 cursor-help" />
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                            Not counted in training days missed
+                          </div>
+                        </div>
+                      </div>
                     ) : null}
 
                     {/* Calculate and show total training days missed for this record */}
