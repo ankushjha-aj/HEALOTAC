@@ -96,11 +96,21 @@ export async function PATCH(
     }
 
     const body = await request.json()
-    const { totalTrainingDaysMissed } = body
+    const { totalTrainingDaysMissed: additionalDays } = body
+
+    // Get current record
+    const currentRecord = await db.select().from(medicalRecords).where(eq(medicalRecords.id, recordId)).limit(1)
+
+    if (currentRecord.length === 0) {
+      return NextResponse.json({ error: 'Record not found' }, { status: 404 })
+    }
+
+    const currentDays = currentRecord[0].totalTrainingDaysMissed || 0
+    const newTotal = currentDays + additionalDays
 
     // Update the record
     await db.update(medicalRecords)
-      .set({ totalTrainingDaysMissed })
+      .set({ totalTrainingDaysMissed: newTotal, medicalStatus: 'Completed' })
       .where(eq(medicalRecords.id, recordId))
 
     return NextResponse.json({ success: true })

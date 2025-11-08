@@ -272,7 +272,7 @@ export default function CadetDetailsPage({
       if (response.ok) {
         // Update local state only after successful API update
         setMedicalRecords(prev => prev.map(record =>
-          record.id === recordId ? { ...record, totalTrainingDaysMissed: daysMissed, medicalStatus: 'Completed' } : record
+          record.id === recordId ? { ...record, totalTrainingDaysMissed: (record.totalTrainingDaysMissed || 0) + daysMissed, medicalStatus: 'Completed' } : record
         ))
       }
     } catch (error) {
