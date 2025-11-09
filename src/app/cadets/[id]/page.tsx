@@ -939,7 +939,7 @@ export default function CadetDetailsPage({
                 </div>
               ) : (
                 <>
-                  <MedicalRecordsList records={pagination.getVisibleItems(medicalRecords)} cadetId={cadetId} onReturn={handleReturn} />
+                  <MedicalRecordsList records={pagination.getVisibleItems(medicalRecords)} cadetId={cadetId} cadetInfo={cadetInfo} onReturn={handleReturn} />
 
                   {/* Pagination Controls */}
                   <div className="mt-6 flex flex-col items-center gap-4">

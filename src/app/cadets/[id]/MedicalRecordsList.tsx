@@ -1,8 +1,76 @@
 'use client'
 
-import { Calendar, Clock, FileText, X, Info } from 'lucide-react'
+import { Calendar, Clock, FileText, X, Info, Download } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import jsPDF from 'jspdf'
+
+interface CadetInfo {
+  id: number
+  name: string
+  battalion: string
+  company: string
+  joinDate: string
+  academyNumber?: number
+  height?: number
+  weight?: number
+  age?: number
+  course?: string
+  sex?: string
+  createdAt: string
+  updatedAt?: string
+  relegated?: string
+  // Health Parameters
+  bloodGroup?: string
+  bmi?: string
+  bodyFat?: string
+  calcanealBoneDensity?: string
+  bp?: string
+  pulse?: string
+  so2?: string
+  bcaFat?: string
+  ecg?: string
+  temp?: string
+  smmKg?: string
+  // Vaccination Status
+  covidDose1?: boolean
+  covidDose2?: boolean
+  covidDose3?: boolean
+  hepatitisBDose1?: boolean
+  hepatitisBDose2?: boolean
+  tetanusToxoid?: boolean
+  chickenPoxDose1?: boolean
+  chickenPoxDose2?: boolean
+  chickenPoxSuffered?: boolean
+  yellowFever?: boolean
+  pastMedicalHistory?: string
+  // Tests
+  enduranceTest?: string
+  agilityTest?: string
+  speedTest?: string
+  // Strength Tests
+  verticalJump?: string
+  ballThrow?: string
+  lowerBackStrength?: string
+  shoulderDynamometerLeft?: string
+  shoulderDynamometerRight?: string
+  handGripDynamometerLeft?: string
+  handGripDynamometerRight?: string
+  // Overall Assessment
+  overallAssessment?: string
+  // Menstrual & Medical History (Female only)
+  menstrualFrequency?: string
+  menstrualDays?: string
+  lastMenstrualDate?: string
+  menstrualAids?: string | string[]
+  sexuallyActive?: string
+  maritalStatus?: string
+  pregnancyHistory?: string
+  contraceptiveHistory?: string
+  surgeryHistory?: string
+  medicalCondition?: string
+  hemoglobinLevel?: string
+}
 
 interface MedicalRecord {
   id: number
@@ -27,11 +95,169 @@ interface MedicalRecord {
 interface MedicalRecordsListProps {
   records: MedicalRecord[]
   cadetId: number
+  cadetInfo?: CadetInfo
   onReturn?: (recordId: number, daysMissed: number) => void
 }
 
-export default function MedicalRecordsList({ records, cadetId, onReturn }: MedicalRecordsListProps) {
+export default function MedicalRecordsList({ records, cadetId, cadetInfo, onReturn }: MedicalRecordsListProps) {
   const [showModal, setShowModal] = useState(false)
+
+  const generateMedicalRecordPDF = (record: MedicalRecord, cadetInfo: CadetInfo) => {
+    const doc = new jsPDF()
+    
+    // Set font
+    doc.setFont('helvetica')
+    
+    // Header
+    doc.setFontSize(20)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Medical Record Report', 20, 30)
+    
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Indian Army Officers Training Academy (OTA) Chennai', 20, 45)
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 55)
+    
+    // Cadet Information Section
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Cadet Information', 20, 75)
+    
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
+    let yPos = 90
+    
+    doc.text(`Name: ${cadetInfo.name}`, 20, yPos)
+    yPos += 8
+    doc.text(`Battalion: ${cadetInfo.battalion}`, 20, yPos)
+    yPos += 8
+    doc.text(`Company: ${cadetInfo.company}`, 20, yPos)
+    yPos += 8
+    
+    if (cadetInfo.academyNumber) {
+      doc.text(`Academy Number: ${cadetInfo.academyNumber}`, 20, yPos)
+      yPos += 8
+    }
+    
+    if (cadetInfo.course) {
+      doc.text(`Course: ${cadetInfo.course}`, 20, yPos)
+      yPos += 8
+    }
+    
+    if (cadetInfo.age) {
+      doc.text(`Age: ${cadetInfo.age} years`, 20, yPos)
+      yPos += 8
+    }
+    
+    if (cadetInfo.sex) {
+      doc.text(`Gender: ${cadetInfo.sex}`, 20, yPos)
+      yPos += 8
+    }
+    
+    if (cadetInfo.height) {
+      doc.text(`Height: ${cadetInfo.height} cm`, 20, yPos)
+      yPos += 8
+    }
+    
+    if (cadetInfo.weight) {
+      doc.text(`Weight: ${cadetInfo.weight} kg`, 20, yPos)
+      yPos += 8
+    }
+    
+    if (cadetInfo.bloodGroup) {
+      doc.text(`Blood Group: ${cadetInfo.bloodGroup}`, 20, yPos)
+      yPos += 8
+    }
+    
+    doc.text(`Join Date: ${new Date(cadetInfo.joinDate).toLocaleDateString()}`, 20, yPos)
+    yPos += 8
+    
+    // Medical Record Section
+    yPos += 15
+    doc.setFontSize(16)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Medical Record Details', 20, yPos)
+    yPos += 15
+    
+    doc.setFontSize(11)
+    doc.setFont('helvetica', 'normal')
+    
+    doc.text(`Date of Reporting: ${new Date(record.dateOfReporting).toLocaleDateString()}`, 20, yPos)
+    yPos += 8
+    
+    doc.text(`Medical Problem: ${record.medicalProblem}`, 20, yPos)
+    yPos += 8
+    
+    if (record.diagnosis) {
+      doc.text(`Diagnosis: ${record.diagnosis}`, 20, yPos)
+      yPos += 8
+    }
+    
+    doc.text(`Medical Status: ${record.medicalStatus}`, 20, yPos)
+    yPos += 8
+    
+    // Treatment Details
+    if (record.attendC && Number(record.attendC) > 0) {
+      doc.text(`Attend C: ${record.attendC}`, 20, yPos)
+      yPos += 8
+    }
+    
+    if (record.miDetained && Number(record.miDetained) > 0) {
+      doc.text(`MI Detained: ${record.miDetained}`, 20, yPos)
+      yPos += 8
+    }
+    
+    if (record.exPpg && Number(record.exPpg) > 0) {
+      doc.text(`Ex-PPG: ${record.exPpg} (${(record.exPpg * 0.25).toFixed(1)} days missed)`, 20, yPos)
+      yPos += 8
+    }
+    
+    if (record.attendB && Number(record.attendB) > 0) {
+      doc.text(`Attend B: ${record.attendB} (${(record.attendB * 0.25).toFixed(1)} days missed)`, 20, yPos)
+      yPos += 8
+    }
+    
+    if (record.physiotherapy && Number(record.physiotherapy) > 0) {
+      doc.text(`Physiotherapy: ${record.physiotherapy}`, 20, yPos)
+      yPos += 8
+    }
+    
+    doc.text(`Total Training Days Missed: ${record.totalTrainingDaysMissed || 0}`, 20, yPos)
+    yPos += 8
+    
+    if (record.contactNo) {
+      doc.text(`Contact Number: ${record.contactNo}`, 20, yPos)
+      yPos += 8
+    }
+    
+    if (record.remarks) {
+      yPos += 5
+      doc.setFont('helvetica', 'bold')
+      doc.text('Remarks:', 20, yPos)
+      yPos += 8
+      doc.setFont('helvetica', 'normal')
+      
+      // Split remarks into lines that fit the page width
+      const remarksLines = doc.splitTextToSize(record.remarks, 170)
+      doc.text(remarksLines, 20, yPos)
+      yPos += remarksLines.length * 5
+    }
+    
+    if (record.admittedInMH) {
+      yPos += 5
+      doc.text(`Admitted in Medical Hospital: ${record.admittedInMH}`, 20, yPos)
+      yPos += 8
+    }
+    
+    doc.text(`Monitoring Case: ${record.monitoringCase ? 'Yes' : 'No'}`, 20, yPos)
+    yPos += 8
+    
+    doc.text(`Record Created: ${new Date(record.createdAt).toLocaleDateString()}`, 20, yPos)
+    
+    // Save the PDF
+    const fileName = `Medical_Record_${cadetInfo.name.replace(/\s+/g, '_')}_${record.id}.pdf`
+    doc.save(fileName)
+  }
 
   return (
     <div className="space-y-4">
@@ -61,8 +287,19 @@ export default function MedicalRecordsList({ records, cadetId, onReturn }: Medic
                     </p>
                   </div>
                 </div>
-                <div className="text-sm text-purple-600 dark:text-purple-400 font-medium">
-                  MH/BH/CH Admission
+                <div className="flex items-center gap-2">
+                  {cadetInfo && (
+                    <button
+                      onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
+                      className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
+                      title="Download PDF"
+                    >
+                      <Download className="h-4 w-4" />
+                    </button>
+                  )}
+                  <div className="text-sm text-purple-600 dark:text-purple-400 font-medium">
+                    MH/BH/CH Admission
+                  </div>
                 </div>
               </div>
               {/* Cadet Return Status */}
@@ -138,8 +375,15 @@ export default function MedicalRecordsList({ records, cadetId, onReturn }: Medic
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2 items-center">
-                </div>
+                {cadetInfo && (
+                  <button
+                    onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
+                    className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
+                    title="Download PDF"
+                  >
+                    <Download className="h-4 w-4" />
+                  </button>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
