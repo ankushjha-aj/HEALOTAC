@@ -105,154 +105,289 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
   const generateMedicalRecordPDF = (record: MedicalRecord, cadetInfo: CadetInfo) => {
     const doc = new jsPDF()
     
-    // Set font
-    doc.setFont('helvetica')
+    // Set up colors and styling
+    const primaryColor = [0, 83, 156] // Navy blue
+    const secondaryColor = [100, 100, 100] // Gray
+    const accentColor = [220, 38, 38] // Red for important info
     
-    // Header
-    doc.setFontSize(20)
+    let yPos = 18
+    
+    // Header Section with Border
+    doc.setFillColor(240, 240, 240)
+    doc.rect(0, 0, 210, 50, 'F')
+    
+    // Header Text
     doc.setFont('helvetica', 'bold')
-    doc.text('Medical Record Report', 20, 30)
+    doc.setFontSize(20)
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.text('MEDICAL RECORD REPORT', 105, yPos + 16, { align: 'center' })
     
-    doc.setFontSize(12)
     doc.setFont('helvetica', 'normal')
-    doc.text('Indian Army Officers Training Academy (OTA) Chennai', 20, 45)
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 55)
+    doc.setFontSize(11)
+    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
+    doc.text('OFFICERS TRAINING ACADEMY - CHENNAI', 105, yPos + 30, { align: 'center' })
+    
+    // Header border
+    doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.setLineWidth(0.5)
+    doc.rect(10, 10, 190, 35)
+    
+    yPos = 56
+    
+    // Report Details
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
+    doc.text(`Report ID: MR-${record.id}`, 15, yPos)
+    doc.text(`Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 140, yPos)
+    
+    yPos += 16
     
     // Cadet Information Section
-    doc.setFontSize(16)
     doc.setFont('helvetica', 'bold')
-    doc.text('Cadet Information', 20, 75)
-    
     doc.setFontSize(11)
-    doc.setFont('helvetica', 'normal')
-    let yPos = 90
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.text('CADET INFORMATION', 15, yPos)
     
-    doc.text(`Name: ${cadetInfo.name}`, 20, yPos)
+    // Section underline
+    doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.setLineWidth(0.3)
+    doc.line(15, yPos + 2, 80, yPos + 2)
+    
     yPos += 8
-    doc.text(`Battalion: ${cadetInfo.battalion}`, 20, yPos)
-    yPos += 8
-    doc.text(`Company: ${cadetInfo.company}`, 20, yPos)
-    yPos += 8
     
-    if (cadetInfo.academyNumber) {
-      doc.text(`Academy Number: ${cadetInfo.academyNumber}`, 20, yPos)
-      yPos += 8
-    }
+    // Cadet Info Grid (two columns)
+    const cadetData: [string, string][] = [
+      ['Name:', cadetInfo.name || 'N/A'],
+      ['Academy Number:', cadetInfo.academyNumber ? String(cadetInfo.academyNumber) : 'N/A'],
+      ['Battalion:', cadetInfo.battalion || 'N/A'],
+      ['Company:', cadetInfo.company || 'N/A'],
+      ['Course:', cadetInfo.course || 'N/A'],
+      ['Age:', cadetInfo.age ? `${cadetInfo.age}` : 'N/A'],
+      ['Gender:', cadetInfo.sex || 'N/A'],
+      ['Height (cm):', cadetInfo.height ? `${cadetInfo.height}` : 'N/A'],
+      ['Weight (kg):', cadetInfo.weight ? `${cadetInfo.weight}` : 'N/A'],
+      ['Blood Group:', cadetInfo.bloodGroup || 'N/A'],
+      ['Join Date:', new Date(cadetInfo.joinDate).toLocaleDateString()]
+    ]
     
-    if (cadetInfo.course) {
-      doc.text(`Course: ${cadetInfo.course}`, 20, yPos)
-      yPos += 8
-    }
+    const cadetColumns = 2
+    const columnWidth = 88
+    const columnGap = 10
+    const rowHeight = 7
+    let cadetRow = 0
+    let cadetStartY = yPos
     
-    if (cadetInfo.age) {
-      doc.text(`Age: ${cadetInfo.age} years`, 20, yPos)
-      yPos += 8
-    }
+    cadetData.forEach(([label, value], index) => {
+      const column = index % cadetColumns
+      if (column === 0 && index !== 0) {
+        cadetRow += 1
+      }
+      let currentY = cadetStartY + cadetRow * rowHeight
+      if (currentY > 252) {
+        doc.addPage()
+        yPos = 18
+        cadetStartY = yPos
+        cadetRow = 0
+        currentY = cadetStartY
+      }
+      const currentX = 15 + column * (columnWidth + columnGap)
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(9)
+      doc.setTextColor(0, 0, 0)
+      doc.text(String(label), currentX, currentY)
+      doc.setDrawColor(204, 204, 204)
+      doc.setLineWidth(0.4)
+      const valueBoxX = currentX + 32
+      const valueBoxWidth = columnWidth - 35
+      doc.rect(valueBoxX, currentY - 5, valueBoxWidth, 6.5)
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(7.5)
+      doc.text(value, valueBoxX + 1.5, currentY - 0.5)
+    })
     
-    if (cadetInfo.sex) {
-      doc.text(`Gender: ${cadetInfo.sex}`, 20, yPos)
-      yPos += 8
-    }
-    
-    if (cadetInfo.height) {
-      doc.text(`Height: ${cadetInfo.height} cm`, 20, yPos)
-      yPos += 8
-    }
-    
-    if (cadetInfo.weight) {
-      doc.text(`Weight: ${cadetInfo.weight} kg`, 20, yPos)
-      yPos += 8
-    }
-    
-    if (cadetInfo.bloodGroup) {
-      doc.text(`Blood Group: ${cadetInfo.bloodGroup}`, 20, yPos)
-      yPos += 8
-    }
-    
-    doc.text(`Join Date: ${new Date(cadetInfo.joinDate).toLocaleDateString()}`, 20, yPos)
-    yPos += 8
+    yPos = cadetStartY + (cadetRow + 1) * rowHeight + 8
     
     // Medical Record Section
-    yPos += 15
-    doc.setFontSize(16)
+    if (yPos > 250) {
+      doc.addPage()
+      yPos = 20
+    }
+    
     doc.setFont('helvetica', 'bold')
-    doc.text('Medical Record Details', 20, yPos)
-    yPos += 15
-    
     doc.setFontSize(11)
-    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.text('MEDICAL RECORD DETAILS', 15, yPos)
     
-    doc.text(`Date of Reporting: ${new Date(record.dateOfReporting).toLocaleDateString()}`, 20, yPos)
+    // Section underline
+    doc.line(15, yPos + 2, 95, yPos + 2)
+    
     yPos += 8
     
-    doc.text(`Medical Problem: ${record.medicalProblem}`, 20, yPos)
-    yPos += 8
+    // Medical Record Table
+    const medicalData: [string, string][] = [
+      ['Date of Reporting:', new Date(record.dateOfReporting).toLocaleDateString()],
+      ['Medical Problem:', record.medicalProblem],
+      ['Diagnosis:', record.diagnosis || 'Not specified'],
+      ['Medical Status:', record.medicalStatus],
+      ['Contact Number:', record.contactNo || 'Not provided']
+    ]
     
-    if (record.diagnosis) {
-      doc.text(`Diagnosis: ${record.diagnosis}`, 20, yPos)
-      yPos += 8
-    }
-    
-    doc.text(`Medical Status: ${record.medicalStatus}`, 20, yPos)
-    yPos += 8
-    
-    // Treatment Details
-    if (record.attendC && Number(record.attendC) > 0) {
-      doc.text(`Attend C: ${record.attendC}`, 20, yPos)
-      yPos += 8
-    }
-    
-    if (record.miDetained && Number(record.miDetained) > 0) {
-      doc.text(`MI Detained: ${record.miDetained}`, 20, yPos)
-      yPos += 8
-    }
-    
-    if (record.exPpg && Number(record.exPpg) > 0) {
-      doc.text(`Ex-PPG: ${record.exPpg} (${(record.exPpg * 0.25).toFixed(1)} days missed)`, 20, yPos)
-      yPos += 8
-    }
-    
-    if (record.attendB && Number(record.attendB) > 0) {
-      doc.text(`Attend B: ${record.attendB} (${(record.attendB * 0.25).toFixed(1)} days missed)`, 20, yPos)
-      yPos += 8
-    }
-    
-    if (record.physiotherapy && Number(record.physiotherapy) > 0) {
-      doc.text(`Physiotherapy: ${record.physiotherapy}`, 20, yPos)
-      yPos += 8
-    }
-    
-    doc.text(`Total Training Days Missed: ${record.totalTrainingDaysMissed || 0}`, 20, yPos)
-    yPos += 8
-    
-    if (record.contactNo) {
-      doc.text(`Contact Number: ${record.contactNo}`, 20, yPos)
-      yPos += 8
-    }
-    
-    if (record.remarks) {
-      yPos += 5
+    doc.setFontSize(9)
+    medicalData.forEach(([label, value]) => {
+      if (yPos > 270) {
+        doc.addPage()
+        yPos = 20
+      }
+      
       doc.setFont('helvetica', 'bold')
-      doc.text('Remarks:', 20, yPos)
-      yPos += 8
+      doc.text(String(label), 20, yPos)
       doc.setFont('helvetica', 'normal')
       
-      // Split remarks into lines that fit the page width
-      const remarksLines = doc.splitTextToSize(record.remarks, 170)
-      doc.text(remarksLines, 20, yPos)
-      yPos += remarksLines.length * 5
+      // Handle long text wrapping
+      if (value.length > 50) {
+        const lines = doc.splitTextToSize(value, 120)
+        doc.text(lines, 70, yPos)
+        yPos += lines.length * 4.5
+      } else {
+        doc.text(value, 70, yPos)
+        yPos += 5.5
+      }
+    })
+    
+    yPos += 3
+    
+    // Treatment Details Section
+    if (yPos > 200) {
+      doc.addPage()
+      yPos = 20
     }
+    
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(9)
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.text('TREATMENT DETAILS', 15, yPos)
+    yPos += 10
+    
+    const treatmentData: [string, string][] = []
+    
+    if (record.attendC && Number(record.attendC) > 0) {
+      treatmentData.push(['Attend C:', String(record.attendC)])
+    }
+    if (record.miDetained && Number(record.miDetained) > 0) {
+      treatmentData.push(['MI Detained:', String(record.miDetained)])
+    }
+    if (record.exPpg && Number(record.exPpg) > 0) {
+      treatmentData.push(['Ex-PPG:', `${record.exPpg} (${(record.exPpg * 0.25).toFixed(1)} days missed)`])
+    }
+    if (record.attendB && Number(record.attendB) > 0) {
+      treatmentData.push(['Attend B:', `${record.attendB} (${(record.attendB * 0.25).toFixed(1)} days missed)`])
+    }
+    if (record.physiotherapy && Number(record.physiotherapy) > 0) {
+      treatmentData.push(['Physiotherapy:', String(record.physiotherapy)])
+    }
+    
+    if (treatmentData.length > 0) {
+      treatmentData.forEach(([label, value]) => {
+        if (yPos > 265) {
+          doc.addPage()
+          yPos = 18
+        }
+        doc.setFont('helvetica', 'bold')
+        doc.text(String(label), 25, yPos)
+        doc.setFont('helvetica', 'normal')
+        doc.text(value, 75, yPos)
+        yPos += 5.5
+      })
+    } else {
+      doc.setFont('helvetica', 'normal')
+      doc.text('No specific treatment details recorded', 25, yPos)
+      yPos += 5.5
+    }
+    
+    yPos += 3
+    
+    // Training Impact
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(12)
+    doc.setTextColor(accentColor[0], accentColor[1], accentColor[2])
+    doc.text('TRAINING IMPACT', 15, yPos)
+    yPos += 10
+    
+    let totalTrainingDays = record.totalTrainingDaysMissed || 0
+    if (record.exPpg && Number(record.exPpg) > 0) {
+      totalTrainingDays += Number(record.exPpg) * 0.25
+    }
+    if (record.attendB && Number(record.attendB) > 0) {
+      totalTrainingDays += Number(record.attendB) * 0.25
+    }
+    const formattedTotalDays = totalTrainingDays > 0 ? totalTrainingDays.toFixed(1) : '0'
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(0, 0, 0)
+    doc.text(`Total Training Days Missed: ${formattedTotalDays} day${formattedTotalDays === '1.0' ? '' : 's'}`, 25, yPos)
+    yPos += 5.5
+    
+    const monitoringValue = record.monitoringCase ? 'Yes' : 'No'
+    doc.text(`Monitoring Case: ${monitoringValue}`, 25, yPos)
+    yPos += 5.5
     
     if (record.admittedInMH) {
-      yPos += 5
-      doc.text(`Admitted in Medical Hospital: ${record.admittedInMH}`, 20, yPos)
-      yPos += 8
+      doc.text(`Admitted in Medical Hospital: ${record.admittedInMH}`, 25, yPos)
+      yPos += 5.5
     }
     
-    doc.text(`Monitoring Case: ${record.monitoringCase ? 'Yes' : 'No'}`, 20, yPos)
-    yPos += 8
+    yPos += 3
     
-    doc.text(`Record Created: ${new Date(record.createdAt).toLocaleDateString()}`, 20, yPos)
+    // Remarks Section
+    if (record.remarks) {
+      if (yPos > 195) {
+        doc.addPage()
+        yPos = 18
+      }
+      
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(10)
+      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
+      doc.text('REMARKS', 15, yPos)
+      yPos += 7
+      
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(8.5)
+      doc.setTextColor(0, 0, 0)
+      
+      const remarksLines = doc.splitTextToSize(record.remarks, 165)
+      doc.text(remarksLines, 20, yPos)
+      yPos += remarksLines.length * 4.5 + 8
+    }
+    
+    // Signature Section
+    if (yPos > 212) {
+      doc.addPage()
+      yPos = 18
+    }
+    
+    // Draw signature lines
+    doc.setDrawColor(0, 0, 0)
+    doc.setLineWidth(0.3)
+    
+    yPos += 20
+    doc.line(20, yPos, 80, yPos) // Doctor signature line
+    doc.line(120, yPos, 180, yPos) // Date line
+    
+    yPos += 5
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
+    doc.text("Doctor's Signature", 20, yPos)
+    doc.text('Date', 120, yPos)
+    
+    yPos += 15
+    
+    // Footer
+    doc.setFontSize(8)
+    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
+    doc.text('This document is generated electronically by HEALOTAC Medical Records Management System', 105, 280, { align: 'center' })
+    doc.text(`Record created on: ${new Date(record.createdAt).toLocaleDateString()}`, 105, 285, { align: 'center' })
     
     // Save the PDF
     const fileName = `Medical_Record_${cadetInfo.name.replace(/\s+/g, '_')}_${record.id}.pdf`
