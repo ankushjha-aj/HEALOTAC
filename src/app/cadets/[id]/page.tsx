@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Edit, Plus, Save, X } from 'lucide-react'
+import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import MedicalRecordsList from './MedicalRecordsList'
 import { usePagination } from '@/hooks/usePagination'
@@ -109,9 +109,6 @@ export default function CadetDetailsPage({
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [editingWeight, setEditingWeight] = useState(false)
-  const [weightInput, setWeightInput] = useState('')
-  const [updatingWeight, setUpdatingWeight] = useState(false)
   const [showMoreCadetInfo, setShowMoreCadetInfo] = useState(false)
   const [showMenstrualModal, setShowMenstrualModal] = useState(false)
 
@@ -178,7 +175,6 @@ export default function CadetDetailsPage({
 
       setCadetInfo(cadetData)
       setMedicalRecords(medicalRecordsResult)
-      setWeightInput(cadetData.weight?.toString() || '')
     } catch (err) {
       console.error('❌ Error loading cadet details:', err)
       setError(err instanceof Error ? err.message : 'Failed to load cadet details')
@@ -220,37 +216,6 @@ export default function CadetDetailsPage({
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [showMenstrualModal])
-
-  const handleUpdateWeight = async () => {
-    if (!cadetInfo) return
-
-    try {
-      setUpdatingWeight(true)
-      const weightValue = weightInput ? parseInt(weightInput) : undefined
-
-      const response = await fetch(`/api/cadets/${cadetId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ weight: weightValue }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to update weight')
-      }
-
-      // Update local state
-      setCadetInfo({ ...cadetInfo, weight: weightValue })
-      setEditingWeight(false)
-    } catch (err) {
-      console.error('Error updating weight:', err)
-      alert('Failed to update weight. Please try again.')
-    } finally {
-      setUpdatingWeight(false)
-    }
-  }
 
   const handleReturn = useCallback(async (recordId: number, daysMissed: number) => {
     try {
@@ -469,57 +434,11 @@ export default function CadetDetailsPage({
                         )}
 
                         {cadetInfo.weight && (
-                          <div className="flex items-center gap-2 group">
+                          <div className="flex items-center gap-2">
                             <Weight className="h-4 w-4 text-primary" />
-                            <div className="flex-1">
-                              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Weight</p>
-                              {editingWeight ? (
-                                <div className="flex items-center gap-2 mt-1">
-                                  <input
-                                    type="number"
-                                    value={weightInput}
-                                    onChange={(e) => setWeightInput(e.target.value)}
-                                    className="text-sm px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-20"
-                                    placeholder="kg"
-                                    min="0"
-                                    disabled={updatingWeight}
-                                  />
-                                  <button
-                                    onClick={handleUpdateWeight}
-                                    disabled={updatingWeight}
-                                    className="p-1 text-green-600 hover:text-green-700 disabled:opacity-50"
-                                    title="Save weight"
-                                  >
-                                    {updatingWeight ? (
-                                      <div className="animate-spin rounded-full h-3 w-3 border-b border-green-600"></div>
-                                    ) : (
-                                      <Save className="h-3 w-3" />
-                                    )}
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setEditingWeight(false)
-                                      setWeightInput(cadetInfo.weight?.toString() || '')
-                                    }}
-                                    disabled={updatingWeight}
-                                    className="p-1 text-red-600 hover:text-red-700 disabled:opacity-50"
-                                    title="Cancel editing"
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </button>
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-2">
-                                  <p className="text-sm font-medium">{cadetInfo.weight} kg</p>
-                                  <button
-                                    onClick={() => setEditingWeight(true)}
-                                    className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-primary transition-opacity"
-                                    title="Edit weight"
-                                  >
-                                    <Edit className="h-3 w-3" />
-                                  </button>
-                                </div>
-                              )}
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">curr. Weight</p>
+                              <p className="text-sm font-medium">{cadetInfo.weight} kg</p>
                             </div>
                           </div>
                         )}
