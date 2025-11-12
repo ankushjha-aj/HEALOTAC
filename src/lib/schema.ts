@@ -24,7 +24,9 @@ export const cadets = pgTable('cadets', {
   academyNumber: integer('academy_number'),
   // New demographic fields
   height: integer('height'), // in cm
-  weight: integer('weight'), // in kg
+  weight: integer('weight'), // in kg (legacy, keeping for compatibility)
+  initialWeight: integer('initial_weight'), // in kg (weight at cadet creation)
+  currentWeight: integer('current_weight'), // in kg (latest weight from medical records)
   age: integer('age'),
   course: varchar('course', { length: 100 }),
   sex: varchar('sex', { length: 10 }),

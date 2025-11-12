@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const {
-      name, battalion, company, joinDate, academyNumber, height, weight, age, course, sex, relegated,
+      name, battalion, company, joinDate, academyNumber, height, initialWeight, weight, age, course, sex, relegated,
       // Health Parameters
       bloodGroup, bmi, bodyFat, calcanealBoneDensity, bp, pulse, so2, bcaFat, ecg, temp, smmKg,
       // Vaccination Status
@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
       joinDate: new Date(joinDate),
       academyNumber: academyNumber ? academyNumber.toString() : null,
       height: height ? height.toString() : null,
+      initialWeight: initialWeight ? initialWeight.toString() : null,
       weight: weight ? weight.toString() : null,
       age: age ? age.toString() : null,
       course: course ? course.toString() : null,

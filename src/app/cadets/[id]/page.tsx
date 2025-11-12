@@ -18,6 +18,8 @@ interface CadetInfo {
   joinDate: string
   academyNumber?: number
   height?: number
+  initialWeight?: number
+  currentWeight?: number
   weight?: number
   age?: number
   course?: string
@@ -433,12 +435,22 @@ export default function CadetDetailsPage({
                           </div>
                         )}
 
-                        {cadetInfo.weight && (
+                        {cadetInfo.initialWeight && (
                           <div className="flex items-center gap-2">
                             <Weight className="h-4 w-4 text-primary" />
                             <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">curr. Weight</p>
-                              <p className="text-sm font-medium">{cadetInfo.weight} kg</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Initial Weight</p>
+                              <p className="text-sm font-medium">{cadetInfo.initialWeight} kg</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {cadetInfo.currentWeight && (
+                          <div className="flex items-center gap-2">
+                            <Weight className="h-4 w-4 text-primary" />
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Current Weight</p>
+                              <p className="text-sm font-medium">{cadetInfo.currentWeight} kg</p>
                             </div>
                           </div>
                         )}

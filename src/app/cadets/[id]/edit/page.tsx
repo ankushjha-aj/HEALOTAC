@@ -453,7 +453,7 @@ export default function EditCadetPage({
 
                 <div>
                   <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Weight (kg)
+                    Initial Weight (kg)
                   </label>
                   <input
                     type="number"
@@ -461,10 +461,11 @@ export default function EditCadetPage({
                     name="weight"
                     value={formData.weight}
                     onChange={handleInputChange}
-                    className="input-field"
+                    className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
                     placeholder="e.g. 70"
                     min="30"
                     max="200"
+                    disabled
                   />
                 </div>
 

@@ -16,6 +16,8 @@ interface Cadet {
   joinDate?: string
   academyNumber?: number | null
   height?: number | null
+  initialWeight?: number | null
+  currentWeight?: number | null
   weight?: number | null
   age?: number | null
   course?: string | null
@@ -32,6 +34,7 @@ interface CadetFormData {
   joinDate: string
   academyNumber?: string
   height?: string
+  initialWeight?: string
   weight?: string
   age?: string
   course?: string
@@ -129,6 +132,7 @@ function NewMedicalRecordPageInner() {
     joinDate: '',
     academyNumber: '',
     height: '',
+    initialWeight: '',
     weight: '',
     age: '',
     course: '',
@@ -378,13 +382,11 @@ function NewMedicalRecordPageInner() {
         }
       }
 
-      // Proceed with selection if no active admissions
       setSelectedCadet(cadet)
       setCadetSearchTerm(`${cadet.name} - ${cadet.company} Company, ${cadet.battalion}`)
       setFormData(prev => ({ 
         ...prev, 
-        cadetId: cadet.id.toString(),
-        weight: cadet.weight ? cadet.weight.toString() : ''
+        cadetId: cadet.id.toString()
       }))
       setShowCadetSuggestions(false)
     } catch (error) {
@@ -394,8 +396,7 @@ function NewMedicalRecordPageInner() {
       setCadetSearchTerm(`${cadet.name} - ${cadet.company} Company, ${cadet.battalion}`)
       setFormData(prev => ({ 
         ...prev, 
-        cadetId: cadet.id.toString(),
-        weight: cadet.weight ? cadet.weight.toString() : ''
+        cadetId: cadet.id.toString()
       }))
       setShowCadetSuggestions(false)
     }
@@ -521,6 +522,7 @@ function NewMedicalRecordPageInner() {
           joinDate: '',
           academyNumber: '',
           height: '',
+          initialWeight: '',
           weight: '',
           age: '',
           course: '',
@@ -685,7 +687,7 @@ function NewMedicalRecordPageInner() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
               },
-              body: JSON.stringify({ weight: parseFloat(formData.weight) }),
+              body: JSON.stringify({ currentWeight: parseFloat(formData.weight) }),
             })
 
             if (weightResponse.ok) {
@@ -923,7 +925,7 @@ function NewMedicalRecordPageInner() {
                       {/* Weight */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Weight (kg)
+                          Initial Weight (kg)
                         </label>
                         <input
                           type="text"
@@ -1029,10 +1031,10 @@ function NewMedicalRecordPageInner() {
                 )}
               </div>
 
-              {/* 4. Weight (kg) */}
+              {/* 4. Current Weight (kg) */}
               <div>
                 <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Weight (kg) *
+                  Current Weight (kg) *
                 </label>
                 <input
                   type="number"
@@ -1424,21 +1426,22 @@ function NewMedicalRecordPageInner() {
                           />
                         </div>
 
-                        {/* Weight (kg) */}
+                        {/* Initial Weight (kg) */}
                         <div>
-                          <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Weight (kg) *
+                          <label htmlFor="initialWeight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Initial Weight (kg) *
                           </label>
                           <input
                             type="number"
-                            id="weight"
-                            name="weight"
+                            id="initialWeight"
+                            name="initialWeight"
                             required
                             min={0}
-                            value={cadetFormData.weight}
+                            step="0.1"
+                            value={cadetFormData.initialWeight}
                             onChange={handleCadetFormChange}
                             className="input-field"
-                            placeholder="e.g., 68"
+                            placeholder="e.g., 68.5"
                           />
                         </div>
 

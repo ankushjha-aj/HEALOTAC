@@ -114,6 +114,9 @@ export async function PATCH(
     if ('weight' in updates) {
       updateData.weight = typeof updates.weight === 'number' ? updates.weight : updates.weight ? parseInt(updates.weight) : undefined
     }
+    if ('currentWeight' in updates) {
+      updateData.currentWeight = typeof updates.currentWeight === 'number' ? updates.currentWeight : updates.currentWeight ? parseInt(updates.currentWeight) : undefined
+    }
 
     // Handle menstrual health data updates
     if ('menstrualFrequency' in updates) {
