@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server' 
 import { db } from '@/lib/db'
 import { cadets } from '@/lib/schema'
+import { desc } from 'drizzle-orm'
 import { createAuthMiddleware } from '@/lib/auth'
 
 // GET /api/cadets - Get all cadets
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
   if (authError) return authError
 
   try {
-    const allCadets = await db.select().from(cadets).orderBy(cadets.createdAt)
+    const allCadets = await db.select().from(cadets).orderBy(desc(cadets.createdAt))
     console.log('📊 FETCHED CADETS:', allCadets.length, 'records')
     return NextResponse.json(allCadets)
   } catch (error) {
@@ -24,13 +25,13 @@ export async function GET(request: NextRequest) {
 
 // POST /api/cadets - Create new cadet
 export async function POST(request: NextRequest) {
-  // Check authentication - only admin can create cadets
-  const authError = createAuthMiddleware(['admin'])(request)
+  // Check authentication - allow both admin and user to create cadets
+  const authError = createAuthMiddleware(['admin', 'user'])(request)
   if (authError) return authError
 
   try {
     const {
-      name, battalion, company, joinDate, academyNumber, height, initialWeight, weight, age, course, sex, relegated,
+      name, battalion, company, joinDate, academyNumber, height, initialWeight, weight, age, course, sex, nokContact, relegated,
       // Health Parameters
       bloodGroup, bmi, bodyFat, calcanealBoneDensity, bp, pulse, so2, bcaFat, ecg, temp, smmKg,
       // Vaccination Status
@@ -73,6 +74,7 @@ export async function POST(request: NextRequest) {
       age: age ? age.toString() : null,
       course: course ? course.toString() : null,
       sex: sex || null,
+      nokContact: nokContact ? nokContact.toString() : null,
       relegated: relegated || 'N',
       // Health Parameters
       bloodGroup: bloodGroup || null,

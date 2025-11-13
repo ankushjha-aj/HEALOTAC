@@ -4,6 +4,7 @@ import { Calendar, Clock, FileText, X, Info, Download } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import { useUser } from '@/hooks/useUser'
 
 interface CadetInfo {
   id: number
@@ -101,6 +102,7 @@ interface MedicalRecordsListProps {
 
 export default function MedicalRecordsList({ records, cadetId, cadetInfo, onReturn }: MedicalRecordsListProps) {
   const [showModal, setShowModal] = useState(false)
+  const { user } = useUser()
 
   const generateMedicalRecordPDF = async (record: MedicalRecord, cadetInfo: CadetInfo) => {
     try {
@@ -451,7 +453,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {cadetInfo && (
+                  {user?.role !== 'user' && cadetInfo && (
                     <button
                       onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
                       className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
@@ -481,15 +483,15 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                   </div>
                   <label 
                     className="relative inline-flex items-center cursor-pointer" 
-                    title={!canCheck ? "Please come back after 24 hours in order to change status to returned" : isChecked ? "Cadet has been marked as returned" : "Double-click to mark cadet as returned"}
+                    title={!canCheck ? "Please come back after 24 hours in order to change status to returned" : isChecked ? "Cadet has been marked as returned" : user?.role === 'user' ? "You are not authorized to manage anything else adding cadet record" : "Double-click to mark cadet as returned"}
                     onDoubleClick={(e) => {
-                      if (!isChecked && canCheck && onReturn) {
+                      if (!isChecked && canCheck && onReturn && user?.role !== 'user') {
                         onReturn(record.id, daysMissed)
                         setShowModal(true)
                       }
                     }}
                   >
-                    <input type="checkbox" className="sr-only peer" checked={isChecked} disabled={isChecked || !canCheck} />
+                    <input type="checkbox" className="sr-only peer" checked={isChecked} disabled={isChecked || !canCheck || user?.role === 'user'} />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 peer-disabled:opacity-50 peer-disabled:cursor-not-allowed"></div>
                     <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Returned</span>
                   </label>
@@ -538,7 +540,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     </div>
                   </div>
                 </div>
-                {cadetInfo && (
+                {cadetInfo && user?.role !== 'user' && (
                   <button
                     onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
                     className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"

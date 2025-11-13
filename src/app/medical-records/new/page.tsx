@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import Link from 'next/link'
 import { X, Plus, User } from 'lucide-react'
+import { useUser } from '@/hooks/useUser'
 
 interface Cadet {
   id: number
@@ -23,6 +24,7 @@ interface Cadet {
   course?: string | null
   sex?: string | null
   relegated?: string
+  createdAt: string
 }
 
 interface CadetFormData {
@@ -39,6 +41,7 @@ interface CadetFormData {
   age?: string
   course?: string
   sex?: string
+  nokContact?: string
   relegated?: string
   // Health Parameters
   bloodGroup?: string
@@ -95,6 +98,7 @@ interface CadetFormData {
 function NewMedicalRecordPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { user } = useUser()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [cadets, setCadets] = useState<Cadet[]>([])
   const [loadingCadets, setLoadingCadets] = useState(true)
@@ -137,6 +141,7 @@ function NewMedicalRecordPageInner() {
     age: '',
     course: '',
     sex: '',
+    nokContact: '',
     relegated: 'N',
     // Health Parameters
     bloodGroup: '',
@@ -265,7 +270,8 @@ function NewMedicalRecordPageInner() {
                 name: cadetData.name,
                 company: cadetData.company,
                 battalion: cadetData.battalion,
-                relegated: cadetData.relegated || 'N'
+                relegated: cadetData.relegated || 'N',
+                createdAt: cadetData.createdAt || new Date().toISOString()
               }
               handleCadetSelect(cadet)
             } else {
@@ -302,6 +308,13 @@ function NewMedicalRecordPageInner() {
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [showConfirmation, showRecordConfirmation])
+
+  // Auto-show add cadet modal for NA users
+  useEffect(() => {
+    if (user?.role === 'user') {
+      // Modal no longer auto-shows, user clicks button instead
+    }
+  }, [user])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -527,6 +540,7 @@ function NewMedicalRecordPageInner() {
           age: '',
           course: '',
           sex: '',
+          nokContact: '',
           relegated: 'N',
           // Health Parameters
           bloodGroup: '',
@@ -719,578 +733,653 @@ function NewMedicalRecordPageInner() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add Medical Record</h1>
-          <p className="text-gray-600 dark:text-gray-400">Record a new medical visit or treatment</p>
-        </div>
+        {user?.role === 'user' ? (
+          // NA user: Cadet management interface
+          <>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cadet Management</h1>
+              <p className="text-gray-600 dark:text-gray-400">Add new cadets to the system</p>
+            </div>
 
-        {/* Form */}
-        <div className="card p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                {error}
+            {/* Add Cadet Button */}
+            <div className="flex justify-center">
+              <button
+                onClick={() => setShowAddCadetModal(true)}
+                className="btn-primary flex items-center gap-2 px-6 py-3 text-lg"
+              >
+                <Plus className="h-6 w-6" />
+                Add New Cadet
+              </button>
+            </div>
+
+            {/* Display added cadets */}
+            {cadets.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Added Cadets</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {cadets.map((cadet) => (
+                    <div key={cadet.id} className="card p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-white">{cadet.name}</h3>
+                          <div className="mt-2 space-y-1">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              <span className="font-medium">Battalion:</span> {cadet.battalion}
+                            </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              <span className="font-medium">Academy Number:</span> {cadet.academyNumber || 'N/A'}
+                            </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              <span className="font-medium">Company:</span> {cadet.company}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            Added {new Date(cadet.createdAt).toLocaleDateString()}
+                          </div>
+                          {cadet.relegated === 'Y' && (
+                            <div className="mt-1">
+                              <span className="text-red-600 dark:text-red-400 font-bold">R</span>
+                              <span className="w-2 h-2 bg-red-500 rounded-full inline-block ml-1"></span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* 1. Find or Add Cadet */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Cadet Selection *
-                </label>
-                <div className="flex gap-3">
-                  {/* Cadet Search Input */}
-                  <div className="flex-1 relative">
-                    {loadingCadets ? (
-                      <div className="input-field flex items-center">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-                        Loading cadets... {searchParams.get('cadetId') && 'Pre-selecting from cadet details...'}
-                      </div>
-                    ) : (
-                      <>
-                        <input
-                          type="text"
-                          placeholder="Search for existing cadet by name, company, battalion, or academy number..."
-                          value={cadetSearchTerm}
-                          onChange={handleCadetSearch}
-                          onFocus={handleCadetFocus}
-                          onBlur={() => setTimeout(() => setShowCadetSuggestions(false), 200)}
-                          className={`input-field ${fieldErrors.cadetId ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
-                          required={!!formData.cadetId}
-                        />
-
-                        {/* Auto-complete suggestions */}
-                        {showCadetSuggestions && filteredCadets.length > 0 && (
-                          <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                            {filteredCadets.slice(0, 10).map((cadet) => (
-                              <div
-                                key={cadet.id}
-                                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0"
-                                onClick={() => handleCadetSelect(cadet)}
-                              >
-                                <div className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                                  {cadet.name}
-                                  {cadet.relegated === 'Y' && (
-                                    <>
-                                      <span className="text-red-600 dark:text-red-400 font-bold">R</span>
-                                      <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                                    </>
-                                  )}
-                                </div>
-                                <div className="text-sm text-gray-500 dark:text-gray-400">
-                                  {cadet.company} Company, {cadet.battalion}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-
-                  {/* Action buttons for cadet management */}
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowAddCadetModal(true)}
-                      className="btn-secondary text-sm px-3 py-1"
-                      title="Add new cadet"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                    {selectedCadet && (
-                      <Link
-                        href={`/cadets/${selectedCadet.id}/edit`}
-                        className="btn-secondary text-sm px-3 py-1"
-                        title="Edit selected cadet"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                      </Link>
-                    )}
-                  </div>
+            {cadets.length === 0 && !loadingCadets && (
+              <div className="text-center py-12">
+                <div className="text-gray-500 dark:text-gray-400">
+                  <svg className="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                  <p className="text-lg font-medium">No cadets added yet</p>
+                  <p className="text-sm">Click the "Add New Cadet" button to get started</p>
                 </div>
+              </div>
+            )}
+          </>
+        ) : (
+          // RMO user: Full medical record form
+          <>
+            {/* Header */}
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Add Medical Record</h1>
+              <p className="text-gray-600 dark:text-gray-400">Record a new medical visit or treatment</p>
+            </div>
 
-                {fieldErrors.cadetId && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.cadetId}</p>
+            {/* Form */}
+            <div className="card p-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    {error}
+                  </div>
                 )}
 
-                {selectedCadet && (
-                  <div className="mt-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                    <div className="text-sm">
-                      <span className="font-medium text-green-800 dark:text-green-400">Selected:</span>{' '}
-                      <span className="text-green-700 dark:text-green-300 flex items-center gap-2">
-                        {selectedCadet.name}
-                        {selectedCadet.relegated === 'Y' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* 1. Find or Add Cadet */}
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Cadet Selection *
+                    </label>
+                    <div className="flex gap-3">
+                      {/* Cadet Search Input */}
+                      <div className="flex-1 relative">
+                        {loadingCadets ? (
+                          <div className="input-field flex items-center">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                            Loading cadets... {searchParams.get('cadetId') && 'Pre-selecting from cadet details...'}
+                          </div>
+                        ) : (
                           <>
-                            <span className="text-red-600 dark:text-red-400 font-bold">R</span>
-                            <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                            <input
+                              type="text"
+                              placeholder="Search for existing cadet by name, company, battalion, or academy number..."
+                              value={cadetSearchTerm}
+                              onChange={handleCadetSearch}
+                              onFocus={handleCadetFocus}
+                              onBlur={() => setTimeout(() => setShowCadetSuggestions(false), 200)}
+                              className={`input-field ${fieldErrors.cadetId ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                              required={!!formData.cadetId}
+                            />
+
+                            {/* Auto-complete suggestions */}
+                            {showCadetSuggestions && filteredCadets.length > 0 && (
+                              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                {filteredCadets.slice(0, 10).map((cadet) => (
+                                  <div
+                                    key={cadet.id}
+                                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-600 last:border-b-0"
+                                    onClick={() => handleCadetSelect(cadet)}
+                                  >
+                                    <div className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                                      {cadet.name}
+                                      {cadet.relegated === 'Y' && (
+                                        <>
+                                          <span className="text-red-600 dark:text-red-400 font-bold">R</span>
+                                          <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                                        </>
+                                      )}
+                                    </div>
+                                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                                      {cadet.company} Company, {cadet.battalion}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           </>
                         )}
-                        - {selectedCadet.company} Company, {selectedCadet.battalion}
-                      </span>
-                      {searchParams.get('cadetId') && (
-                        <div className="text-xs text-green-600 dark:text-green-400 mt-1">
-                          ✓ Pre-selected from cadet details
+                      </div>
+
+                      {/* Action buttons for cadet management */}
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowAddCadetModal(true)}
+                          className="btn-secondary text-sm px-3 py-1"
+                          title="Add new cadet"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </button>
+                        {selectedCadet && (
+                          <Link
+                            href={`/cadets/${selectedCadet.id}/edit`}
+                            className="btn-secondary text-sm px-3 py-1"
+                            title="Edit selected cadet"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+
+                    {fieldErrors.cadetId && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.cadetId}</p>
+                    )}
+
+                    {selectedCadet && (
+                      <div className="mt-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                        <div className="text-sm">
+                          <span className="font-medium text-green-800 dark:text-green-400">Selected:</span>{' '}
+                          <span className="text-green-700 dark:text-green-300 flex items-center gap-2">
+                            {selectedCadet.name}
+                            {selectedCadet.relegated === 'Y' && (
+                              <>
+                                <span className="text-red-600 dark:text-red-400 font-bold">R</span>
+                                <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                              </>
+                            )}
+                            - {selectedCadet.company} Company, {selectedCadet.battalion}
+                          </span>
+                          {searchParams.get('cadetId') && (
+                            <div className="text-xs text-green-600 dark:text-green-400 mt-1">
+                              ✓ Pre-selected from cadet details
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {cadets.length === 0 && !loadingCadets && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        No cadets available. Use &quot;Add New&quot; to create the first cadet.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Demographics Section - Display selected cadet's info */}
+                  {selectedCadet && (
+                    <div className="md:col-span-2">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                        Cadet Demographics
+                      </h4>
+                      <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          {/* Battalion */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Battalion
+                            </label>
+                            <input
+                              type="text"
+                              value={selectedCadet.battalion}
+                              readOnly
+                              className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                            />
+                          </div>
+
+                          {/* Company */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Company
+                            </label>
+                            <input
+                              type="text"
+                              value={selectedCadet.company}
+                              readOnly
+                              className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                            />
+                          </div>
+
+                          {/* Academy Number */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Academy Number
+                            </label>
+                            <input
+                              type="text"
+                              value={selectedCadet.academyNumber || 'N/A'}
+                              readOnly
+                              className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                            />
+                          </div>
+
+                          {/* Join Date */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Join Date
+                            </label>
+                            <input
+                              type="text"
+                              value={selectedCadet.joinDate ? new Date(selectedCadet.joinDate).toLocaleDateString() : 'N/A'}
+                              readOnly
+                              className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                            />
+                          </div>
+
+                          {/* Height */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Height (cm)
+                            </label>
+                            <input
+                              type="text"
+                              value={selectedCadet.height ? `${selectedCadet.height} cm` : 'N/A'}
+                              readOnly
+                              className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                            />
+                          </div>
+
+                          {/* Weight */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Initial Weight (kg)
+                            </label>
+                            <input
+                              type="text"
+                              value={selectedCadet.weight ? `${selectedCadet.weight} kg` : 'N/A'}
+                              readOnly
+                              className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                            />
+                          </div>
+
+                          {/* Age */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Age
+                            </label>
+                            <input
+                              type="text"
+                              value={selectedCadet.age || 'N/A'}
+                              readOnly
+                              className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                            />
+                          </div>
+
+                          {/* Course */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Course
+                            </label>
+                            <input
+                              type="text"
+                              value={selectedCadet.course || 'N/A'}
+                              readOnly
+                              className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                            />
+                          </div>
+
+                          {/* Sex */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Sex
+                            </label>
+                            <input
+                              type="text"
+                              value={selectedCadet.sex || 'N/A'}
+                              readOnly
+                              className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                            />
+                          </div>
+
+                          {/* Relegated */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Relegated
+                            </label>
+                            <input
+                              type="text"
+                              value={selectedCadet.relegated === 'Y' ? 'Yes' : 'No'}
+                              readOnly
+                              className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. Date of reporting */}
+                  <div>
+                    <label htmlFor="dateOfReporting" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Date of reporting *
+                    </label>
+                    <input
+                      type="date"
+                      id="dateOfReporting"
+                      name="dateOfReporting"
+                      required
+                      value={formData.dateOfReporting}
+                      onChange={handleChange}
+                      max={new Date().toISOString().split('T')[0]} // Prevent future dates
+                      className={`input-field ${fieldErrors.dateOfReporting ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    />
+                    {fieldErrors.dateOfReporting && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.dateOfReporting}</p>
+                    )}
+                  </div>
+
+                  {/* 3. Medical Problem */}
+                  <div>
+                    <label htmlFor="medicalProblem" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Medical Problem *
+                    </label>
+                    <input
+                      type="text"
+                      id="medicalProblem"
+                      name="medicalProblem"
+                      required
+                      value={formData.medicalProblem}
+                      onChange={handleChange}
+                      className={`input-field ${fieldErrors.medicalProblem ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                      placeholder="e.g., Ankle Sprain, Viral Fever"
+                    />
+                    {fieldErrors.medicalProblem && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.medicalProblem}</p>
+                    )}
+                  </div>
+
+                  {/* 4. Current Weight (kg) */}
+                  <div>
+                    <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Current Weight (kg) *
+                    </label>
+                    <input
+                      type="number"
+                      id="weight"
+                      name="weight"
+                      min={0}
+                      step="0.1"
+                      required
+                      value={formData.weight}
+                      onChange={handleChange}
+                      className="input-field"
+                      placeholder="e.g., 68.5"
+                    />
+                  </div>
+
+                  {/* 5. Diagnosis */}
+                  <div className="md:col-span-2">
+                    <label htmlFor="diagnosis" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Prescription
+                    </label>
+                    <textarea
+                      id="diagnosis"
+                      name="diagnosis"
+                      rows={3}
+                      value={formData.diagnosis}
+                      onChange={handleChange}
+                      className="input-field"
+                      placeholder="Detailed prescription option"
+                    />
+                  </div>
+
+                  {/* 6. Status */}
+                  <div>
+                    <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Medical Status
+                    </label>
+                    <select
+                      id="status"
+                      name="medicalStatus"
+                      value={formData.status}
+                      onChange={handleChange}
+                      className="input-field"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+
+                  {/* 7. Training Days (Combined Attend C / MI Detained) */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Training Days
+                    </label>
+                    <div className="space-y-2">
+                      {/* Training Type Selection */}
+                      <select
+                        name="trainingType"
+                        value={formData.trainingType}
+                        onChange={handleChange}
+                        disabled={formData.admittedInMH === 'Yes'}
+                        className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                      >
+                        <option value="none">None</option>
+                        <option value="attendC">Attend C</option>
+                        <option value="miDetained">MI Detained</option>
+                      </select>
+
+                      {/* Training Days Input - Only show if a type is selected */}
+                      {formData.trainingType !== 'none' && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600 dark:text-gray-400 min-w-0">
+                            {formData.trainingType === 'attendC' ? 'Attend C:' : 'MI Detained:'}
+                          </span>
+                          <input
+                            type="number"
+                            name="trainingDays"
+                            min="0"
+                            max={formData.trainingType === 'attendC' ? '10' : '30'}
+                            value={formData.trainingDays}
+                            onChange={handleChange}
+                            disabled={formData.admittedInMH === 'Yes'}
+                            className={`input-field flex-1 ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                            placeholder="0"
+                          />
                         </div>
                       )}
                     </div>
                   </div>
-                )}
 
-                {cadets.length === 0 && !loadingCadets && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    No cadets available. Use &quot;Add New&quot; to create the first cadet.
-                  </p>
-                )}
-              </div>
+                  {/* 9. Ex-PPG */}
+                  <div>
+                    <label htmlFor="exPpg" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Ex-PPG
+                    </label>
+                    <input
+                      type="number"
+                      id="exPpg"
+                      name="exPpg"
+                      min="0"
+                      value={formData.exPpg}
+                      onChange={handleChange}
+                      disabled={formData.admittedInMH === 'Yes'}
+                      className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                      placeholder="0"
+                    />
+                  </div>
 
-              {/* Demographics Section - Display selected cadet's info */}
-              {selectedCadet && (
-                <div className="md:col-span-2">
-                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                    Cadet Demographics
-                  </h4>
-                  <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {/* Battalion */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Battalion
-                        </label>
-                        <input
-                          type="text"
-                          value={selectedCadet.battalion}
-                          readOnly
-                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                        />
-                      </div>
+                  {/* 10. Attend B */}
+                  <div>
+                    <label htmlFor="attendB" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Attend B
+                    </label>
+                    <input
+                      type="number"
+                      id="attendB"
+                      name="attendB"
+                      min="0"
+                      value={formData.attendB}
+                      onChange={handleChange}
+                      disabled={formData.admittedInMH === 'Yes'}
+                      className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                      placeholder="0"
+                    />
+                  </div>
 
-                      {/* Company */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Company
-                        </label>
-                        <input
-                          type="text"
-                          value={selectedCadet.company}
-                          readOnly
-                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                        />
-                      </div>
+                  {/* 11. Physiotherapy */}
+                  <div>
+                    <label htmlFor="physiotherapy" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Physiotherapy
+                    </label>
+                    <input
+                      type="number"
+                      id="physiotherapy"
+                      name="physiotherapy"
+                      min="0"
+                      value={formData.physiotherapy}
+                      onChange={handleChange}
+                      disabled={formData.admittedInMH === 'Yes'}
+                      className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                      placeholder="0"
+                    />
+                  </div>
 
-                      {/* Academy Number */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Academy Number
-                        </label>
-                        <input
-                          type="text"
-                          value={selectedCadet.academyNumber || 'N/A'}
-                          readOnly
-                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                        />
-                      </div>
+                  <div>
+                    <label htmlFor="monitoringCase" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Monitoring Case
+                    </label>
+                    <select
+                      id="monitoringCase"
+                      name="monitoringCase"
+                      value={formData.monitoringCase}
+                      onChange={handleChange}
+                      disabled={formData.admittedInMH === 'Yes'}
+                      className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                    >
+                      <option value="No">No</option>
+                      <option value="Yes">Yes</option>
+                    </select>
+                  </div>
 
-                      {/* Join Date */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Join Date
-                        </label>
-                        <input
-                          type="text"
-                          value={selectedCadet.joinDate ? new Date(selectedCadet.joinDate).toLocaleDateString() : 'N/A'}
-                          readOnly
-                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                        />
-                      </div>
+                  {/* 8. Admitted in MH/BH/CH */}
+                  <div>
+                    <label htmlFor="admittedInMH" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Admitted in MH/BH/CH
+                    </label>
+                    <select
+                      id="admittedInMH"
+                      name="admittedInMH"
+                      value={formData.admittedInMH}
+                      onChange={handleChange}
+                      className="input-field"
+                    >
+                      <option value="No">No</option>
+                      <option value="Yes">Yes</option>
+                    </select>
+                  </div>
 
-                      {/* Height */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Height (cm)
-                        </label>
-                        <input
-                          type="text"
-                          value={selectedCadet.height ? `${selectedCadet.height} cm` : 'N/A'}
-                          readOnly
-                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                        />
-                      </div>
+                  {/* 9. Contact No. */}
+                  <div>
+                    <label htmlFor="contactNo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Contact No. *
+                    </label>
+                    <input
+                      type="tel"
+                      id="contactNo"
+                      name="contactNo"
+                      required
+                      value={formData.contactNo}
+                      onChange={handleChange}
+                      className="input-field"
+                      placeholder="Phone number"
+                      maxLength={10}
+                    />
+                  </div>
 
-                      {/* Weight */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Initial Weight (kg)
-                        </label>
-                        <input
-                          type="text"
-                          value={selectedCadet.weight ? `${selectedCadet.weight} kg` : 'N/A'}
-                          readOnly
-                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                        />
-                      </div>
-
-                      {/* Age */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Age
-                        </label>
-                        <input
-                          type="text"
-                          value={selectedCadet.age || 'N/A'}
-                          readOnly
-                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                        />
-                      </div>
-
-                      {/* Course */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Course
-                        </label>
-                        <input
-                          type="text"
-                          value={selectedCadet.course || 'N/A'}
-                          readOnly
-                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                        />
-                      </div>
-
-                      {/* Sex */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Sex
-                        </label>
-                        <input
-                          type="text"
-                          value={selectedCadet.sex || 'N/A'}
-                          readOnly
-                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                        />
-                      </div>
-
-                      {/* Relegated */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Relegated
-                        </label>
-                        <input
-                          type="text"
-                          value={selectedCadet.relegated === 'Y' ? 'Yes' : 'No'}
-                          readOnly
-                          className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                        />
-                      </div>
-                    </div>
+                  {/* 10. Remarks */}
+                  <div className="md:col-span-2">
+                    <label htmlFor="remarks" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Remarks
+                    </label>
+                    <textarea
+                      id="remarks"
+                      name="remarks"
+                      rows={3}
+                      value={formData.remarks}
+                      onChange={handleChange}
+                      className="input-field"
+                      placeholder="Any additional remarks or observations"
+                    />
                   </div>
                 </div>
-              )}
 
-              {/* 2. Date of reporting */}
-              <div>
-                <label htmlFor="dateOfReporting" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Date of reporting *
-                </label>
-                <input
-                  type="date"
-                  id="dateOfReporting"
-                  name="dateOfReporting"
-                  required
-                  value={formData.dateOfReporting}
-                  onChange={handleChange}
-                  max={new Date().toISOString().split('T')[0]} // Prevent future dates
-                  className={`input-field ${fieldErrors.dateOfReporting ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
-                />
-                {fieldErrors.dateOfReporting && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.dateOfReporting}</p>
-                )}
-              </div>
-
-              {/* 3. Medical Problem */}
-              <div>
-                <label htmlFor="medicalProblem" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Medical Problem *
-                </label>
-                <input
-                  type="text"
-                  id="medicalProblem"
-                  name="medicalProblem"
-                  required
-                  value={formData.medicalProblem}
-                  onChange={handleChange}
-                  className={`input-field ${fieldErrors.medicalProblem ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
-                  placeholder="e.g., Ankle Sprain, Viral Fever"
-                />
-                {fieldErrors.medicalProblem && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.medicalProblem}</p>
-                )}
-              </div>
-
-              {/* 4. Current Weight (kg) */}
-              <div>
-                <label htmlFor="weight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Current Weight (kg) *
-                </label>
-                <input
-                  type="number"
-                  id="weight"
-                  name="weight"
-                  min={0}
-                  step="0.1"
-                  required
-                  value={formData.weight}
-                  onChange={handleChange}
-                  className="input-field"
-                  placeholder="e.g., 68.5"
-                />
-              </div>
-
-              {/* 5. Diagnosis */}
-              <div className="md:col-span-2">
-                <label htmlFor="diagnosis" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Prescription
-                </label>
-                <textarea
-                  id="diagnosis"
-                  name="diagnosis"
-                  rows={3}
-                  value={formData.diagnosis}
-                  onChange={handleChange}
-                  className="input-field"
-                  placeholder="Detailed prescription option"
-                />
-              </div>
-
-              {/* 6. Status */}
-              <div>
-                <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Medical Status
-                </label>
-                <select
-                  id="status"
-                  name="medicalStatus"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="input-field"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </div>
-
-              {/* 7. Training Days (Combined Attend C / MI Detained) */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Training Days
-                </label>
-                <div className="space-y-2">
-                  {/* Training Type Selection */}
-                  <select
-                    name="trainingType"
-                    value={formData.trainingType}
-                    onChange={handleChange}
-                    disabled={formData.admittedInMH === 'Yes'}
-                    className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                {/* Submit Button */}
+                <div className="flex justify-end gap-3">
+                  <Link
+                    href="/dashboard"
+                    className="btn-secondary"
                   >
-                    <option value="none">None</option>
-                    <option value="attendC">Attend C</option>
-                    <option value="miDetained">MI Detained</option>
-                  </select>
+                    Cancel
+                  </Link>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Adding Record...' : 'Add Medical Record'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </>
+        )}
 
-                  {/* Training Days Input - Only show if a type is selected */}
-                  {formData.trainingType !== 'none' && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400 min-w-0">
-                        {formData.trainingType === 'attendC' ? 'Attend C:' : 'MI Detained:'}
-                      </span>
-                      <input
-                        type="number"
-                        name="trainingDays"
-                        min="0"
-                        max={formData.trainingType === 'attendC' ? '10' : '30'}
-                        value={formData.trainingDays}
-                        onChange={handleChange}
-                        disabled={formData.admittedInMH === 'Yes'}
-                        className={`input-field flex-1 ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
-                        placeholder="0"
-                      />
+        {/* Add Cadet Modal */}
+        {showAddCadetModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    Add New Cadet
+                  </h3>
+                  <button
+                    onClick={() => setShowAddCadetModal(false)}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleCreateCadet} className="space-y-4">
+                  {cadetError && (
+                    <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      {cadetError}
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* 9. Ex-PPG */}
-              <div>
-                <label htmlFor="exPpg" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Ex-PPG
-                </label>
-                <input
-                  type="number"
-                  id="exPpg"
-                  name="exPpg"
-                  min="0"
-                  value={formData.exPpg}
-                  onChange={handleChange}
-                  disabled={formData.admittedInMH === 'Yes'}
-                  className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
-                  placeholder="0"
-                />
-              </div>
-
-              {/* 10. Attend B */}
-              <div>
-                <label htmlFor="attendB" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Attend B
-                </label>
-                <input
-                  type="number"
-                  id="attendB"
-                  name="attendB"
-                  min="0"
-                  value={formData.attendB}
-                  onChange={handleChange}
-                  disabled={formData.admittedInMH === 'Yes'}
-                  className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
-                  placeholder="0"
-                />
-              </div>
-
-              {/* 11. Physiotherapy */}
-              <div>
-                <label htmlFor="physiotherapy" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Physiotherapy
-                </label>
-                <input
-                  type="number"
-                  id="physiotherapy"
-                  name="physiotherapy"
-                  min="0"
-                  value={formData.physiotherapy}
-                  onChange={handleChange}
-                  disabled={formData.admittedInMH === 'Yes'}
-                  className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
-                  placeholder="0"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="monitoringCase" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Monitoring Case
-                </label>
-                <select
-                  id="monitoringCase"
-                  name="monitoringCase"
-                  value={formData.monitoringCase}
-                  onChange={handleChange}
-                  disabled={formData.admittedInMH === 'Yes'}
-                  className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
-                >
-                  <option value="No">No</option>
-                  <option value="Yes">Yes</option>
-                </select>
-              </div>
-
-              {/* 8. Admitted in MH/BH/CH */}
-              <div>
-                <label htmlFor="admittedInMH" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Admitted in MH/BH/CH
-                </label>
-                <select
-                  id="admittedInMH"
-                  name="admittedInMH"
-                  value={formData.admittedInMH}
-                  onChange={handleChange}
-                  className="input-field"
-                >
-                  <option value="No">No</option>
-                  <option value="Yes">Yes</option>
-                </select>
-              </div>
-
-              {/* 9. Contact No. */}
-              <div>
-                <label htmlFor="contactNo" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Contact No. *
-                </label>
-                <input
-                  type="tel"
-                  id="contactNo"
-                  name="contactNo"
-                  required
-                  value={formData.contactNo}
-                  onChange={handleChange}
-                  className="input-field"
-                  placeholder="Phone number"
-                  maxLength={10}
-                />
-              </div>
-
-              {/* 10. Remarks */}
-              <div className="md:col-span-2">
-                <label htmlFor="remarks" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Remarks
-                </label>
-                <textarea
-                  id="remarks"
-                  name="remarks"
-                  rows={3}
-                  value={formData.remarks}
-                  onChange={handleChange}
-                  className="input-field"
-                  placeholder="Any additional remarks or observations"
-                />
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex justify-end gap-3">
-              <Link
-                href="/dashboard"
-                className="btn-secondary"
-              >
-                Cancel
-              </Link>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Adding Record...' : 'Add Medical Record'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      {/* Add Cadet Modal */}
-      {showAddCadetModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Add New Cadet
-                </h3>
-                <button
-                  onClick={() => setShowAddCadetModal(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <form onSubmit={handleCreateCadet} className="space-y-4">
-                {cadetError && (
-                  <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                    {cadetError}
-                  </div>
-                )}
 
                 <div className="grid grid-cols-1 gap-4">
                   {/* Cadet Name */}
@@ -1500,7 +1589,23 @@ function NewMedicalRecordPageInner() {
                           </select>
                         </div>
 
-                        {/* Relegated */}
+                        {/* NOK Contact */}
+                        <div>
+                          <label htmlFor="nokContact" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            NOK Contact *
+                          </label>
+                          <input
+                            type="tel"
+                            id="nokContact"
+                            name="nokContact"
+                            required
+                            value={cadetFormData.nokContact}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., +91 9876543210"
+                            maxLength={20}
+                          />
+                        </div>
                         <div>
                           <label htmlFor="relegated" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Relegated *
@@ -2674,6 +2779,7 @@ function NewMedicalRecordPageInner() {
           </div>
         </div>
       )}
+    </div>
     </DashboardLayout>
   )
 }

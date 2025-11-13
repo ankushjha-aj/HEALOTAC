@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Users, Activity, Plus, FileText, LogOut } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useUser } from '@/hooks/useUser'
 
 // Logo Image
 const Logo = ({ className = "" }: { className?: string }) => (
@@ -22,6 +23,7 @@ const navigation = [
 export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const { user } = useUser()
   const [navigatingToNewRecord, setNavigatingToNewRecord] = useState(false)
 
   const handleLogout = () => {
@@ -37,6 +39,9 @@ export default function Sidebar() {
       router.push('/medical-records/new')
     }, 800) // 800ms delay for smooth animation
   }
+
+  // Check if user is NA user
+  const isNAUser = user?.role === 'user'
 
   return (
     <aside className="w-64 flex-col bg-white dark:bg-gray-800/50 border-r border-gray-200 dark:border-gray-700/50 p-4 hidden lg:flex sticky top-0 h-screen overflow-y-auto">
@@ -79,7 +84,26 @@ export default function Sidebar() {
             )
           }
           
-          // Regular navigation links
+          // For NA users, show disabled navigation items for other pages
+          if (isNAUser && item.name !== 'Add Record') {
+            return (
+              <div
+                key={item.name}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-50"
+                title="Access restricted for NA users"
+              >
+                <item.icon className="h-5 w-5" />
+                <span>{item.name}</span>
+                <div className="ml-auto text-xs text-gray-400">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+              </div>
+            )
+          }
+          
+          // Regular navigation links for non-NA users
           const Icon = item.icon
           return (
             <Link

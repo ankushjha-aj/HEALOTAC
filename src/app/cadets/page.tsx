@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { usePagination } from '@/hooks/usePagination'
 import PaginationControls from '@/components/PaginationControls'
 import { useRouter } from 'next/navigation'
+import { useUser } from '@/hooks/useUser'
 
 // Interface for Medical Record
 interface MedicalRecord {
@@ -52,6 +53,7 @@ export default function CadetsPage() {
   const [cadetToDelete, setCadetToDelete] = useState<Cadet | null>(null)
 
   const router = useRouter()
+  const { user } = useUser()
 
   // ESC key handler for delete confirmation modal
   useEffect(() => {
@@ -456,12 +458,14 @@ export default function CadetsPage() {
                         >
                           <Edit className="h-4 w-4" />
                         </Link>
-                        <button 
-                          onClick={() => handleDeleteCadet(cadet)}
-                          className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        {user?.role !== 'user' && (
+                          <button 
+                            onClick={() => handleDeleteCadet(cadet)}
+                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

@@ -25,9 +25,10 @@ interface CadetInfo {
   age?: number
   course?: string
   sex?: string
+  nokContact?: string
+  relegated?: string
   createdAt: string
   updatedAt: string
-  relegated?: string
   // Health Parameters
   bloodGroup?: string
   bmi?: string
@@ -1036,6 +1037,22 @@ export default function CadetDetailsPage({
                   </div>
                 </div>
               )}
+
+              {/* NOK Contact */}
+              <div className="mb-6">
+                <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Emergency Contact</h4>
+                <div className="pl-4 border-l-2 border-red-200 dark:border-red-600">
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-red-500" />
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Next of Kin Contact</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {cadetInfo.nokContact || 'Not provided'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
             </div>
           )}

@@ -30,6 +30,7 @@ export const cadets = pgTable('cadets', {
   age: integer('age'),
   course: varchar('course', { length: 100 }),
   sex: varchar('sex', { length: 10 }),
+  nokContact: varchar('nok_contact', { length: 20 }), // Next of Kin contact number
   relegated: varchar('relegated', { length: 1 }).default('N').notNull(),
   // Health Parameters
   bloodGroup: varchar('blood_group', { length: 10 }),
