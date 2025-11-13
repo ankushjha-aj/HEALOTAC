@@ -140,7 +140,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
           }
         })
       } else {
-        // Fallback: Use text overlay - only academy number for now
+        // Fallback: Use text overlay for academy number and name
         console.log('No form fields found, using text overlay')
         
         // Position academy number in the academy number section
@@ -148,6 +148,16 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
           firstPage.drawText(String(cadetInfo.academyNumber), {
             x: 105, // Slightly left for better alignment
             y: 662, // Lower on the page for proper positioning
+            size: 12,
+            color: black,
+          })
+        }
+
+        // Position name below the academy number
+        if (cadetInfo.name) {
+          firstPage.drawText(cadetInfo.name, {
+            x: 240, // Same X position as academy number
+            y: 662, // Slightly lower than academy number
             size: 12,
             color: black,
           })
