@@ -388,6 +388,15 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             font: helveticaFont,
           })
         }
+
+        // Doctor's Sign
+        firstPage.drawText("Doctor's Sign", {
+          x: 520,
+          y: 10,
+          size: 10,
+          color: black,
+          font: helveticaBoldFont,
+        });
       }
       
       // Serialize the PDF document
