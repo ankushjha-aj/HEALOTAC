@@ -140,7 +140,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
           }
         })
       } else {
-        // Fallback: Use text overlay for academy number, name, company/course, age, sex, and date of reporting
+        // Fallback: Use text overlay for academy number, name, company/course, age, sex, date of reporting, mobile number, and total training days missed
         console.log('No form fields found, using text overlay')
         
         // Position academy number in the academy number section
@@ -202,6 +202,33 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
           firstPage.drawText(dateText, {
             x: 215.5, // Position for date
             y: 615, // Same y-plane as age/sex
+            size: 12,
+            color: black,
+          })
+        }
+
+        // Position mobile number
+        if (record.contactNo) {
+          firstPage.drawText(record.contactNo, {
+            x: 419, // Position for mobile number
+            y: 718.2, // Same y-plane as age/sex/date
+            size: 12,
+            color: black,
+          })
+        }
+
+        // Position total training days missed
+        const totalTrainingDays = records.reduce((total, record) => {
+          let days = record.totalTrainingDaysMissed || 0
+          if (record.exPpg && Number(record.exPpg) > 0) days += Number(record.exPpg) * 0.25
+          if (record.attendB && Number(record.attendB) > 0) days += Number(record.attendB) * 0.25
+          return total + days
+        }, 0)
+
+        if (totalTrainingDays > 0) {
+          firstPage.drawText(String(totalTrainingDays.toFixed(1)), {
+            x: 385.5, // Specified x coordinate
+            y: 615, // Specified y coordinate
             size: 12,
             color: black,
           })
