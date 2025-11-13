@@ -3,7 +3,7 @@
 import { Calendar, Clock, FileText, X, Info, Download } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { PDFDocument, rgb } from 'pdf-lib'
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 
 interface CadetInfo {
   id: number
@@ -117,6 +117,10 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
       
       // Set up font and colors
       const black = rgb(0, 0, 0)
+      const red = rgb(1, 0, 0)
+      const green = rgb(0, 0.5, 0)
+      const helveticaFont = await pdfDoc.embedStandardFont(StandardFonts.Helvetica)
+      const helveticaBoldFont = await pdfDoc.embedStandardFont(StandardFonts.HelveticaBold)
       
       // Check for form fields
       const form = pdfDoc.getForm()
@@ -150,6 +154,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             y: 662, // Lower on the page for proper positioning
             size: 12,
             color: black,
+            font: helveticaFont,
           })
         }
 
@@ -160,6 +165,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             y: 662, // Slightly lower than academy number
             size: 12,
             color: black,
+            font: helveticaFont,
           })
         }
 
@@ -174,6 +180,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             y: 662, // Below the name field
             size: 12,
             color: black,
+            font: helveticaFont,
           })
         }
 
@@ -184,6 +191,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             y: 615, // Same y-plane
             size: 12,
             color: black,
+            font: helveticaFont,
           })
         }
 
@@ -193,6 +201,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             y: 615, // Same y-plane as age
             size: 12,
             color: black,
+            font: helveticaFont,
           })
         }
 
@@ -204,6 +213,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             y: 615, // Same y-plane as age/sex
             size: 12,
             color: black,
+            font: helveticaFont,
           })
         }
 
@@ -214,10 +224,11 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             y: 718.2, // Same y-plane as age/sex/date
             size: 12,
             color: black,
+            font: helveticaFont,
           })
         }
 
-        // Position total training days missed
+        // Position diagnosis below the date of reporting
         const totalTrainingDays = records.reduce((total, record) => {
           let days = record.totalTrainingDaysMissed || 0
           if (record.exPpg && Number(record.exPpg) > 0) days += Number(record.exPpg) * 0.25
@@ -231,6 +242,150 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             y: 615, // Specified y coordinate
             size: 12,
             color: black,
+            font: helveticaFont,
+          })
+        }
+
+        // Position medical problem
+        if (record.medicalProblem) {
+          firstPage.drawText('MEDICAL PROBLEM', {
+            x: 170, // Left position
+            y: 480, // Heading above content
+            size: 11,
+            color: red,
+            font: helveticaBoldFont,
+          })
+          firstPage.drawText(record.medicalProblem, {
+            x: 170, // Left position
+            y: 460, // Below heading
+            size: 10.5,
+            color: black,
+            font: helveticaFont,
+          })
+        }
+
+        // Position diagnosis
+        if (record.diagnosis) {
+          firstPage.drawText('DIAGNOSIS', {
+            x: 170, // Left position
+            y: 430, // Heading above content
+            size: 11,
+            color: red,
+            font: helveticaBoldFont,
+          })
+          firstPage.drawText(record.diagnosis, {
+            x: 170, // Left position
+            y: 410, // Below heading
+            size: 10.5,
+            color: black,
+            font: helveticaFont,
+          })
+        }
+
+        // Position details below diagnosis
+        firstPage.drawText('DETAILS', {
+          x: 170, // Left position
+          y: 350, // Heading above details
+          size: 11,
+          color: red,
+          font: helveticaBoldFont,
+        });
+
+        let detailY = 330; // Start below heading
+        const lineSpacing = 15; // Space between lines
+
+        if (record.attendC && Number(record.attendC) > 0) {
+          firstPage.drawText(`Attend C: ${record.attendC}`, {
+            x: 170,
+            y: detailY,
+            size: 10,
+            color: black,
+            font: helveticaFont,
+          });
+          detailY -= lineSpacing;
+        }
+
+        if (record.miDetained && Number(record.miDetained) > 0) {
+          firstPage.drawText(`MI Detained: ${record.miDetained}`, {
+            x: 170,
+            y: detailY,
+            size: 10,
+            color: black,
+            font: helveticaFont,
+          });
+          detailY -= lineSpacing;
+        }
+
+        if (record.exPpg && Number(record.exPpg) > 0) {
+          firstPage.drawText(`Ex-PPG: ${record.exPpg} (+${(record.exPpg * 0.25).toFixed(1)} day${record.exPpg * 0.25 !== 1 ? 's' : ''} missed)`, {
+            x: 170,
+            y: detailY,
+            size: 10,
+            color: black,
+            font: helveticaFont,
+          });
+          detailY -= lineSpacing;
+        }
+
+        if (record.attendB && Number(record.attendB) > 0) {
+          firstPage.drawText(`Attend B: ${record.attendB} (+${(record.attendB * 0.25).toFixed(1)} day${record.attendB * 0.25 !== 1 ? 's' : ''} missed)`, {
+            x: 170,
+            y: detailY,
+            size: 10,
+            color: black,
+            font: helveticaFont,
+          });
+          detailY -= lineSpacing;
+        }
+
+        if (record.physiotherapy && Number(record.physiotherapy) > 0) {
+          firstPage.drawText(`Physiotherapy: ${record.physiotherapy}`, {
+            x: 170,
+            y: detailY,
+            size: 10,
+            color: black,
+            font: helveticaFont,
+          });
+          detailY -= lineSpacing;
+        }
+
+        if (record.monitoringCase) {
+          firstPage.drawText(`Monitoring Case: YES`, {
+            x: 170,
+            y: detailY,
+            size: 10,
+            color: rgb(0, 0.5, 0), // Green (0.5 = 128/255)
+            font: helveticaFont,
+          });
+          detailY -= lineSpacing;
+        }
+
+        if (record.admittedInMH === 'Yes') {
+          firstPage.drawText(`Admitted in MH: YES`, {
+            x: 170,
+            y: detailY,
+            size: 10,
+            color: green, // Red for MH admission
+            font: helveticaFont,
+          });
+          detailY -= lineSpacing;
+        }
+
+        // Position remarks
+        if (record.remarks) {
+          firstPage.drawText('REMARKS', {
+            x: 170, // Left position
+            y: 215, // Heading above content
+            size: 11,
+            color: red,
+            font: helveticaBoldFont,
+          })
+          firstPage.drawText(record.remarks, {
+            x: 170, // Left position
+            y: 195, // Below heading
+            size: 10.5,
+            color: black,
+            font: helveticaFont,
           })
         }
       }
