@@ -140,7 +140,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
           }
         })
       } else {
-        // Fallback: Use text overlay for academy number, name, company/course, and age
+        // Fallback: Use text overlay for academy number, name, company/course, age, sex, and date of reporting
         console.log('No form fields found, using text overlay')
         
         // Position academy number in the academy number section
@@ -191,6 +191,17 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
           firstPage.drawText(cadetInfo.sex, {
             x: 150, // Right of age for sex
             y: 615, // Same y-plane as age
+            size: 12,
+            color: black,
+          })
+        }
+
+        // Position date of reporting
+        if (record.dateOfReporting) {
+          const dateText = new Date(record.dateOfReporting).toLocaleDateString()
+          firstPage.drawText(dateText, {
+            x: 215.5, // Position for date
+            y: 615, // Same y-plane as age/sex
             size: 12,
             color: black,
           })
