@@ -3,7 +3,7 @@
 import { Calendar, Clock, FileText, X, Info, Download } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import jsPDF from 'jspdf'
+import { PDFDocument, rgb } from 'pdf-lib'
 
 interface CadetInfo {
   id: number
@@ -102,296 +102,79 @@ interface MedicalRecordsListProps {
 export default function MedicalRecordsList({ records, cadetId, cadetInfo, onReturn }: MedicalRecordsListProps) {
   const [showModal, setShowModal] = useState(false)
 
-  const generateMedicalRecordPDF = (record: MedicalRecord, cadetInfo: CadetInfo) => {
-    const doc = new jsPDF()
-    
-    // Set up colors and styling
-    const primaryColor = [0, 83, 156] // Navy blue
-    const secondaryColor = [100, 100, 100] // Gray
-    const accentColor = [220, 38, 38] // Red for important info
-    
-    let yPos = 18
-    
-    // Header Section with Border
-    doc.setFillColor(240, 240, 240)
-    doc.rect(0, 0, 210, 50, 'F')
-    
-    // Header Text
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(20)
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.text('MEDICAL RECORD REPORT', 105, yPos + 16, { align: 'center' })
-    
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(11)
-    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
-    doc.text('OFFICERS TRAINING ACADEMY - CHENNAI', 105, yPos + 30, { align: 'center' })
-    
-    // Header border
-    doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.setLineWidth(0.5)
-    doc.rect(10, 10, 190, 35)
-    
-    yPos = 56
-    
-    // Report Details
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(9)
-    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
-    doc.text(`Report ID: MR-${record.id}`, 15, yPos)
-    doc.text(`Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, 140, yPos)
-    
-    yPos += 16
-    
-    // Cadet Information Section
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(11)
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.text('CADET INFORMATION', 15, yPos)
-    
-    // Section underline
-    doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.setLineWidth(0.3)
-    doc.line(15, yPos + 2, 80, yPos + 2)
-    
-    yPos += 8
-    
-    // Cadet Info Grid (two columns)
-    const cadetData: [string, string][] = [
-      ['Name:', cadetInfo.name || 'N/A'],
-      ['Academy Number:', cadetInfo.academyNumber ? String(cadetInfo.academyNumber) : 'N/A'],
-      ['Battalion:', cadetInfo.battalion || 'N/A'],
-      ['Company:', cadetInfo.company || 'N/A'],
-      ['Course:', cadetInfo.course || 'N/A'],
-      ['Age:', cadetInfo.age ? `${cadetInfo.age}` : 'N/A'],
-      ['Gender:', cadetInfo.sex || 'N/A'],
-      ['Height (cm):', cadetInfo.height ? `${cadetInfo.height}` : 'N/A'],
-      ['Weight (kg):', cadetInfo.weight ? `${cadetInfo.weight}` : 'N/A'],
-      ['Blood Group:', cadetInfo.bloodGroup || 'N/A'],
-      ['Join Date:', new Date(cadetInfo.joinDate).toLocaleDateString()]
-    ]
-    
-    const cadetColumns = 2
-    const columnWidth = 88
-    const columnGap = 10
-    const rowHeight = 7
-    let cadetRow = 0
-    let cadetStartY = yPos
-    
-    cadetData.forEach(([label, value], index) => {
-      const column = index % cadetColumns
-      if (column === 0 && index !== 0) {
-        cadetRow += 1
-      }
-      let currentY = cadetStartY + cadetRow * rowHeight
-      if (currentY > 252) {
-        doc.addPage()
-        yPos = 18
-        cadetStartY = yPos
-        cadetRow = 0
-        currentY = cadetStartY
-      }
-      const currentX = 15 + column * (columnWidth + columnGap)
-      doc.setFont('helvetica', 'bold')
-      doc.setFontSize(9)
-      doc.setTextColor(0, 0, 0)
-      doc.text(String(label), currentX, currentY)
-      doc.setDrawColor(204, 204, 204)
-      doc.setLineWidth(0.4)
-      const valueBoxX = currentX + 32
-      const valueBoxWidth = columnWidth - 35
-      doc.rect(valueBoxX, currentY - 5, valueBoxWidth, 6.5)
-      doc.setFont('helvetica', 'normal')
-      doc.setFontSize(7.5)
-      doc.text(value, valueBoxX + 1.5, currentY - 0.5)
-    })
-    
-    yPos = cadetStartY + (cadetRow + 1) * rowHeight + 8
-    
-    // Medical Record Section
-    if (yPos > 250) {
-      doc.addPage()
-      yPos = 20
-    }
-    
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(11)
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.text('MEDICAL RECORD DETAILS', 15, yPos)
-    
-    // Section underline
-    doc.line(15, yPos + 2, 95, yPos + 2)
-    
-    yPos += 8
-    
-    // Medical Record Table
-    const medicalData: [string, string][] = [
-      ['Date of Reporting:', new Date(record.dateOfReporting).toLocaleDateString()],
-      ['Medical Problem:', record.medicalProblem],
-      ['Diagnosis:', record.diagnosis || 'Not specified'],
-      ['Medical Status:', record.medicalStatus],
-      ['Contact Number:', record.contactNo || 'Not provided']
-    ]
-    
-    doc.setFontSize(9)
-    medicalData.forEach(([label, value]) => {
-      if (yPos > 270) {
-        doc.addPage()
-        yPos = 20
-      }
+  const generateMedicalRecordPDF = async (record: MedicalRecord, cadetInfo: CadetInfo) => {
+    try {
+      // Fetch the existing MI ROOM.pdf template
+      const response = await fetch('/MI ROOM.pdf')
+      const templateBytes = await response.arrayBuffer()
       
-      doc.setFont('helvetica', 'bold')
-      doc.text(String(label), 20, yPos)
-      doc.setFont('helvetica', 'normal')
+      // Load the PDF document
+      const pdfDoc = await PDFDocument.load(templateBytes)
       
-      // Handle long text wrapping
-      if (value.length > 50) {
-        const lines = doc.splitTextToSize(value, 120)
-        doc.text(lines, 70, yPos)
-        yPos += lines.length * 4.5
+      // Get the first page
+      const pages = pdfDoc.getPages()
+      const firstPage = pages[0]
+      
+      // Set up font and colors
+      const black = rgb(0, 0, 0)
+      
+      // Check for form fields
+      const form = pdfDoc.getForm()
+      const fields = form.getFields()
+      console.log('PDF Form Fields found:', fields.length)
+      
+      // If form fields exist, try to fill them first
+      if (fields.length > 0) {
+        console.log('Attempting to fill form fields...')
+        
+        fields.forEach(field => {
+          const fieldName = field.getName().toLowerCase()
+          console.log('Processing field:', fieldName)
+          
+          // Only handle academy number for now
+          if (fieldName.includes('academy') || fieldName.includes('number')) {
+            if (cadetInfo.academyNumber) {
+              form.getTextField(field.getName())?.setText(String(cadetInfo.academyNumber))
+              console.log('Filled academy number:', cadetInfo.academyNumber)
+            }
+          }
+        })
       } else {
-        doc.text(value, 70, yPos)
-        yPos += 5.5
-      }
-    })
-    
-    yPos += 3
-    
-    // Treatment Details Section
-    if (yPos > 200) {
-      doc.addPage()
-      yPos = 20
-    }
-    
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(9)
-    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-    doc.text('TREATMENT DETAILS', 15, yPos)
-    yPos += 10
-    
-    const treatmentData: [string, string][] = []
-    
-    if (record.attendC && Number(record.attendC) > 0) {
-      treatmentData.push(['Attend C:', String(record.attendC)])
-    }
-    if (record.miDetained && Number(record.miDetained) > 0) {
-      treatmentData.push(['MI Detained:', String(record.miDetained)])
-    }
-    if (record.exPpg && Number(record.exPpg) > 0) {
-      treatmentData.push(['Ex-PPG:', `${record.exPpg} (${(record.exPpg * 0.25).toFixed(1)} days missed)`])
-    }
-    if (record.attendB && Number(record.attendB) > 0) {
-      treatmentData.push(['Attend B:', `${record.attendB} (${(record.attendB * 0.25).toFixed(1)} days missed)`])
-    }
-    if (record.physiotherapy && Number(record.physiotherapy) > 0) {
-      treatmentData.push(['Physiotherapy:', String(record.physiotherapy)])
-    }
-    
-    if (treatmentData.length > 0) {
-      treatmentData.forEach(([label, value]) => {
-        if (yPos > 265) {
-          doc.addPage()
-          yPos = 18
+        // Fallback: Use text overlay - only academy number for now
+        console.log('No form fields found, using text overlay')
+        
+        // Position academy number in the academy number section
+        if (cadetInfo.academyNumber) {
+          firstPage.drawText(String(cadetInfo.academyNumber), {
+            x: 105, // Slightly left for better alignment
+            y: 662, // Lower on the page for proper positioning
+            size: 12,
+            color: black,
+          })
         }
-        doc.setFont('helvetica', 'bold')
-        doc.text(String(label), 25, yPos)
-        doc.setFont('helvetica', 'normal')
-        doc.text(value, 75, yPos)
-        yPos += 5.5
-      })
-    } else {
-      doc.setFont('helvetica', 'normal')
-      doc.text('No specific treatment details recorded', 25, yPos)
-      yPos += 5.5
-    }
-    
-    yPos += 3
-    
-    // Training Impact
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(12)
-    doc.setTextColor(accentColor[0], accentColor[1], accentColor[2])
-    doc.text('TRAINING IMPACT', 15, yPos)
-    yPos += 10
-    
-    let totalTrainingDays = record.totalTrainingDaysMissed || 0
-    if (record.exPpg && Number(record.exPpg) > 0) {
-      totalTrainingDays += Number(record.exPpg) * 0.25
-    }
-    if (record.attendB && Number(record.attendB) > 0) {
-      totalTrainingDays += Number(record.attendB) * 0.25
-    }
-    const formattedTotalDays = totalTrainingDays > 0 ? totalTrainingDays.toFixed(1) : '0'
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(0, 0, 0)
-    doc.text(`Total Training Days Missed: ${formattedTotalDays} day${formattedTotalDays === '1.0' ? '' : 's'}`, 25, yPos)
-    yPos += 5.5
-    
-    const monitoringValue = record.monitoringCase ? 'Yes' : 'No'
-    doc.text(`Monitoring Case: ${monitoringValue}`, 25, yPos)
-    yPos += 5.5
-    
-    if (record.admittedInMH) {
-      doc.text(`Admitted in Medical Hospital: ${record.admittedInMH}`, 25, yPos)
-      yPos += 5.5
-    }
-    
-    yPos += 3
-    
-    // Remarks Section
-    if (record.remarks) {
-      if (yPos > 195) {
-        doc.addPage()
-        yPos = 18
       }
       
-      doc.setFont('helvetica', 'bold')
-      doc.setFontSize(10)
-      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
-      doc.text('REMARKS', 15, yPos)
-      yPos += 7
+      // Serialize the PDF document
+      const pdfBytes = await pdfDoc.save()
       
-      doc.setFont('helvetica', 'normal')
-      doc.setFontSize(8.5)
-      doc.setTextColor(0, 0, 0)
+      // Create a blob and download
+      const blob = new Blob([pdfBytes] as BlobPart[], { type: 'application/pdf' })
+      const url = URL.createObjectURL(blob)
       
-      const remarksLines = doc.splitTextToSize(record.remarks, 165)
-      doc.text(remarksLines, 20, yPos)
-      yPos += remarksLines.length * 4.5 + 8
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `MI_ROOM_${cadetInfo.name.replace(/\s+/g, '_')}_${record.id}_filled.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      // Clean up the URL object
+      URL.revokeObjectURL(url)
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      alert('Error generating PDF. Please try again.')
     }
-    
-    // Signature Section
-    if (yPos > 212) {
-      doc.addPage()
-      yPos = 18
-    }
-    
-    // Draw signature lines
-    doc.setDrawColor(0, 0, 0)
-    doc.setLineWidth(0.3)
-    
-    yPos += 20
-    doc.line(20, yPos, 80, yPos) // Doctor signature line
-    doc.line(120, yPos, 180, yPos) // Date line
-    
-    yPos += 5
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(10)
-    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
-    doc.text("Doctor's Signature", 20, yPos)
-    doc.text('Date', 120, yPos)
-    
-    yPos += 15
-    
-    // Footer
-    doc.setFontSize(8)
-    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
-    doc.text('This document is generated electronically by HEALOTAC Medical Records Management System', 105, 280, { align: 'center' })
-    doc.text(`Record created on: ${new Date(record.createdAt).toLocaleDateString()}`, 105, 285, { align: 'center' })
-    
-    // Save the PDF
-    const fileName = `Medical_Record_${cadetInfo.name.replace(/\s+/g, '_')}_${record.id}.pdf`
-    doc.save(fileName)
   }
 
   return (
@@ -427,7 +210,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     <button
                       onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
                       className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
-                      title="Download PDF"
+                      title="Download PDF with medical record data"
                     >
                       <Download className="h-4 w-4" />
                     </button>
@@ -514,7 +297,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                   <button
                     onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
                     className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
-                    title="Download PDF"
+                    title="Download PDF with medical record data"
                   >
                     <Download className="h-4 w-4" />
                   </button>

@@ -9,6 +9,7 @@ import Link from 'next/link'
 import MedicalRecordsList from './MedicalRecordsList'
 import { usePagination } from '@/hooks/usePagination'
 import PaginationControls from '@/components/PaginationControls'
+import jsPDF from 'jspdf'
 
 interface CadetInfo {
   id: number
@@ -296,6 +297,249 @@ export default function CadetDetailsPage({
       hasValue(cadetInfo.menstrualAids)
     )
   }, [cadetInfo, isFemaleCadet])
+
+  const generateCadetProfilePDF = () => {
+    if (!cadetInfo) return
+
+    const doc = new jsPDF()
+    
+    // Set up colors and styling
+    const primaryColor = [0, 83, 156] // Navy blue
+    const secondaryColor = [100, 100, 100] // Gray
+    const accentColor = [220, 38, 38] // Red for important info
+    
+    let yPos = 18
+    
+    // Header Section
+    doc.setFillColor(240, 240, 240)
+    doc.rect(0, 0, 210, 40, 'F')
+    
+    // Header Text
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(18)
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.text('MI ROOM', 105, yPos + 12, { align: 'center' })
+    
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
+    doc.text('OFFICERS TRAINING ACADEMY - CHENNAI', 105, yPos + 25, { align: 'center' })
+    
+    // Header border
+    doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
+    doc.setLineWidth(0.5)
+    doc.rect(10, 10, 190, 25)
+    
+    yPos = 50
+    
+    // Main Content Section
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.setTextColor(0, 0, 0)
+    
+    // Left Column - Basic Info
+    let leftX = 15
+    let rightX = 110
+    
+    // Academy Number
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('ACADEMY NUMBER:', leftX, yPos)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.text(cadetInfo.academyNumber ? String(cadetInfo.academyNumber) : 'ACADEMY NUMBER', leftX + 35, yPos)
+    
+    yPos += 8
+    
+    // Name
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('NAME:', leftX, yPos)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.text(cadetInfo.name || '', leftX + 15, yPos)
+    
+    yPos += 8
+    
+    // Company
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('COMPANY:', leftX, yPos)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.text(cadetInfo.company || '', leftX + 20, yPos)
+    
+    yPos += 8
+    
+    // Battalion
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('BATTALION:', leftX, yPos)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.text(cadetInfo.battalion || '', leftX + 22, yPos)
+    
+    yPos += 8
+    
+    // Date of Reporting (use profile generation date)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('DATE OF REPORTING:', leftX, yPos)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.text(new Date().toLocaleDateString(), leftX + 40, yPos)
+    
+    yPos += 15
+    
+    // Total Training Days of Absence Due to Medical Category
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('TOTAL TRG DAYS OF ABSENCE DUE TO MEDICAL CATEGORY:', leftX, yPos)
+    yPos += 6
+    
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.text(totalTrainingDaysMissed.toString(), leftX + 10, yPos)
+    
+    yPos += 15
+    
+    // Diagnosis or Prescription (Cadet Profile Info)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('DIAGNOSIS OR PRESCRIPTION:', leftX, yPos)
+    yPos += 6
+    
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    const profileInfo = [
+      `Initial Weight: ${cadetInfo.initialWeight || 'N/A'} kg`,
+      `Current Weight: ${cadetInfo.currentWeight || 'N/A'} kg`,
+      `Height: ${cadetInfo.height || 'N/A'} cm`,
+      `Age: ${cadetInfo.age || 'N/A'} years`,
+      `Sex: ${cadetInfo.sex || 'N/A'}`,
+      `Course: ${cadetInfo.course || 'N/A'}`,
+      `Join Date: ${new Date(cadetInfo.joinDate).toLocaleDateString()}`,
+      `Medical Records: ${medicalRecords.length} record${medicalRecords.length !== 1 ? 's' : ''}`
+    ].join('\n')
+    
+    const lines = doc.splitTextToSize(profileInfo, 80)
+    doc.text(lines, leftX + 5, yPos)
+    yPos += lines.length * 4
+    
+    yPos += 10
+    
+    // Remarks (empty for cadet profile)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('REMARKS:', leftX, yPos)
+    yPos += 6
+    
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.text('', leftX + 5, yPos)
+    
+    yPos += 15
+    
+    // What was given section (empty for cadet profile)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('WHAT WAS GIVEN:', leftX, yPos)
+    yPos += 8
+    
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.text('', leftX + 5, yPos)
+    
+    // Right Column - Vital Signs (blank for manual filling)
+    yPos = 50 // Reset to top for right column
+    
+    // Temp
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('TEMP:', rightX, yPos)
+    doc.setDrawColor(0, 0, 0)
+    doc.setLineWidth(0.3)
+    doc.line(rightX + 12, yPos + 2, rightX + 40, yPos + 2)
+    
+    yPos += 8
+    
+    // BP
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('BP:', rightX, yPos)
+    doc.line(rightX + 8, yPos + 2, rightX + 40, yPos + 2)
+    
+    yPos += 8
+    
+    // Pulse
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('PULSE:', rightX, yPos)
+    doc.line(rightX + 15, yPos + 2, rightX + 40, yPos + 2)
+    
+    yPos += 8
+    
+    // SpO2
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('SpO2:', rightX, yPos)
+    doc.line(rightX + 12, yPos + 2, rightX + 40, yPos + 2)
+    
+    yPos += 12
+    
+    // Pallor
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('PALLOR:', rightX, yPos)
+    doc.line(rightX + 15, yPos + 2, rightX + 40, yPos + 2)
+    
+    yPos += 8
+    
+    // Oedema
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('OEDEMA:', rightX, yPos)
+    doc.line(rightX + 17, yPos + 2, rightX + 40, yPos + 2)
+    
+    yPos += 8
+    
+    // Icterus
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(10)
+    doc.text('ICTERUS:', rightX, yPos)
+    doc.line(rightX + 17, yPos + 2, rightX + 40, yPos + 2)
+    
+    yPos += 15
+    
+    // Signature Section at bottom
+    yPos = 250
+    
+    // Draw signature lines
+    doc.setDrawColor(0, 0, 0)
+    doc.setLineWidth(0.3)
+    
+    doc.line(20, yPos, 80, yPos) // Doctor signature line
+    doc.line(130, yPos, 180, yPos) // Date line
+    
+    yPos += 5
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(10)
+    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
+    doc.text("Doctor's Signature", 20, yPos)
+    doc.text('Date', 130, yPos)
+    
+    yPos += 15
+    
+    // Footer
+    doc.setFontSize(8)
+    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
+    doc.text('This document is generated electronically by HEALOTAC Medical Records Management System', 105, 280, { align: 'center' })
+    doc.text(`Record created on: ${new Date().toLocaleDateString()}`, 105, 285, { align: 'center' })
+    
+    // Save the PDF
+    const fileName = `MI_ROOM_${cadetInfo.name.replace(/\s+/g, '_')}_${cadetId}.pdf`
+    doc.save(fileName)
+  }
 
   if (loading) {
     return (
