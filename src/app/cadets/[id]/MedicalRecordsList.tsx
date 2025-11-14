@@ -104,6 +104,20 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
   const [showModal, setShowModal] = useState(false)
   const { user } = useUser()
 
+  // Helper function to count weekdays (excluding Sundays) between two dates
+  const getWeekdaysBetween = (startDate: Date, endDate: Date): number => {
+    let count = 0
+    const current = new Date(startDate)
+    const end = new Date(endDate)
+    while (current <= end) {
+      if (current.getDay() !== 0) { // 0 = Sunday
+        count++
+      }
+      current.setDate(current.getDate() + 1)
+    }
+    return count
+  }
+
   const generateMedicalRecordPDF = async (record: MedicalRecord, cadetInfo: CadetInfo) => {
     try {
       // Fetch the existing MI ROOM.pdf template
@@ -430,7 +444,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
         const admissionDate = new Date(record.dateOfReporting)
         const timeDiff = Date.now() - admissionDate.getTime()
         const canCheck = timeDiff >= 24 * 60 * 60 * 1000
-        const daysMissed = Math.floor(timeDiff / (24 * 60 * 60 * 1000))
+        const daysMissed = getWeekdaysBetween(admissionDate, new Date())
         const isChecked = record.admittedInMH === 'Yes' && (record.totalTrainingDaysMissed || 0) > 0
 
         return (
