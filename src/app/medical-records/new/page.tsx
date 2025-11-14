@@ -1010,14 +1010,14 @@ function NewMedicalRecordPageInner() {
                             />
                           </div>
 
-                          {/* Weight */}
+                          {/* Initial Weight */}
                           <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                               Initial Weight (kg)
                             </label>
                             <input
                               type="text"
-                              value={selectedCadet.weight ? `${selectedCadet.weight} kg` : 'N/A'}
+                              value={selectedCadet.initialWeight ? `${selectedCadet.initialWeight} kg` : 'N/A'}
                               readOnly
                               className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
                             />
