@@ -226,12 +226,12 @@ export default function CadetsPage() {
   // Reset pagination to page 1 when search or filter changes
   useEffect(() => {
     pagination.goToPage(1)
-  }, [searchTerm, showHighTrainingMissed])
+  }, [searchTerm, showHighTrainingMissed, pagination])
 
   // Get paginated cadets
   const paginatedCadets = useMemo(
     () => pagination.getVisibleItems(filteredCadets),
-    [pagination.currentPage, pagination.itemsPerPage, filteredCadets]
+    [pagination, filteredCadets]
   )
 
   const handleAddNewRecord = () => {

@@ -6,10 +6,11 @@ import { usePathname } from 'next/navigation'
 import { Home, Users, Activity, Plus, FileText, LogOut } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
+import Image from 'next/image'
 
 // Logo Image
 const Logo = ({ className = "" }: { className?: string }) => (
-  <img src="/logo.png" alt="Logo" className={className} />
+  <Image src="/logo.png" alt="Logo" width={32} height={32} className={className} />
 )
 
 const navigation = [

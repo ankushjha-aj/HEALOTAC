@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
+import Image from 'next/image'
 
 export default function LoginPage() {
   const [username, setUsername] = useState('')
@@ -72,7 +73,7 @@ export default function LoginPage() {
         {/* Professional Header */}
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-white dark:bg-gray-800 rounded-full shadow-lg border border-gray-100 dark:border-gray-700">
-            <img src="/logo.png" alt="HEALOTAC Logo" className="w-12 h-12" />
+            <Image src="/logo.png" alt="HEALOTAC Logo" width={48} height={48} />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
             HEALOTAC

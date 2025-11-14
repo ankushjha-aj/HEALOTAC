@@ -3,10 +3,11 @@
 import { User, Menu } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import ThemeToggle from '@/components/theme/ThemeToggle'
+import Image from 'next/image'
 
 // Logo Image
 const Logo = ({ className = "" }: { className?: string }) => (
-  <img src="/logo.png" alt="Logo" className={className} />
+  <Image src="/logo.png" alt="Logo" width={32} height={32} className={className} />
 )
 
 export default function Header() {
