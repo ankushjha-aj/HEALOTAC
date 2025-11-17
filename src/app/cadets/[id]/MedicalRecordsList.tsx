@@ -263,7 +263,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
         }, 0)
 
         if (totalTrainingDays > 0) {
-          firstPage.drawText(String(totalTrainingDays.toFixed(1)), {
+          firstPage.drawText(String(totalTrainingDays.toFixed(2)), {
             x: 385.5, // Specified x coordinate
             y: 615, // Specified y coordinate
             size: 12,
@@ -361,7 +361,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
         }
 
         if (record.exPpg && Number(record.exPpg) > 0) {
-          firstPage.drawText(`Ex-PPG: ${record.exPpg} (+${(record.exPpg * 0.25).toFixed(1)} day${record.exPpg * 0.25 !== 1 ? 's' : ''} missed)`, {
+          firstPage.drawText(`Ex-PPG: ${record.exPpg} (+${(record.exPpg * 0.25).toFixed(2)} day${record.exPpg * 0.25 !== 1 ? 's' : ''} missed)`, {
             x: 170,
             y: detailY,
             size: 10,
@@ -372,7 +372,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
         }
 
         if (record.attendB && Number(record.attendB) > 0) {
-          firstPage.drawText(`Attend B: ${record.attendB} (+${(record.attendB * 0.25).toFixed(1)} day${record.attendB * 0.25 !== 1 ? 's' : ''} missed)`, {
+          firstPage.drawText(`Attend B: ${record.attendB} (+${(record.attendB * 0.25).toFixed(2)} day${record.attendB * 0.25 !== 1 ? 's' : ''} missed)`, {
             x: 170,
             y: detailY,
             size: 10,
@@ -634,12 +634,12 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
 
                     {/* Only show Ex-PPG if > 0 */}
                     {record.exPpg && Number(record.exPpg) > 0 ? (
-                      <div>Ex-PPG: {record.exPpg} (+{(record.exPpg * 0.25).toFixed(1)} day{(record.exPpg * 0.25) !== 1 ? 's' : ''} missed)</div>
+                      <div>Ex-PPG: {record.exPpg} (+{(record.exPpg * 0.25).toFixed(2)} day{(record.exPpg * 0.25) !== 1 ? 's' : ''} missed)</div>
                     ) : null}
 
                     {/* Only show Attend B if > 0 */}
                     {record.attendB && Number(record.attendB) > 0 ? (
-                      <div>Attend B: {record.attendB} (+{(record.attendB * 0.25).toFixed(1)} day{(record.attendB * 0.25) !== 1 ? 's' : ''} missed)</div>
+                      <div>Attend B: {record.attendB} (+{(record.attendB * 0.25).toFixed(2)} day{(record.attendB * 0.25) !== 1 ? 's' : ''} missed)</div>
                     ) : null}
 
                     {/* Only show Physiotherapy if > 0 */}
@@ -662,7 +662,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                       if (record.attendB && Number(record.attendB) > 0) totalDays += Number(record.attendB) * 0.25
                       return totalDays > 0 ? (
                         <div className="font-medium text-red-600 dark:text-red-400 border-t border-gray-200 dark:border-gray-600 pt-1 mt-2">
-                          Training Days Missed: {totalDays.toFixed(1)} day{totalDays !== 1 ? 's' : ''}
+                          Training Days Missed: {totalDays.toFixed(2)} day{totalDays !== 1 ? 's' : ''}
                         </div>
                       ) : null
                     })()}
