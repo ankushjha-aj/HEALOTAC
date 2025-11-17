@@ -271,13 +271,19 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             color: red,
             font: helveticaBoldFont,
           })
-          firstPage.drawText(record.medicalProblem, {
-            x: 170, // Left position
-            y: 460, // Below heading
-            size: 10.5,
-            color: black,
-            font: helveticaFont,
-          })
+          const problemLines = record.medicalProblem.split('\n');
+          let problemY = 460; // Below heading
+          const lineSpacing = 15; // Space between lines
+          for (const line of problemLines) {
+            firstPage.drawText(line, {
+              x: 170, // Left position
+              y: problemY,
+              size: 10.5,
+              color: black,
+              font: helveticaFont,
+            });
+            problemY -= lineSpacing;
+          }
         }
 
         // Position diagnosis
@@ -289,25 +295,31 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             color: red,
             font: helveticaBoldFont,
           })
-          firstPage.drawText(record.diagnosis, {
-            x: 170, // Left position
-            y: 410, // Below heading
-            size: 10.5,
-            color: black,
-            font: helveticaFont,
-          })
+          const diagLines = record.diagnosis.split('\n');
+          let diagY = 410; // Below heading
+          const lineSpacing = 15; // Space between lines
+          for (const line of diagLines) {
+            firstPage.drawText(line, {
+              x: 170, // Left position
+              y: diagY,
+              size: 10.5,
+              color: black,
+              font: helveticaFont,
+            });
+            diagY -= lineSpacing;
+          }
         }
 
         // Position details below diagnosis
         firstPage.drawText('DETAILS', {
           x: 170, // Left position
-          y: 350, // Heading above details
+          y: 320, // Heading above details
           size: 11,
           color: red,
           font: helveticaBoldFont,
         });
 
-        let detailY = 330; // Start below heading
+        let detailY = 300; // Start below heading
         const lineSpacing = 15; // Space between lines
 
         if (record.attendC && Number(record.attendC) > 0) {
@@ -396,13 +408,19 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             color: red,
             font: helveticaBoldFont,
           })
-          firstPage.drawText(record.remarks, {
-            x: 170, // Left position
-            y: 195, // Below heading
-            size: 10.5,
-            color: black,
-            font: helveticaFont,
-          })
+          const remarksLines = record.remarks.split('\n');
+          let remarksY = 195; // Below heading
+          const lineSpacing = 15; // Space between lines
+          for (const line of remarksLines) {
+            firstPage.drawText(line, {
+              x: 170, // Left position
+              y: remarksY,
+              size: 10.5,
+              color: black,
+              font: helveticaFont,
+            });
+            remarksY -= lineSpacing;
+          }
         }
 
         // Doctor's Sign
