@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Calendar, Users, Activity, TrendingUp, RefreshCw } from 'lucide-react'
@@ -100,20 +100,27 @@ export default function DashboardPage() {
   const [jwtToken, setJwtToken] = useState<string | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const [currentDateTime, setCurrentDateTime] = useState<string>('')
+  const [checkingAuth, setCheckingAuth] = useState(true)
+  const [canRender, setCanRender] = useState(false)
 
   const [navigatingToNewRecord, setNavigatingToNewRecord] = useState(false)
 
-  // Check authentication on mount
-  useEffect(() => {
-    const token = localStorage.getItem('jwt_token')
-    if (token) {
+  // Check authentication synchronously
+  const token = localStorage.getItem('jwt_token')
+  useLayoutEffect(() => {
+    if (!token) {
+      window.location.href = '/'
+    } else {
       setJwtToken(token)
       setIsAuthenticated(true)
-    } else {
-      // Redirect to login if no token
-      window.location.href = '/login'
+      setCheckingAuth(false)
+      setCanRender(true)
     }
   }, [])
+
+  if (!canRender) {
+    return null
+  }
 
   // Update current date and time
   useEffect(() => {
@@ -157,7 +164,7 @@ export default function DashboardPage() {
         if (cadetsRes.status === 401 || recordsRes.status === 401) {
           // Token expired, redirect to login
           localStorage.removeItem('jwt_token')
-          window.location.href = '/login'
+          window.location.href = '/'
           return
         }
         setDbStatus(`api error (${cadetsRes.status}, ${recordsRes.status})`)
@@ -246,6 +253,17 @@ export default function DashboardPage() {
     }))
     .sort((a, b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime())
     .slice(0, 5)
+
+  if (checkingAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Checking authentication...</p>
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (
