@@ -22,7 +22,7 @@ interface MedicalRecord {
   totalTrainingDaysMissed: number
   contactNo: string
   remarks: string
-  createdAt: string
+  createdAt: string 
   monitoringCase: boolean
   admittedInMH?: string // New field for admission in MH/BH/CH
 }
