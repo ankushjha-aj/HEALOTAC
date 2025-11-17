@@ -277,8 +277,15 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
 
         if (totalTrainingDays > 0) {
           firstPage.drawText(String(totalTrainingDays.toFixed(2)), {
-            x: 385.5, // Specified x coordinate
+            x: 367, // Specified x coordinate
             y: 615, // Specified y coordinate
+            size: 12,
+            color: black,
+            font: helveticaFont,
+          })
+          firstPage.drawText("(Sundays are excluded)", {
+            x: 399.5,
+            y: 615,
             size: 12,
             color: black,
             font: helveticaFont,
