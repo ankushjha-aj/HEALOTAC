@@ -349,13 +349,13 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
         // Position details below diagnosis
         firstPage.drawText('DETAILS', {
           x: 170, // Left position
-          y: 325, // Heading above details
+          y: 290, // Heading above details
           size: 12,
           color: red,
           font: helveticaBoldFont,
         });
 
-        let detailY = 305; // Start below heading
+        let detailY = 270; // Start below heading
         const lineSpacing = 15; // Space between lines
 
         if (record.attendC && Number(record.attendC) > 0) {
