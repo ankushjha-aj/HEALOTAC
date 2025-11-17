@@ -1235,8 +1235,8 @@ function NewMedicalRecordPageInner() {
                         name="trainingType"
                         value={formData.trainingType}
                         onChange={handleChange}
-                        disabled={formData.admittedInMH === 'Yes'}
-                        className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                        disabled={Boolean(formData.admittedInMH === 'Yes' || (formData.exPpg && parseInt(formData.exPpg) > 0) || (formData.attendB && parseInt(formData.attendB) > 0))}
+                        className={`input-field ${formData.admittedInMH === 'Yes' || (formData.exPpg && parseInt(formData.exPpg) > 0) || (formData.attendB && parseInt(formData.attendB) > 0) ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
                       >
                         <option value="none">None</option>
                         <option value="attendC">Attend C</option>
@@ -1256,8 +1256,8 @@ function NewMedicalRecordPageInner() {
                             max={formData.trainingType === 'attendC' ? '10' : '30'}
                             value={formData.trainingDays}
                             onChange={handleChange}
-                            disabled={formData.admittedInMH === 'Yes'}
-                            className={`input-field flex-1 ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                            disabled={Boolean(formData.admittedInMH === 'Yes' || (formData.exPpg && parseInt(formData.exPpg) > 0) || (formData.attendB && parseInt(formData.attendB) > 0))}
+                            className={`input-field flex-1 ${formData.admittedInMH === 'Yes' || (formData.exPpg && parseInt(formData.exPpg) > 0) || (formData.attendB && parseInt(formData.attendB) > 0) ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
                             placeholder="0"
                           />
                         </div>
@@ -1277,8 +1277,8 @@ function NewMedicalRecordPageInner() {
                       min="0"
                       value={formData.exPpg}
                       onChange={handleChange}
-                      disabled={formData.admittedInMH === 'Yes'}
-                      className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                      disabled={Boolean(formData.admittedInMH === 'Yes' || formData.trainingType !== 'none' || (formData.attendB && parseInt(formData.attendB) > 0))}
+                      className={`input-field ${formData.admittedInMH === 'Yes' || formData.trainingType !== 'none' || (formData.attendB && parseInt(formData.attendB) > 0) ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
                       placeholder="0"
                     />
                   </div>
@@ -1295,8 +1295,8 @@ function NewMedicalRecordPageInner() {
                       min="0"
                       value={formData.attendB}
                       onChange={handleChange}
-                      disabled={formData.admittedInMH === 'Yes'}
-                      className={`input-field ${formData.admittedInMH === 'Yes' ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
+                      disabled={Boolean(formData.admittedInMH === 'Yes' || formData.trainingType !== 'none' || (formData.exPpg && parseInt(formData.exPpg) > 0))}
+                      className={`input-field ${formData.admittedInMH === 'Yes' || formData.trainingType !== 'none' || (formData.exPpg && parseInt(formData.exPpg) > 0) ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''}`}
                       placeholder="0"
                     />
                   </div>
