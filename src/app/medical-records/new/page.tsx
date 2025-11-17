@@ -331,7 +331,7 @@ function NewMedicalRecordPageInner() {
       } else if (decimalFields.includes(name)) {
         processedValue = value.replace(/[^0-9.]/g, '') // Digits and decimal point
       } else if (name === 'nokContact') {
-        processedValue = value.replace(/[^+\d]/g, '') // + and digits
+        processedValue = value.replace(/\D/g, '') // Only digits
       } else if (name === 'contactNo') {
         processedValue = value.replace(/\D/g, '') // Only digits (existing)
       }
@@ -510,9 +510,25 @@ function NewMedicalRecordPageInner() {
       }
 
       // Default handling for other inputs
+      let processedValue = type === 'checkbox' ? checked : value
+      if (name === 'height' && processedValue && !isNaN(Number(processedValue))) {
+        processedValue = Math.min(300, Number(processedValue)).toString()
+      }
+      if ((name === 'initialWeight' || name === 'weight') && processedValue && !isNaN(Number(processedValue))) {
+        processedValue = Math.min(300, Number(processedValue)).toString()
+      }
+      if (name === 'age' && processedValue && !isNaN(Number(processedValue))) {
+        processedValue = Math.min(99, Number(processedValue)).toString()
+      }
+      if (name === 'course' && processedValue && !isNaN(Number(processedValue))) {
+        processedValue = Math.min(99999, Number(processedValue)).toString()
+      }
+      if (name === 'nokContact') {
+        processedValue = value.replace(/\D/g, '') // Only digits
+      }
       return {
         ...prev,
-        [name]: type === 'checkbox' ? checked : value
+        [name]: processedValue
       }
     })
   }
@@ -1546,6 +1562,7 @@ function NewMedicalRecordPageInner() {
                             name="height"
                             required
                             min={0}
+                            max={300}
                             value={cadetFormData.height}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1585,6 +1602,7 @@ function NewMedicalRecordPageInner() {
                             name="age"
                             required
                             min={0}
+                            max={99}
                             value={cadetFormData.age}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1604,6 +1622,7 @@ function NewMedicalRecordPageInner() {
                             name="course"
                             required
                             min={1}
+                            max={99999}
                             value={cadetFormData.course}
                             onChange={handleCadetFormChange}
                             className="input-field"
@@ -1644,8 +1663,8 @@ function NewMedicalRecordPageInner() {
                             value={cadetFormData.nokContact}
                             onChange={handleCadetFormChange}
                             className="input-field"
-                            placeholder="e.g., +91 9876543210"
-                            maxLength={20}
+                            placeholder="e.g., 9876543210"
+                            maxLength={10}
                           />
                         </div>
                         <div>
