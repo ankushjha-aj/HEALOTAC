@@ -172,9 +172,6 @@ export default function CadetDetailsPage({
       const recordsResponse = recordsRes.ok ? await recordsRes.json() : { records: [] }
       const { records: medicalRecordsResult } = recordsResponse
 
-      // Sort records by createdAt descending (latest first)
-      medicalRecordsResult.sort((a: MedicalRecord, b: MedicalRecord) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-
       console.log(`✅ RECEIVED CADET DATA:`, cadetData)
       console.log(`🔍 MENSTRUAL DATA CHECK:`, {
         menstrualFrequency: cadetData.menstrualFrequency,

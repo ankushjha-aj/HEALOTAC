@@ -104,9 +104,6 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
   const [showModal, setShowModal] = useState(false)
   const { user } = useUser()
 
-  // Sort records to show latest first
-  const sortedRecords = [...records].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-
   // Helper function to count weekdays (excluding Sundays) between two dates
   const getWeekdaysBetween = (startDate: Date, endDate: Date): number => {
     let count = 0
@@ -503,7 +500,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
 
   return (
     <div className="space-y-4">
-      {sortedRecords.map((record: MedicalRecord) => {
+      {records.map((record: MedicalRecord) => {
         const admissionDate = new Date(record.dateOfReporting)
         const timeDiff = Date.now() - admissionDate.getTime()
         const canCheck = timeDiff >= 24 * 60 * 60 * 1000

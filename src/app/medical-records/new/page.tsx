@@ -309,10 +309,12 @@ function NewMedicalRecordPageInner() {
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [showConfirmation, showRecordConfirmation])
 
-  // Auto-set dateOfReporting to today
+  // Auto-show add cadet modal for NA users
   useEffect(() => {
-    setFormData(prev => ({ ...prev, dateOfReporting: new Date().toISOString().split('T')[0] }))
-  }, [])
+    if (user?.role === 'user') {
+      // Modal no longer auto-shows, user clicks button instead
+    }
+  }, [user])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -1134,18 +1136,18 @@ function NewMedicalRecordPageInner() {
                       Date of reporting *
                     </label>
                     <input
-                      type="text"
+                      type="date"
                       id="dateOfReporting"
-                      required
-                      value={formData.dateOfReporting ? new Date(formData.dateOfReporting).toLocaleDateString() : ''}
-                      readOnly
-                      className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                    />
-                    <input
-                      type="hidden"
                       name="dateOfReporting"
+                      required
                       value={formData.dateOfReporting}
+                      onChange={handleChange}
+                      max={new Date().toISOString().split('T')[0]} // Prevent future dates
+                      className={`input-field ${fieldErrors.dateOfReporting ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                     />
+                    {fieldErrors.dateOfReporting && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.dateOfReporting}</p>
+                    )}
                   </div>
 
                   {/* 3. Medical Problem */}
@@ -1546,7 +1548,6 @@ function NewMedicalRecordPageInner() {
                             value={cadetFormData.joinDate}
                             onChange={handleCadetFormChange}
                             className="input-field"
-                            max={new Date().toISOString().split('T')[0]}
                           />
                         </div>
 
@@ -2509,8 +2510,6 @@ function NewMedicalRecordPageInner() {
                                 name="lastMenstrualDate"
                                 value={cadetFormData.lastMenstrualDate}
                                 onChange={handleCadetFormChange}
-                                min={new Date().toISOString().split('T')[0]}
-                                max={new Date().toISOString().split('T')[0]}
                                 className={`input-field ${fieldErrors.lastMenstrualDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                               />
                               {fieldErrors.lastMenstrualDate && (

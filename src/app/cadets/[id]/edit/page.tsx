@@ -609,7 +609,6 @@ export default function EditCadetPage({
                           name="lastMenstrualDate"
                           value={formData.lastMenstrualDate}
                           onChange={handleInputChange}
-                          max={new Date().toISOString().split('T')[0]}
                         />
                       </div>
                     </div>
