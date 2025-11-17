@@ -341,6 +341,11 @@ function NewMedicalRecordPageInner() {
         [name]: processedValue
       }
 
+      // Apply max limits for specific fields
+      if (name === 'weight' && processedValue && !isNaN(Number(processedValue))) {
+        newData.weight = Math.min(300, Number(processedValue)).toString()
+      }
+
       // Handle training type changes
       if (name === 'trainingType') {
         if (value === 'none') {
@@ -525,6 +530,9 @@ function NewMedicalRecordPageInner() {
       }
       if (name === 'nokContact') {
         processedValue = value.replace(/\D/g, '') // Only digits
+      }
+      if (name === 'academyNumber' && typeof processedValue === 'string') {
+        processedValue = processedValue.slice(0, 10) // Limit to 10 digits
       }
       return {
         ...prev,
@@ -1187,6 +1195,7 @@ function NewMedicalRecordPageInner() {
                       id="weight"
                       name="weight"
                       min={0}
+                      max={300}
                       step="0.1"
                       required
                       value={formData.weight}
