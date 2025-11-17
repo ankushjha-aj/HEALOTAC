@@ -322,7 +322,7 @@ function NewMedicalRecordPageInner() {
     setFormData(prev => {
       const newData = {
         ...prev,
-        [name]: value
+        [name]: name === 'contactNo' ? value.replace(/\D/g, '') : value
       }
 
       // Handle training type changes
