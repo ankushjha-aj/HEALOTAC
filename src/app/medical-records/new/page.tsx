@@ -1548,6 +1548,7 @@ function NewMedicalRecordPageInner() {
                             required
                             value={cadetFormData.joinDate}
                             onChange={handleCadetFormChange}
+                            max={new Date().toISOString().split('T')[0]} // Prevent future dates
                             className="input-field"
                           />
                         </div>
