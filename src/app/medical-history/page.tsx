@@ -88,16 +88,17 @@ export default function MedicalHistoryPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleStatusUpdate = async (recordId: number, newStatus: string) => {
-    // For status changes to "Completed", show confirmation about checking return status
-    if (newStatus === 'Completed') {
+  const handleStatusUpdate = async (recordId: number, newStatus: string, record?: MedicalRecord) => {
+    // For status changes to "Completed" when admitted in MH, show confirmation about checking return status
+    if (newStatus === 'Completed' && record?.admittedInMH === 'Yes') {
       const confirmed = confirm('Please first verify whether the cadet has returned. If the cadet has not returned, do not mark it as completed, as this action cannot be changed later.\n\nDo you want to proceed?')
       if (!confirmed) return
-    } else {
-      // Show regular confirmation for other status changes
+    } else if (record?.admittedInMH === 'Yes') {
+      // Show regular confirmation for other status changes when admitted in MH
       const confirmed = confirm(`Are you sure you want to mark this medical record as ${newStatus.toLowerCase()}?`)
       if (!confirmed) return
     }
+    // No confirmation for regular records (not admitted in MH)
 
     setUpdatingRecordId(recordId)
 
@@ -473,7 +474,7 @@ export default function MedicalHistoryPage() {
                           <div className="flex gap-1">
                             {record.admittedInMH !== 'Yes' && record.medicalStatus !== 'Active' && (
                               <button
-                                onClick={() => handleStatusUpdate(record.id, 'Active')}
+                                onClick={() => handleStatusUpdate(record.id, 'Active', record)}
                                 disabled={updatingRecordId === record.id}
                                 className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-yellow-600 text-white rounded hover:bg-yellow-700 disabled:bg-yellow-400 disabled:cursor-not-allowed transition-colors"
                                 title="Mark as Active"
@@ -490,7 +491,7 @@ export default function MedicalHistoryPage() {
                             )}
                             {record.medicalStatus !== 'Completed' && (
                               <button
-                                onClick={() => handleStatusUpdate(record.id, 'Completed')}
+                                onClick={() => handleStatusUpdate(record.id, 'Completed', record)}
                                 disabled={updatingRecordId === record.id}
                                 className="inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed transition-colors"
                                 title="Mark as Completed"

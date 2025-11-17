@@ -172,6 +172,15 @@ export default function CadetDetailsPage({
       const recordsResponse = recordsRes.ok ? await recordsRes.json() : { records: [] }
       const { records: medicalRecordsResult } = recordsResponse
 
+      console.log(`✅ RAW RECORDS RESPONSE:`, recordsResponse)
+      console.log(`✅ RECEIVED MEDICAL RECORDS:`, medicalRecordsResult.length, 'records')
+      console.log(`✅ RECORDS RESPONSE STATUS:`, recordsRes.status, recordsRes.ok)
+
+      // Sort medical records by createdAt descending (most recent first)
+      const sortedMedicalRecords = medicalRecordsResult.sort((a: MedicalRecord, b: MedicalRecord) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+
       console.log(`✅ RECEIVED CADET DATA:`, cadetData)
       console.log(`🔍 MENSTRUAL DATA CHECK:`, {
         menstrualFrequency: cadetData.menstrualFrequency,
@@ -187,12 +196,10 @@ export default function CadetDetailsPage({
         hemoglobinLevel: cadetData.hemoglobinLevel
       })
       console.log(`🔍 MENSTRUAL AIDS TYPE:`, typeof cadetData.menstrualAids, Array.isArray(cadetData.menstrualAids))
-      console.log(`✅ RAW RECORDS RESPONSE:`, recordsResponse)
-      console.log(`✅ RECEIVED MEDICAL RECORDS:`, medicalRecordsResult.length, 'records')
-      console.log(`✅ RECORDS RESPONSE STATUS:`, recordsRes.status, recordsRes.ok)
+      console.log(`✅ RECEIVED CADET DATA:`, cadetData)
 
       setCadetInfo(cadetData)
-      setMedicalRecords(medicalRecordsResult)
+      setMedicalRecords(sortedMedicalRecords)
     } catch (err) {
       console.error('❌ Error loading cadet details:', err)
       setError(err instanceof Error ? err.message : 'Failed to load cadet details')
