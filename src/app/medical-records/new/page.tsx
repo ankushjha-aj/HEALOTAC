@@ -320,7 +320,21 @@ function NewMedicalRecordPageInner() {
     const { name, value } = e.target
 
     setFormData(prev => {
-      let processedValue = name === 'contactNo' ? value.replace(/\D/g, '') : value
+      let processedValue = value
+
+      // Numeric validation for specific fields
+      const numericFields = ['initialWeight', 'course', 'height', 'age', 'academyNumber']
+      const decimalFields = ['bmi', 'so2']
+
+      if (numericFields.includes(name)) {
+        processedValue = value.replace(/\D/g, '') // Only digits
+      } else if (decimalFields.includes(name)) {
+        processedValue = value.replace(/[^0-9.]/g, '') // Digits and decimal point
+      } else if (name === 'nokContact') {
+        processedValue = value.replace(/[^+\d]/g, '') // + and digits
+      } else if (name === 'contactNo') {
+        processedValue = value.replace(/\D/g, '') // Only digits (existing)
+      }
 
       const newData = {
         ...prev,
@@ -1501,6 +1515,7 @@ function NewMedicalRecordPageInner() {
                             className="input-field"
                             placeholder="e.g., 12345"
                             min={1}
+                            maxLength={10}
                           />
                         </div>
 
@@ -1535,6 +1550,7 @@ function NewMedicalRecordPageInner() {
                             onChange={handleCadetFormChange}
                             className="input-field"
                             placeholder="e.g., 175"
+                            maxLength={3}
                           />
                         </div>
 
@@ -1554,6 +1570,7 @@ function NewMedicalRecordPageInner() {
                             onChange={handleCadetFormChange}
                             className="input-field"
                             placeholder="e.g., 68.5"
+                            max={300}
                           />
                         </div>
 
@@ -1572,6 +1589,7 @@ function NewMedicalRecordPageInner() {
                             onChange={handleCadetFormChange}
                             className="input-field"
                             placeholder="e.g., 21"
+                            maxLength={2}
                           />
                         </div>
 
@@ -1590,6 +1608,7 @@ function NewMedicalRecordPageInner() {
                             onChange={handleCadetFormChange}
                             className="input-field"
                             placeholder="e.g., 121, 122, 123"
+                            maxLength={5}
                           />
                         </div>
 
