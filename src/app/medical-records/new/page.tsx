@@ -532,7 +532,7 @@ function NewMedicalRecordPageInner() {
         processedValue = value.replace(/\D/g, '') // Only digits
       }
       if (name === 'academyNumber' && typeof processedValue === 'string') {
-        processedValue = processedValue.slice(0, 10) // Limit to 10 digits
+        processedValue = processedValue.slice(0, 5) // Limit to 5 digits
       }
       return {
         ...prev,
@@ -1550,7 +1550,7 @@ function NewMedicalRecordPageInner() {
                             className="input-field"
                             placeholder="e.g., 12345"
                             min={1} 
-                            maxLength={10}
+                            maxLength={5}
                           />
                         </div> 
 
