@@ -122,31 +122,12 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
     try {
       // Fetch the existing MI ROOM.pdf template
       const response = await fetch('/MI ROOM.pdf')
-      const templateBytes = await response.arrayBuffer()
-      
-      // Load the PDF document
-      const pdfDoc = await PDFDocument.load(templateBytes)
-      
-      // Get the first page
-      const pages = pdfDoc.getPages()
-      const firstPage = pages[0]
-      
-      // Set up font and colors
-      const black = rgb(0, 0, 0)
-      const red = rgb(1, 0, 0)
-      const green = rgb(0, 0.5, 0)
-      const helveticaFont = await pdfDoc.embedStandardFont(StandardFonts.Helvetica)
-      const helveticaBoldFont = await pdfDoc.embedStandardFont(StandardFonts.HelveticaBold)
-      
-      // Check for form fields
+      const pdfDoc = await PDFDocument.load(await response.arrayBuffer())
       const form = pdfDoc.getForm()
       const fields = form.getFields()
-      console.log('PDF Form Fields found:', fields.length)
-      
-      // If form fields exist, try to fill them first
+
       if (fields.length > 0) {
-        console.log('Attempting to fill form fields...')
-        
+        // Fill form fields
         fields.forEach(field => {
           const fieldName = field.getName().toLowerCase()
           console.log('Processing field:', fieldName)
@@ -162,6 +143,35 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
       } else {
         // Fallback: Use text overlay for academy number, name, company/course, age, sex, date of reporting, mobile number, and total training days missed
         console.log('No form fields found, using text overlay')
+        
+        // Embed fonts
+        const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+        const helveticaBoldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
+
+        const firstPage = pdfDoc.getPages()[0]
+
+        // Define colors
+        const red = rgb(1, 0, 0)
+        const black = rgb(0, 0, 0)
+        const green = rgb(0, 0.5, 0)
+        const wrapText = (text: string, maxWidth: number, font: any, size: number) => {
+          const words = text.split(' ')
+          const lines: string[] = []
+          let currentLine = ''
+          for (const word of words) {
+            const testLine = currentLine ? currentLine + ' ' + word : word
+            if (font.widthOfTextAtSize(testLine, size) <= maxWidth) {
+              currentLine = testLine
+            } else {
+              if (currentLine) lines.push(currentLine)
+              currentLine = word
+            }
+          }
+          if (currentLine) lines.push(currentLine)
+          return lines
+        }
+
+        const maxWidth = 375 // Approximate available width (595 - 170 - 50)
         
         // Position academy number in the academy number section
         if (cadetInfo.academyNumber) {
@@ -296,9 +306,15 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             font: helveticaBoldFont,
           })
           const diagLines = record.diagnosis.split('\n');
+          const allDiagLines: string[] = []
+          for (const line of diagLines) {
+            const wrapped = wrapText(line, maxWidth, helveticaFont, 11)
+            allDiagLines.push(...wrapped)
+          }
+          const finalDiagLines = allDiagLines.slice(0, 3)
           let diagY = 410; // Below heading
           const lineSpacing = 15; // Space between lines
-          for (const line of diagLines) {
+          for (const line of finalDiagLines) {
             firstPage.drawText(line, {
               x: 170, // Left position
               y: diagY,
@@ -409,9 +425,15 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             font: helveticaBoldFont,
           })
           const remarksLines = record.remarks.split('\n');
+          const allRemarksLines: string[] = []
+          for (const line of remarksLines) {
+            const wrapped = wrapText(line, maxWidth, helveticaFont, 11)
+            allRemarksLines.push(...wrapped)
+          }
+          const finalRemarksLines = allRemarksLines.slice(0, 3)
           let remarksY = 195; // Below heading
           const lineSpacing = 15; // Space between lines
-          for (const line of remarksLines) {
+          for (const line of finalRemarksLines) {
             firstPage.drawText(line, {
               x: 170, // Left position
               y: remarksY,

@@ -354,16 +354,9 @@ function NewMedicalRecordPageInner() {
   const handleRemarksBlur = () => {
     setFormData(prev => {
       let processedValue = prev.remarks
-      // Process remarks: wrap lines exceeding 13 words, limit to 3 lines
+      // Limit to 3 lines
       const lines = processedValue.split('\n')
-      const processedLines: string[] = []
-      for (const line of lines) {
-        const words = line.trim().split(/\s+/).filter(w => w)
-        for (let i = 0; i < words.length; i += 13) {
-          processedLines.push(words.slice(i, i + 13).join(' '))
-        }
-      }
-      processedValue = processedLines.slice(0, 3).join('\n')
+      processedValue = lines.slice(0, 3).join('\n')
       return { ...prev, remarks: processedValue }
     })
   }
@@ -371,16 +364,9 @@ function NewMedicalRecordPageInner() {
   const handleDiagnosisBlur = () => {
     setFormData(prev => {
       let processedValue = prev.diagnosis
-      // Process diagnosis: wrap lines exceeding 13 words, limit to 3 lines
+      // Limit to 3 lines
       const lines = processedValue.split('\n')
-      const processedLines: string[] = []
-      for (const line of lines) {
-        const words = line.trim().split(/\s+/).filter(w => w)
-        for (let i = 0; i < words.length; i += 13) {
-          processedLines.push(words.slice(i, i + 13).join(' '))
-        }
-      }
-      processedValue = processedLines.slice(0, 3).join('\n')
+      processedValue = lines.slice(0, 3).join('\n')
       return { ...prev, diagnosis: processedValue }
     })
   }
