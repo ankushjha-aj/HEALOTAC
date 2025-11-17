@@ -532,20 +532,42 @@ export default function MedicalHistoryPage() {
                             {record.admittedInMH === 'Yes' && record.medicalStatus === 'Active' ? 'Admitted in MH' : record.medicalStatus}
                           </span>
                           {/* Auto-completion indicator for Active records with attendC */}
-                          {record.medicalStatus === 'Active' && record.attendC && record.attendC > 0 && record.admittedInMH !== 'Yes' ? (() => {
-                            const reportingDate = new Date(record.dateOfReporting)
-                            const attendanceEndDate = new Date(reportingDate)
-                            attendanceEndDate.setDate(attendanceEndDate.getDate() + record.attendC)
-                            const now = new Date()
-                            const daysUntilExpiry = Math.ceil((attendanceEndDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
-
-                            if (daysUntilExpiry <= 0) {
-                              return <span className="text-xs text-orange-600 dark:text-orange-400 ml-2" title="Will auto-complete on next page load">⏰</span>
-                            } else if (daysUntilExpiry <= 2) {
-                              return <span className="text-xs text-orange-600 dark:text-orange-400 ml-2" title={`Auto-completes in ${daysUntilExpiry} day${daysUntilExpiry !== 1 ? 's' : ''}`}>⏳</span>
+                          {(() => {
+                            // Debug logging
+                            if (record.medicalStatus === 'Active' && record.attendC && record.attendC > 0) {
+                              console.log('🔍 Checking record:', {
+                                id: record.id,
+                                name: record.name,
+                                status: record.medicalStatus,
+                                attendC: record.attendC,
+                                admittedInMH: record.admittedInMH,
+                                dateOfReporting: record.dateOfReporting
+                              })
                             }
-                            return null
-                          })() : null}
+
+                            return record.medicalStatus === 'Active' && record.attendC && record.attendC > 0 && record.admittedInMH !== 'Yes' ? (() => {
+                              const reportingDate = new Date(record.dateOfReporting)
+                              const attendanceEndDate = new Date(reportingDate)
+                              attendanceEndDate.setDate(attendanceEndDate.getDate() + record.attendC)
+                              const now = new Date()
+                              const daysUntilExpiry = Math.ceil((attendanceEndDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+
+                              console.log('📅 Date calculation for record', record.id, ':', {
+                                reportingDate: reportingDate.toDateString(),
+                                attendanceEndDate: attendanceEndDate.toDateString(),
+                                now: now.toDateString(),
+                                daysUntilExpiry,
+                                willShowIndicator: daysUntilExpiry <= 2
+                              })
+
+                              if (daysUntilExpiry <= 0) {
+                                return <span className="text-xs text-orange-600 dark:text-orange-400 ml-2" title="Will auto-complete on next page load">⏰</span>
+                              } else if (daysUntilExpiry <= 2) {
+                                return <span className="text-xs text-orange-600 dark:text-orange-400 ml-2" title={`Auto-completes in ${daysUntilExpiry} day${daysUntilExpiry !== 1 ? 's' : ''}`}>⏳</span>
+                              }
+                              return null
+                            })() : null
+                          })()}
                           <div className="flex gap-1">
                             {record.admittedInMH !== 'Yes' && record.medicalStatus !== 'Active' && (
                               <button
