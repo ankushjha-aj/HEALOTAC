@@ -110,12 +110,39 @@ export async function PATCH(
     const updates = await request.json()
     const updateData: any = {}
 
-    // Handle weight updates
-    if ('weight' in updates) {
-      updateData.weight = typeof updates.weight === 'number' ? updates.weight : updates.weight ? parseInt(updates.weight) : undefined
+    // Handle basic cadet information updates
+    if ('name' in updates) {
+      updateData.name = updates.name || null
     }
-    if ('currentWeight' in updates) {
-      updateData.currentWeight = typeof updates.currentWeight === 'number' ? updates.currentWeight : updates.currentWeight ? parseInt(updates.currentWeight) : undefined
+    if ('battalion' in updates) {
+      updateData.battalion = updates.battalion || null
+    }
+    if ('company' in updates) {
+      updateData.company = updates.company || null
+    }
+    if ('joinDate' in updates) {
+      updateData.joinDate = updates.joinDate ? new Date(updates.joinDate) : null
+    }
+    if ('academyNumber' in updates) {
+      updateData.academyNumber = updates.academyNumber ? parseInt(updates.academyNumber) : null
+    }
+    if ('height' in updates) {
+      updateData.height = updates.height ? parseInt(updates.height) : null
+    }
+    if ('weight' in updates) {
+      updateData.weight = updates.weight ? parseInt(updates.weight) : null
+    }
+    if ('age' in updates) {
+      updateData.age = updates.age ? parseInt(updates.age) : null
+    }
+    if ('course' in updates) {
+      updateData.course = updates.course || null
+    }
+    if ('sex' in updates) {
+      updateData.sex = updates.sex || null
+    }
+    if ('relegated' in updates) {
+      updateData.relegated = updates.relegated || 'N'
     }
 
     // Handle menstrual health data updates
