@@ -93,9 +93,6 @@ export default function DashboardPage() {
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [dbStatus, setDbStatus] = useState<string>('checking...')
-  const [showTooltip, setShowTooltip] = useState(false)
-  const [tooltipContent, setTooltipContent] = useState<string[]>([])
-  const tooltipRef = useRef<HTMLDivElement>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [jwtToken, setJwtToken] = useState<string | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -228,7 +225,6 @@ export default function DashboardPage() {
   })
 
   const todayCadets = new Set(todayRecords.map(record => record.cadetId))
-  const todayCadetNames = [...new Set(todayRecords.map(record => record.name))]
 
   const stats = [
     {
@@ -319,41 +315,10 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="relative">
-                      {/* Right side - Users Icon (hoverable) */}
-                      <div
-                        className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg cursor-pointer transition-all hover:bg-primary/20 dark:hover:bg-primary/30"
-                        onMouseEnter={() => {
-                          setTooltipContent(todayCadetNames.length > 0 ? todayCadetNames : ['No cadets with records today'])
-                          setShowTooltip(true)
-                        }}
-                        onMouseLeave={() => {
-                          setShowTooltip(false)
-                        }}
-                      >
+                      {/* Right side - Users Icon */}
+                      <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg">
                         <Icon className="h-5 w-5 text-primary" />
                       </div>
-
-                      {/* Custom Tooltip */}
-                      {showTooltip && (
-                        <div
-                          ref={tooltipRef}
-                          className="absolute bottom-full right-0 mb-2 w-80 max-h-64 bg-gray-900 text-white text-sm rounded-lg shadow-lg z-50 overflow-hidden animate-fade-in"
-                        >
-                          <div className="p-3 border-b border-gray-700">
-                            <strong>Cadets with Records Today ({todayCadetNames.length})</strong>
-                            {todayCadetNames.length > 8 && (
-                              <div className="text-xs text-gray-400 mt-1">Scroll to see all</div>
-                            )}
-                          </div>
-                          <div className="max-h-48 overflow-y-auto">
-                            {tooltipContent.map((name, index) => (
-                              <div key={index} className="px-3 py-2 border-b border-gray-700 last:border-b-0 hover:bg-gray-800 transition-colors">
-                                {name}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
