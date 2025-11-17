@@ -1143,7 +1143,8 @@ function NewMedicalRecordPageInner() {
                       value={formData.dateOfReporting}
                       onChange={handleChange}
                       max={new Date().toISOString().split('T')[0]} // Prevent future dates
-                      className={`input-field ${fieldErrors.dateOfReporting ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                      readOnly
+                      className={`input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed ${fieldErrors.dateOfReporting ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                     />
                     {fieldErrors.dateOfReporting && (
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.dateOfReporting}</p>
@@ -1463,7 +1464,7 @@ function NewMedicalRecordPageInner() {
                         onChange={handleCadetFormChange}
                         className="mr-2"
                       />
-                      Foreign Candidate
+                      Foreign Cadet
                     </label>
                   </div>
 
