@@ -1514,7 +1514,7 @@ function NewMedicalRecordPageInner() {
                             onChange={handleCadetFormChange}
                             className="input-field"
                             placeholder="e.g., 12345"
-                            min={1}
+                            min={1} 
                             maxLength={10}
                           />
                         </div> 
