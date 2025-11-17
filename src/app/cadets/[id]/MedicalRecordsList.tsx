@@ -670,12 +670,28 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
 
                     {/* Calculate and show total training days missed for this record */}
                     {(() => {
-                      let totalDays = record.totalTrainingDaysMissed || 0
-                      if (record.exPpg && Number(record.exPpg) > 0) totalDays += Number(record.exPpg) * 0.25
-                      if (record.attendB && Number(record.attendB) > 0) totalDays += Number(record.attendB) * 0.25
-                      return totalDays > 0 ? (
-                        <div className="font-medium text-red-600 dark:text-red-400 border-t border-gray-200 dark:border-gray-600 pt-1 mt-2">
-                          Training Days Missed: {totalDays.toFixed(2)} day{totalDays !== 1 ? 's' : ''}
+                      let weekdays = 0
+                      let sundays = 0
+                      if (record.totalTrainingDaysMissed && record.totalTrainingDaysMissed > 0) {
+                        const startDate = new Date(record.dateOfReporting)
+                        const endDate = new Date(startDate)
+                        endDate.setDate(endDate.getDate() + record.totalTrainingDaysMissed - 1)
+                        weekdays = getWeekdaysBetween(startDate, endDate)
+                        sundays = record.totalTrainingDaysMissed - weekdays
+                      }
+                      weekdays += (record.exPpg || 0) * 0.25
+                      weekdays += (record.attendB || 0) * 0.25
+                      return weekdays > 0 ? (
+                        <div className="font-medium text-red-600 dark:text-red-400 border-t border-gray-200 dark:border-gray-600 pt-1 mt-2 flex items-center gap-2">
+                          Training Days Missed: {weekdays.toFixed(2)} day{weekdays !== 1 ? 's' : ''}
+                          {sundays > 0 && (
+                            <div className="relative group">
+                              <Info className="h-3 w-3 text-gray-400 cursor-help" />
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                                Sundays excluded: {sundays}, original: {record.totalTrainingDaysMissed} days
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ) : null
                     })()}
