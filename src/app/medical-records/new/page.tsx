@@ -668,6 +668,12 @@ function NewMedicalRecordPageInner() {
       errors.dateOfReporting = 'Date of reporting is required'
     }
 
+    if (!formData.contactNo.trim()) {
+      errors.contactNo = 'Contact number is required'
+    } else if (formData.contactNo.length !== 10) {
+      errors.contactNo = 'Contact number must be exactly 10 digits'
+    }
+
     if (!formData.medicalProblem.trim()) {
       errors.medicalProblem = 'Medical problem description is required'
     }
@@ -1365,10 +1371,13 @@ function NewMedicalRecordPageInner() {
                       required
                       value={formData.contactNo}
                       onChange={handleChange}
-                      className="input-field"
+                      className={`input-field ${fieldErrors.contactNo ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                       placeholder="Phone number"
                       maxLength={10}
                     />
+                    {fieldErrors.contactNo && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.contactNo}</p>
+                    )}
                   </div>
 
                   {/* 10. Remarks */}
