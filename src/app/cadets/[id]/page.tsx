@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Plus, X } from 'lucide-react'
+import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ruler, Weight, Users, GraduationCap, Plus, X, Info } from 'lucide-react'
 import Link from 'next/link'
 import MedicalRecordsList from './MedicalRecordsList'
 import { usePagination } from '@/hooks/usePagination'
@@ -99,6 +99,20 @@ interface MedicalRecord {
   contactNo: string
   remarks: string
   createdAt: string
+}
+
+// Helper function to count weekdays (excluding Sundays) between two dates
+const getWeekdaysBetween = (startDate: Date, endDate: Date): number => {
+  let count = 0
+  const current = new Date(startDate)
+  const end = new Date(endDate)
+  while (current <= end) {
+    if (current.getDay() !== 0) { // 0 = Sunday
+      count++
+    }
+    current.setDate(current.getDate() + 1)
+  }
+  return count
 }
 
 export default function CadetDetailsPage({
@@ -249,7 +263,15 @@ export default function CadetDetailsPage({
     }
   }, [])
   const totalTrainingDaysMissed = medicalRecords.reduce((total: number, record: MedicalRecord) => {
-    let days = record.totalTrainingDaysMissed || 0
+    let days = 0
+
+    // Calculate weekdays for the main absence period
+    if (record.totalTrainingDaysMissed && record.totalTrainingDaysMissed > 0) {
+      const startDate = new Date(record.dateOfReporting)
+      const endDate = new Date(startDate)
+      endDate.setDate(endDate.getDate() + record.totalTrainingDaysMissed - 1)
+      days += getWeekdaysBetween(startDate, endDate)
+    }
 
     // Add Ex-PPG contribution (each point = 0.25 days missed)
     if (record.exPpg) {
@@ -400,7 +422,7 @@ export default function CadetDetailsPage({
     
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
-    doc.text(totalTrainingDaysMissed.toString(), leftX + 10, yPos)
+    doc.text(totalTrainingDaysMissed.toFixed(2), leftX + 10, yPos)
     
     yPos += 15
     
@@ -659,8 +681,16 @@ export default function CadetDetailsPage({
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4 text-red-500" />
                       <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Days Missed</p>
-                        <p className="text-sm font-medium text-red-600 dark:text-red-400">{totalTrainingDaysMissed}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Days Missed</p>
+                          <div className="relative group">
+                            <Info className="h-3 w-3 text-gray-400 cursor-help" />
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                              Sundays are not included in the calculation
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-sm font-medium text-red-600 dark:text-red-400">{totalTrainingDaysMissed.toFixed(2)}</p>
                       </div>
                     </div>
                   </div>
