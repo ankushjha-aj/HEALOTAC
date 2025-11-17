@@ -1517,7 +1517,7 @@ function NewMedicalRecordPageInner() {
                             min={1}
                             maxLength={10}
                           />
-                        </div>
+                        </div> 
 
                         {/* Join Date */}
                         <div>
