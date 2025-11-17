@@ -57,11 +57,71 @@ export default function MedicalHistoryPage() {
         if (!response.ok) throw new Error('Failed to fetch medical records')
 
         const records = await response.json()
-        // Sort medical records by createdAt descending (most recent first)
-        const sortedRecords = records.sort((a: MedicalRecord, b: MedicalRecord) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        )
-        setMedicalRecords(sortedRecords)
+        
+        // Check for records that need automatic completion based on attendC
+        const recordsToUpdate = []
+        const now = new Date()
+        
+        for (const record of records) {
+          // Only process records that are Active and have attendC > 0
+          if (record.medicalStatus === 'Active' && record.attendC && record.attendC > 0 && record.admittedInMH !== 'Yes') {
+            const reportingDate = new Date(record.dateOfReporting)
+            const attendanceEndDate = new Date(reportingDate)
+            attendanceEndDate.setDate(attendanceEndDate.getDate() + record.attendC)
+            
+            // If current date is past the attendance end date, mark as completed
+            if (now >= attendanceEndDate) {
+              recordsToUpdate.push(record.id)
+              console.log(`🔄 Auto-completing record ${record.id} for cadet ${record.name} (attendC: ${record.attendC}, reported: ${record.dateOfReporting})`)
+            }
+          }
+        }
+        
+        // Update records that need to be completed
+        if (recordsToUpdate.length > 0) {
+          try {
+            const updatePromises = recordsToUpdate.map(recordId => 
+              fetch(`/api/medical-records/${recordId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ medicalStatus: 'Completed' }),
+              })
+            )
+            
+            await Promise.all(updatePromises)
+            console.log(`✅ Auto-completed ${recordsToUpdate.length} medical records`)
+            
+            // Re-fetch records to get updated data
+            const updatedResponse = await fetch('/api/medical-records', {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            })
+            const updatedRecords = await updatedResponse.json()
+            
+            // Sort medical records by createdAt descending (most recent first)
+            const sortedRecords = updatedRecords.sort((a: MedicalRecord, b: MedicalRecord) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            )
+            setMedicalRecords(sortedRecords)
+          } catch (updateError) {
+            console.error('❌ Error auto-completing records:', updateError)
+            // Fall back to original records if auto-completion fails
+            const sortedRecords = records.sort((a: MedicalRecord, b: MedicalRecord) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            )
+            setMedicalRecords(sortedRecords)
+          }
+        } else {
+          // Sort medical records by createdAt descending (most recent first)
+          const sortedRecords = records.sort((a: MedicalRecord, b: MedicalRecord) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+          setMedicalRecords(sortedRecords)
+        }
       } catch (err) {
         console.error('Error fetching medical records:', err)
         setError(err instanceof Error ? err.message : 'Failed to load medical records')
@@ -471,6 +531,21 @@ export default function MedicalHistoryPage() {
                           }`}>
                             {record.admittedInMH === 'Yes' && record.medicalStatus === 'Active' ? 'Admitted in MH' : record.medicalStatus}
                           </span>
+                          {/* Auto-completion indicator for Active records with attendC */}
+                          {record.medicalStatus === 'Active' && record.attendC && record.attendC > 0 && record.admittedInMH !== 'Yes' ? (() => {
+                            const reportingDate = new Date(record.dateOfReporting)
+                            const attendanceEndDate = new Date(reportingDate)
+                            attendanceEndDate.setDate(attendanceEndDate.getDate() + record.attendC)
+                            const now = new Date()
+                            const daysUntilExpiry = Math.ceil((attendanceEndDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+
+                            if (daysUntilExpiry <= 0) {
+                              return <span className="text-xs text-orange-600 dark:text-orange-400 ml-2" title="Will auto-complete on next page load">⏰</span>
+                            } else if (daysUntilExpiry <= 2) {
+                              return <span className="text-xs text-orange-600 dark:text-orange-400 ml-2" title={`Auto-completes in ${daysUntilExpiry} day${daysUntilExpiry !== 1 ? 's' : ''}`}>⏳</span>
+                            }
+                            return null
+                          })() : null}
                           <div className="flex gap-1">
                             {record.admittedInMH !== 'Yes' && record.medicalStatus !== 'Active' && (
                               <button
