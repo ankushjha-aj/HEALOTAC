@@ -331,7 +331,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             const wrapped = wrapText(line, maxWidth, helveticaFont, 11)
             allDiagLines.push(...wrapped)
           }
-          const finalDiagLines = allDiagLines.slice(0, 3)
+          const finalDiagLines = allDiagLines.slice(0, 7)
           let diagY = 410; // Below heading
           const lineSpacing = 15; // Space between lines
           for (const line of finalDiagLines) {
