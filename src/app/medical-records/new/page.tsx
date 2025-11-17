@@ -320,9 +320,11 @@ function NewMedicalRecordPageInner() {
     const { name, value } = e.target
 
     setFormData(prev => {
+      let processedValue = name === 'contactNo' ? value.replace(/\D/g, '') : value
+
       const newData = {
         ...prev,
-        [name]: name === 'contactNo' ? value.replace(/\D/g, '') : value
+        [name]: processedValue
       }
 
       // Handle training type changes
@@ -349,7 +351,40 @@ function NewMedicalRecordPageInner() {
     })
   }
 
-  // Handle cadet search input
+  const handleRemarksBlur = () => {
+    setFormData(prev => {
+      let processedValue = prev.remarks
+      // Process remarks: wrap lines exceeding 13 words, limit to 3 lines
+      const lines = processedValue.split('\n')
+      const processedLines: string[] = []
+      for (const line of lines) {
+        const words = line.trim().split(/\s+/).filter(w => w)
+        for (let i = 0; i < words.length; i += 13) {
+          processedLines.push(words.slice(i, i + 13).join(' '))
+        }
+      }
+      processedValue = processedLines.slice(0, 3).join('\n')
+      return { ...prev, remarks: processedValue }
+    })
+  }
+
+  const handleDiagnosisBlur = () => {
+    setFormData(prev => {
+      let processedValue = prev.diagnosis
+      // Process diagnosis: wrap lines exceeding 13 words, limit to 3 lines
+      const lines = processedValue.split('\n')
+      const processedLines: string[] = []
+      for (const line of lines) {
+        const words = line.trim().split(/\s+/).filter(w => w)
+        for (let i = 0; i < words.length; i += 13) {
+          processedLines.push(words.slice(i, i + 13).join(' '))
+        }
+      }
+      processedValue = processedLines.slice(0, 3).join('\n')
+      return { ...prev, diagnosis: processedValue }
+    })
+  }
+
   const handleCadetSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setCadetSearchTerm(value)
@@ -1149,6 +1184,7 @@ function NewMedicalRecordPageInner() {
                       rows={3}
                       value={formData.diagnosis}
                       onChange={handleChange}
+                      onBlur={handleDiagnosisBlur}
                       className="input-field"
                       placeholder="Detailed prescription option"
                     />
@@ -1329,6 +1365,7 @@ function NewMedicalRecordPageInner() {
                       rows={3}
                       value={formData.remarks}
                       onChange={handleChange}
+                      onBlur={handleRemarksBlur}
                       className="input-field"
                       placeholder="Any additional remarks or observations"
                     />
