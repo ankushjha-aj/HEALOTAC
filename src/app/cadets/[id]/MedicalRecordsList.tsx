@@ -256,9 +256,22 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
 
         // Position diagnosis below the date of reporting
         const totalTrainingDays = records.reduce((total, record) => {
-          let days = record.totalTrainingDaysMissed || 0
+          let days = 0
+
+          // Calculate weekdays for the main absence period
+          if (record.totalTrainingDaysMissed && record.totalTrainingDaysMissed > 0) {
+            const startDate = new Date(record.dateOfReporting)
+            const endDate = new Date(startDate)
+            endDate.setDate(endDate.getDate() + record.totalTrainingDaysMissed - 1)
+            days += getWeekdaysBetween(startDate, endDate)
+          }
+
+          // Add Ex-PPG contribution (each point = 0.25 days missed)
           if (record.exPpg && Number(record.exPpg) > 0) days += Number(record.exPpg) * 0.25
+
+          // Add Attend B contribution (each point = 0.25 days missed)
           if (record.attendB && Number(record.attendB) > 0) days += Number(record.attendB) * 0.25
+
           return total + days
         }, 0)
 

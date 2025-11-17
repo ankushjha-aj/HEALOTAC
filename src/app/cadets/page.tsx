@@ -17,6 +17,7 @@ interface MedicalRecord {
   medicalStatus: string
   exPpg: number
   attendB: number
+  dateOfReporting: string
 }
 
 // Interface for Cadet
@@ -39,6 +40,20 @@ interface Filters {
   companies: string[]
   statuses: string[]
   companiesByBattalion: Record<string, string[]>
+}
+
+// Helper function to count weekdays (excluding Sundays) between two dates
+const getWeekdaysBetween = (startDate: Date, endDate: Date): number => {
+  let count = 0
+  const current = new Date(startDate)
+  const end = new Date(endDate)
+  while (current <= end) {
+    if (current.getDay() !== 0) { // 0 = Sunday
+      count++
+    }
+    current.setDate(current.getDate() + 1)
+  }
+  return count
 }
 
 export default function CadetsPage() {
@@ -174,7 +189,15 @@ export default function CadetsPage() {
   const cadetsWithTrainingMissed = cadets.map(cadet => {
     const cadetRecords = medicalRecords.filter(record => record.cadetId === cadet.id)
     const totalTrainingMissed = cadetRecords.reduce((total, record) => {
-      let days = record.totalTrainingDaysMissed || 0
+      let days = 0
+
+      // Calculate weekdays for the main absence period
+      if (record.totalTrainingDaysMissed && record.totalTrainingDaysMissed > 0) {
+        const startDate = new Date(record.dateOfReporting)
+        const endDate = new Date(startDate)
+        endDate.setDate(endDate.getDate() + record.totalTrainingDaysMissed - 1)
+        days += getWeekdaysBetween(startDate, endDate)
+      }
 
       // Add Ex-PPG contribution (each point = 0.25 days missed)
       if (record.exPpg) {
