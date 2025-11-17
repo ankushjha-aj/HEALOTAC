@@ -570,7 +570,24 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Returned</span>
                   </label>
                 </div>
-                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">{isChecked ? `Training days missed by cadet: ${daysMissed} days` : 'Double-click the toggle when cadet returns from MH/BH/CH facility (cannot be unset once marked)'}</p>
+                <div className="text-xs text-blue-600 dark:text-blue-400 mt-2 flex items-center gap-2">
+                  <span>{isChecked ? `Training days missed by cadet: ${daysMissed} days` : 'Double-click the toggle when cadet returns from MH/BH/CH facility (cannot be unset once marked)'}</span>
+                  {isChecked && (() => {
+                    // Calculate how many Sundays were in the period
+                    const admissionDate = new Date(record.dateOfReporting)
+                    const returnDate = new Date()
+                    const totalDays = Math.ceil((returnDate.getTime() - admissionDate.getTime()) / (24 * 60 * 60 * 1000))
+                    const sundays = Math.floor((totalDays + admissionDate.getDay()) / 7)
+                    return sundays > 0 ? (
+                      <div className="relative group">
+                        <Info className="h-3 w-3 text-gray-400 cursor-help" />
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                          Sundays excluded: {sundays}, total period: {totalDays} days
+                        </div>
+                      </div>
+                    ) : null
+                  })()}
+                </div>
               </div>
 
               {record.diagnosis && (
