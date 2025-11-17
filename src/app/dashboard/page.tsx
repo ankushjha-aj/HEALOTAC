@@ -337,12 +337,15 @@ export default function DashboardPage() {
                       {showTooltip && (
                         <div
                           ref={tooltipRef}
-                          className="absolute bottom-full right-0 mb-2 w-64 max-h-48 bg-gray-900 text-white text-sm rounded-lg shadow-lg z-50 overflow-hidden animate-fade-in"
+                          className="absolute bottom-full right-0 mb-2 w-80 max-h-64 bg-gray-900 text-white text-sm rounded-lg shadow-lg z-50 overflow-hidden animate-fade-in"
                         >
                           <div className="p-3 border-b border-gray-700">
                             <strong>Cadets with Records Today ({todayCadetNames.length})</strong>
+                            {todayCadetNames.length > 8 && (
+                              <div className="text-xs text-gray-400 mt-1">Scroll to see all</div>
+                            )}
                           </div>
-                          <div className="max-h-32 overflow-y-auto">
+                          <div className="max-h-48 overflow-y-auto">
                             {tooltipContent.map((name, index) => (
                               <div key={index} className="px-3 py-2 border-b border-gray-700 last:border-b-0 hover:bg-gray-800 transition-colors">
                                 {name}
