@@ -267,7 +267,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
           firstPage.drawText('MEDICAL PROBLEM', {
             x: 170, // Left position
             y: 480, // Heading above content
-            size: 11,
+            size: 12,
             color: red,
             font: helveticaBoldFont,
           })
@@ -278,7 +278,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             firstPage.drawText(line, {
               x: 170, // Left position
               y: problemY,
-              size: 10.5,
+              size: 11,
               color: black,
               font: helveticaFont,
             });
@@ -291,7 +291,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
           firstPage.drawText('DIAGNOSIS', {
             x: 170, // Left position
             y: 430, // Heading above content
-            size: 11,
+            size: 12,
             color: red,
             font: helveticaBoldFont,
           })
@@ -302,7 +302,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             firstPage.drawText(line, {
               x: 170, // Left position
               y: diagY,
-              size: 10.5,
+              size: 11,
               color: black,
               font: helveticaFont,
             });
@@ -313,13 +313,13 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
         // Position details below diagnosis
         firstPage.drawText('DETAILS', {
           x: 170, // Left position
-          y: 320, // Heading above details
-          size: 11,
+          y: 325, // Heading above details
+          size: 12,
           color: red,
           font: helveticaBoldFont,
         });
 
-        let detailY = 300; // Start below heading
+        let detailY = 305; // Start below heading
         const lineSpacing = 15; // Space between lines
 
         if (record.attendC && Number(record.attendC) > 0) {
@@ -404,7 +404,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
           firstPage.drawText('REMARKS', {
             x: 170, // Left position
             y: 215, // Heading above content
-            size: 11,
+            size: 12,
             color: red,
             font: helveticaBoldFont,
           })
@@ -415,7 +415,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
             firstPage.drawText(line, {
               x: 170, // Left position
               y: remarksY,
-              size: 10.5,
+              size: 11,
               color: black,
               font: helveticaFont,
             });
@@ -505,7 +505,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                   <div className="flex items-center gap-3">
                     <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
                       <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 1186 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                     </div>
                     <div>
