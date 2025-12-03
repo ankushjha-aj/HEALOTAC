@@ -281,7 +281,7 @@ export default function MedicalHistoryPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-6"> 
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div>
