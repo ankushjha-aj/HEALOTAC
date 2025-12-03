@@ -27,6 +27,7 @@ interface MedicalRecord {
   admittedInMH?: string // New field for admission in MH/BH/CH
   bloodGroup?: string
   isForeign: boolean
+  relegated: string
 }
 
 export default function MedicalHistoryPage() {
@@ -663,6 +664,11 @@ export default function MedicalHistoryPage() {
                               >
                                 {record.name}
                               </Link>
+                              {record.relegated === 'Y' && (
+                                <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-red-600 bg-red-100 rounded-full dark:text-red-400 dark:bg-red-900/30" title="Relegated">
+                                  R
+                                </span>
+                              )}
                               {record.isForeign && (
                                 <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-blue-600 bg-blue-100 rounded-full dark:text-blue-400 dark:bg-blue-900/30" title="Foreign Cadet">
                                   F
