@@ -1,4 +1,4 @@
-'use client' 
+'use client'
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
@@ -287,11 +287,10 @@ export default function ReportsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <button
               onClick={() => handlePeriodChange('yesterday')}
-              className={`p-4 rounded-lg border-2 ${
-                !useCustomRange && selectedPeriod === 'yesterday'
+              className={`p-4 rounded-lg border-2 ${!useCustomRange && selectedPeriod === 'yesterday'
                   ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
                   : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
-              }`}
+                }`}
               disabled={useCustomRange}
             >
               <Calendar className="h-6 w-6 mx-auto mb-2" />
@@ -301,11 +300,10 @@ export default function ReportsPage() {
 
             <button
               onClick={() => handlePeriodChange('today')}
-              className={`p-4 rounded-lg border-2 ${
-                !useCustomRange && selectedPeriod === 'today'
+              className={`p-4 rounded-lg border-2 ${!useCustomRange && selectedPeriod === 'today'
                   ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
                   : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
-              }`}
+                }`}
               disabled={useCustomRange}
             >
               <Clock className="h-6 w-6 mx-auto mb-2" />
@@ -315,11 +313,10 @@ export default function ReportsPage() {
 
             <button
               onClick={() => handlePeriodChange('week')}
-              className={`p-4 rounded-lg border-2 ${
-                !useCustomRange && selectedPeriod === 'week'
+              className={`p-4 rounded-lg border-2 ${!useCustomRange && selectedPeriod === 'week'
                   ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
                   : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
-              }`}
+                }`}
               disabled={useCustomRange}
             >
               <Filter className="h-6 w-6 mx-auto mb-2" />
@@ -329,11 +326,10 @@ export default function ReportsPage() {
 
             <button
               onClick={handleCustomRangeToggle}
-              className={`p-4 rounded-lg border-2 ${
-                useCustomRange
+              className={`p-4 rounded-lg border-2 ${useCustomRange
                   ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
                   : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
-              }`}
+                }`}
             >
               <Calendar className="h-6 w-6 mx-auto mb-2" />
               <div className="text-sm font-medium">Custom Date</div>
@@ -480,7 +476,17 @@ export default function ReportsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {record.company}
+                          {(() => {
+                            const companyMap: { [key: string]: string } = {
+                              'M': 'Meiktila',
+                              'N': 'Naushera',
+                              'Z': 'Zojila',
+                              'J': 'Jessami',
+                              'K': 'Kohima',
+                              'P': 'Phillora'
+                            }
+                            return companyMap[record.company] ? `${record.company} - ${companyMap[record.company]}` : record.company
+                          })()}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -494,20 +500,18 @@ export default function ReportsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          record.medicalStatus === 'Active'
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${record.medicalStatus === 'Active'
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                             : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-                        }`}>
+                          }`}>
                           {record.medicalStatus}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          record.monitoringCase
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${record.monitoringCase
                             ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
                             : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-                        }`}>
+                          }`}>
                           {record.monitoringCase ? 'Yes' : 'No'}
                         </span>
                       </td>

@@ -402,7 +402,16 @@ export default function CadetDetailsPage({
     doc.text('COMPANY:', leftX, yPos)
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
-    doc.text(cadetInfo.company || '', leftX + 20, yPos)
+    const companyMap: { [key: string]: string } = {
+      'M': 'Meiktila',
+      'N': 'Naushera',
+      'Z': 'Zojila',
+      'J': 'Jessami',
+      'K': 'Kohima',
+      'P': 'Phillora'
+    }
+    const companyDisplay = companyMap[cadetInfo.company] ? `${cadetInfo.company} - ${companyMap[cadetInfo.company]}` : (cadetInfo.company || '')
+    doc.text(companyDisplay, leftX + 20, yPos)
 
     yPos += 8
 
@@ -658,7 +667,19 @@ export default function CadetDetailsPage({
                   </div>
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-4">
                     <MapPin className="h-4 w-4" />
-                    <span>{cadetInfo.company} Company, {cadetInfo.battalion}</span>
+                    <span>
+                      {(() => {
+                        const companyMap: { [key: string]: string } = {
+                          'M': 'Meiktila',
+                          'N': 'Naushera',
+                          'Z': 'Zojila',
+                          'J': 'Jessami',
+                          'K': 'Kohima',
+                          'P': 'Phillora'
+                        }
+                        return companyMap[cadetInfo.company] ? `${cadetInfo.company} - ${companyMap[cadetInfo.company]}` : cadetInfo.company
+                      })()} Company, {cadetInfo.battalion}
+                    </span>
                   </div>
                 </div>
 

@@ -22,7 +22,7 @@ interface MedicalRecord {
   totalTrainingDaysMissed: number
   contactNo: string
   remarks: string
-  createdAt: string 
+  createdAt: string
   monitoringCase: boolean
   admittedInMH?: string // New field for admission in MH/BH/CH
 }
@@ -57,18 +57,18 @@ export default function MedicalHistoryPage() {
         if (!response.ok) throw new Error('Failed to fetch medical records')
 
         const records = await response.json()
-        
+
         // Check for records that need automatic completion based on attendC
         const recordsToUpdate = []
         const now = new Date()
-        
+
         for (const record of records) {
           // Only process records that are Active and have attendC > 0
           if (record.medicalStatus === 'Active' && record.attendC && record.attendC > 0 && record.admittedInMH !== 'Yes') {
             const reportingDate = new Date(record.dateOfReporting)
             const attendanceEndDate = new Date(reportingDate)
             attendanceEndDate.setDate(attendanceEndDate.getDate() + record.attendC)
-            
+
             // If current date is past the attendance end date, mark as completed
             if (now >= attendanceEndDate) {
               recordsToUpdate.push(record.id)
@@ -76,11 +76,11 @@ export default function MedicalHistoryPage() {
             }
           }
         }
-        
+
         // Update records that need to be completed
         if (recordsToUpdate.length > 0) {
           try {
-            const updatePromises = recordsToUpdate.map(recordId => 
+            const updatePromises = recordsToUpdate.map(recordId =>
               fetch(`/api/medical-records/${recordId}`, {
                 method: 'PUT',
                 headers: {
@@ -90,10 +90,10 @@ export default function MedicalHistoryPage() {
                 body: JSON.stringify({ medicalStatus: 'Completed' }),
               })
             )
-            
+
             await Promise.all(updatePromises)
             console.log(`✅ Auto-completed ${recordsToUpdate.length} medical records`)
-            
+
             // Re-fetch records to get updated data
             const updatedResponse = await fetch('/api/medical-records', {
               headers: {
@@ -101,7 +101,7 @@ export default function MedicalHistoryPage() {
               }
             })
             const updatedRecords = await updatedResponse.json()
-            
+
             // Sort medical records by createdAt descending (most recent first)
             const sortedRecords = updatedRecords.sort((a: MedicalRecord, b: MedicalRecord) =>
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -273,9 +273,8 @@ export default function MedicalHistoryPage() {
               <button
                 onClick={handleAddNewRecord}
                 disabled={updatingRecordId === -1}
-                className={`btn-primary flex items-center gap-2 ${
-                  updatingRecordId === -1 ? 'cursor-not-allowed opacity-75' : ''
-                }`}
+                className={`btn-primary flex items-center gap-2 ${updatingRecordId === -1 ? 'cursor-not-allowed opacity-75' : ''
+                  }`}
               >
                 {updatingRecordId === -1 ? (
                   <>
@@ -452,9 +451,8 @@ export default function MedicalHistoryPage() {
                         <button
                           onClick={handleAddNewRecord}
                           disabled={updatingRecordId === -1}
-                          className={`btn-primary flex items-center gap-2 ${
-                            updatingRecordId === -1 ? 'cursor-not-allowed opacity-75' : ''
-                          }`}
+                          className={`btn-primary flex items-center gap-2 ${updatingRecordId === -1 ? 'cursor-not-allowed opacity-75' : ''
+                            }`}
                         >
                           {updatingRecordId === -1 ? (
                             <>
@@ -495,7 +493,17 @@ export default function MedicalHistoryPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 dark:text-white">
-                          {record.company}
+                          {(() => {
+                            const companyMap: { [key: string]: string } = {
+                              'M': 'Meiktila',
+                              'N': 'Naushera',
+                              'Z': 'Zojila',
+                              'J': 'Jessami',
+                              'K': 'Kohima',
+                              'P': 'Phillora'
+                            }
+                            return companyMap[record.company] ? `${record.company} - ${companyMap[record.company]}` : record.company
+                          })()}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
                           {record.battalion}
@@ -518,17 +526,16 @@ export default function MedicalHistoryPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            record.admittedInMH === 'Yes' && record.medicalStatus === 'Active'
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${record.admittedInMH === 'Yes' && record.medicalStatus === 'Active'
                               ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
                               : record.medicalStatus === 'Active'
-                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                              : record.medicalStatus === 'Completed'
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                              : record.medicalStatus === 'Returned'
-                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
-                              : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
-                          }`}>
+                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                                : record.medicalStatus === 'Completed'
+                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                                  : record.medicalStatus === 'Returned'
+                                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
+                                    : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                            }`}>
                             {record.admittedInMH === 'Yes' && record.medicalStatus === 'Active' ? 'Admitted in MH' : record.medicalStatus}
                           </span>
                           {/* Auto-completion indicator for Active records with attendC */}

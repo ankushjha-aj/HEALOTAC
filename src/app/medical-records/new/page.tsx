@@ -845,7 +845,17 @@ function NewMedicalRecordPageInner() {
                               <span className="font-medium">Academy Number:</span> {cadet.academyNumber || 'N/A'}
                             </p>
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                              <span className="font-medium">Company:</span> {cadet.company}
+                              <span className="font-medium">Company:</span> {(() => {
+                                const companyMap: { [key: string]: string } = {
+                                  'M': 'Meiktila',
+                                  'N': 'Naushera',
+                                  'Z': 'Zojila',
+                                  'J': 'Jessami',
+                                  'K': 'Kohima',
+                                  'P': 'Phillora'
+                                }
+                                return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
+                              })()}
                             </p>
                           </div>
                         </div>
@@ -943,7 +953,17 @@ function NewMedicalRecordPageInner() {
                                       )}
                                     </div>
                                     <div className="text-sm text-gray-500 dark:text-gray-400">
-                                      {cadet.company} Company, {cadet.battalion}
+                                      {(() => {
+                                        const companyMap: { [key: string]: string } = {
+                                          'M': 'Meiktila',
+                                          'N': 'Naushera',
+                                          'Z': 'Zojila',
+                                          'J': 'Jessami',
+                                          'K': 'Kohima',
+                                          'P': 'Phillora'
+                                        }
+                                        return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
+                                      })()} Company, {cadet.battalion}
                                     </div>
                                   </div>
                                 ))}
@@ -994,7 +1014,17 @@ function NewMedicalRecordPageInner() {
                                 <span className="w-2 h-2 bg-red-500 rounded-full"></span>
                               </>
                             )}
-                            - {selectedCadet.company} Company, {selectedCadet.battalion}
+                            - {(() => {
+                              const companyMap: { [key: string]: string } = {
+                                'M': 'Meiktila',
+                                'N': 'Naushera',
+                                'Z': 'Zojila',
+                                'J': 'Jessami',
+                                'K': 'Kohima',
+                                'P': 'Phillora'
+                              }
+                              return companyMap[selectedCadet.company] ? `${selectedCadet.company} - ${companyMap[selectedCadet.company]}` : selectedCadet.company
+                            })()} Company, {selectedCadet.battalion}
                           </span>
                           {searchParams.get('cadetId') && (
                             <div className="text-xs text-green-600 dark:text-green-400 mt-1">
@@ -1040,7 +1070,17 @@ function NewMedicalRecordPageInner() {
                             </label>
                             <input
                               type="text"
-                              value={selectedCadet.company}
+                              value={(() => {
+                                const companyMap: { [key: string]: string } = {
+                                  'M': 'Meiktila',
+                                  'N': 'Naushera',
+                                  'Z': 'Zojila',
+                                  'J': 'Jessami',
+                                  'K': 'Kohima',
+                                  'P': 'Phillora'
+                                }
+                                return companyMap[selectedCadet.company] ? `${selectedCadet.company} - ${companyMap[selectedCadet.company]}` : selectedCadet.company
+                              })()}
                               readOnly
                               className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
                             />
@@ -1536,12 +1576,12 @@ function NewMedicalRecordPageInner() {
                               className="input-field"
                             >
                               <option value="">Select company...</option>
-                              <option value="M">M</option>
-                              <option value="N">N</option>
-                              <option value="Z">Z</option>
-                              <option value="J">J</option>
-                              <option value="K">K</option>
-                              <option value="P">P</option>
+                              <option value="M">M - Meiktila</option>
+                              <option value="N">N - Naushera</option>
+                              <option value="Z">Z - Zojila</option>
+                              <option value="J">J - Jessami</option>
+                              <option value="K">K - Kohima</option>
+                              <option value="P">P - Phillora</option>
                             </select>
                           </div>
 

@@ -436,12 +436,12 @@ export default function EditCadetPage({
                     required
                   >
                     <option value="">Select Company</option>
-                    <option value="M">M</option>
-                    <option value="N">N</option>
-                    <option value="Z">Z</option>
-                    <option value="J">J</option>
-                    <option value="K">K</option>
-                    <option value="P">P</option>
+                    <option value="M">M - Meiktila</option>
+                    <option value="N">N - Naushera</option>
+                    <option value="Z">Z - Zojila</option>
+                    <option value="J">J - Jessami</option>
+                    <option value="K">K - Kohima</option>
+                    <option value="P">P - Phillora</option>
                   </select>
                 </div>
               </div>

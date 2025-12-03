@@ -94,7 +94,7 @@ export default function CadetsPage() {
       setError(null)
       const token = localStorage.getItem('jwt_token')
       console.log('🔑 JWT Token:', token ? 'Present' : 'Missing')
-      
+
       if (!token) {
         console.log('❌ No JWT token found, setting error')
         setError('Authentication required')
@@ -129,17 +129,17 @@ export default function CadetsPage() {
 
       const cadetsData = await cadetsRes.json()
       const recordsData = await recordsRes.json()
-      
+
       console.log('✅ Cadets data received:', cadetsData.length, 'cadets')
       console.log('✅ Records data received:', recordsData.length, 'records')
-      
+
       // Sort cadets by createdAt descending (most recent first)
       const sortedCadets = cadetsData.sort((a: Cadet, b: Cadet) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       )
       setCadets(sortedCadets)
       setMedicalRecords(recordsData)
-      
+
       console.log('✅ Data set successfully, loading should be false')
     } catch (err) {
       console.error('❌ Error fetching data:', err)
@@ -289,11 +289,10 @@ export default function CadetsPage() {
           <div className="mt-4 lg:mt-0 flex gap-2">
             <button
               onClick={() => setShowHighTrainingMissed(!showHighTrainingMissed)}
-              className={`relative px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg ${
-                showHighTrainingMissed
+              className={`relative px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg ${showHighTrainingMissed
                   ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white border-orange-400 shadow-orange-200 dark:shadow-orange-900/50'
                   : 'bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900/20 dark:hover:to-blue-800/20 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-300 dark:hover:border-blue-500'
-              }`}
+                }`}
               title="Show cadets with ≥30 days training missed"
             >
               {/* Animated background effect when active */}
@@ -314,9 +313,8 @@ export default function CadetsPage() {
             <button
               onClick={handleAddNewRecord}
               disabled={navigatingToNewRecord}
-              className={`btn-primary flex items-center gap-2 ${
-                navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
-              }`}
+              className={`btn-primary flex items-center gap-2 ${navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
+                }`}
             >
               {navigatingToNewRecord ? (
                 <>
@@ -436,17 +434,26 @@ export default function CadetsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {cadet.company}
+                        {(() => {
+                          const companyMap: { [key: string]: string } = {
+                            'M': 'Meiktila',
+                            'N': 'Naushera',
+                            'Z': 'Zojila',
+                            'J': 'Jessami',
+                            'K': 'Kohima',
+                            'P': 'Phillora'
+                          }
+                          return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
+                        })()}
                       </p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        cadet.totalTrainingMissed >= 30
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${cadet.totalTrainingMissed >= 30
                           ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
                           : cadet.totalTrainingMissed > 0
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                          : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                      }`}>
+                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                            : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                        }`}>
                         {cadet.totalTrainingMissed} days
                       </span>
                     </td>
@@ -482,7 +489,7 @@ export default function CadetsPage() {
                           <Edit className="h-4 w-4" />
                         </Link>
                         {user?.role !== 'user' && (
-                          <button 
+                          <button
                             onClick={() => handleDeleteCadet(cadet)}
                             className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
                           >

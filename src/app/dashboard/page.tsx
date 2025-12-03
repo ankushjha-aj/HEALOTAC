@@ -278,9 +278,8 @@ export default function DashboardPage() {
             <button
               onClick={handleAddNewRecord}
               disabled={navigatingToNewRecord}
-              className={`btn-primary flex items-center gap-2 ${
-                navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
-              }`}
+              className={`btn-primary flex items-center gap-2 ${navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
+                }`}
             >
               {navigatingToNewRecord ? (
                 <>
@@ -407,7 +406,17 @@ export default function DashboardPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {cadet.company}
+                        {(() => {
+                          const companyMap: { [key: string]: string } = {
+                            'M': 'Meiktila',
+                            'N': 'Naushera',
+                            'Z': 'Zojila',
+                            'J': 'Jessami',
+                            'K': 'Kohima',
+                            'P': 'Phillora'
+                          }
+                          return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
+                        })()}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
