@@ -598,27 +598,26 @@ export default function MedicalHistoryPage() {
             </div>
 
             {/* Clear Filters Button */}
-            <div className="flex justify-end">
+            {/* Clear Filters and Results Count */}
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="text-sm text-gray-600 dark:text-gray-400 order-2 sm:order-1">
+                Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, filteredRecords.length)} of {filteredRecords.length} medical records
+                {(filters.name || filters.company || filters.battalion || filters.medicalProblem || filters.bloodGroup) && ` matching filters`}
+                {statusFilter !== 'all' && ` with status "${statusFilter}"`}
+              </div>
+
               <button
                 onClick={() => {
                   setFilters({ name: '', company: '', battalion: '', medicalProblem: '', bloodGroup: '' })
                   setStatusFilter('all')
                   setForeignFilter('all')
                 }}
-                className="text-sm text-primary hover:text-primary/80 font-medium"
+                className="text-sm text-primary hover:text-primary/80 font-medium order-1 sm:order-2 whitespace-nowrap"
                 disabled={!filters.name && !filters.company && !filters.battalion && !filters.medicalProblem && !filters.bloodGroup && statusFilter === 'all' && foreignFilter === 'all'}
               >
                 Clear all filters
               </button>
             </div>
-          </div>
-
-          {/* Results Count */}
-          <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-            Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, filteredRecords.length)} of {filteredRecords.length} medical records
-            Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, filteredRecords.length)} of {filteredRecords.length} medical records
-            {(filters.name || filters.company || filters.battalion || filters.medicalProblem || filters.bloodGroup) && ` matching filters`}
-            {statusFilter !== 'all' && ` with status "${statusFilter}"`}
           </div>
         </div>
 
