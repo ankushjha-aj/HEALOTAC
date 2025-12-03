@@ -60,6 +60,11 @@ export const cadets = pgTable('cadets', {
   enduranceTest: varchar('endurance_test', { length: 50 }),
   agilityTest: varchar('agility_test', { length: 50 }),
   speedTest: varchar('speed_test', { length: 50 }),
+  // Physical Proficiency & Efficiency Tests
+  ppt: varchar('ppt', { length: 50 }),
+  ipet: varchar('ipet', { length: 50 }),
+  bpet: varchar('bpet', { length: 50 }),
+  swm: varchar('swm', { length: 50 }),
   // Strength Tests
   verticalJump: varchar('vertical_jump', { length: 50 }),
   ballThrow: varchar('ball_throw', { length: 50 }),

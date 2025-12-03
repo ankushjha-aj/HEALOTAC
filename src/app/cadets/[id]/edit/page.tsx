@@ -33,6 +33,11 @@ interface CadetData {
   surgeryHistory?: string
   medicalCondition?: string
   hemoglobinLevel?: string
+  // Physical Test
+  ppt?: string
+  ipet?: string
+  bpet?: string
+  swm?: string
 }
 
 export default function EditCadetPage({
@@ -95,6 +100,11 @@ export default function EditCadetPage({
     surgeryHistory: '',
     medicalCondition: '',
     hemoglobinLevel: '',
+    // Physical Test
+    ppt: '',
+    ipet: '',
+    bpet: '',
+    swm: '',
   })
 
   const fetchCadetAndFilters = useCallback(async () => {
@@ -148,7 +158,7 @@ export default function EditCadetPage({
             const sortedAids = [...aids].sort();
             const aidsMap: { [key: string]: string } = {
               'Menstrual Cup': '1',
-              'Sanitary Pads': '2', 
+              'Sanitary Pads': '2',
               'Tampon': '3'
             }
             const numericValue = sortedAids.map(aid => aidsMap[aid]).join('');
@@ -173,6 +183,11 @@ export default function EditCadetPage({
         surgeryHistory: cadetData.surgeryHistory || '',
         medicalCondition: cadetData.medicalCondition || '',
         hemoglobinLevel: cadetData.hemoglobinLevel || '',
+        // Physical Test
+        ppt: cadetData.ppt || '',
+        ipet: cadetData.ipet || '',
+        bpet: cadetData.bpet || '',
+        swm: cadetData.swm || '',
       })
     } catch (err) {
       console.error('Error fetching data:', err)
@@ -254,6 +269,11 @@ export default function EditCadetPage({
         surgeryHistory: formData.surgeryHistory || undefined,
         medicalCondition: formData.medicalCondition || undefined,
         hemoglobinLevel: formData.hemoglobinLevel ? parseFloat(formData.hemoglobinLevel) : undefined,
+        // Physical Test
+        ppt: formData.ppt || undefined,
+        ipet: formData.ipet || undefined,
+        bpet: formData.bpet || undefined,
+        swm: formData.swm || undefined,
       }
 
       const response = await fetch(`/api/cadets/${cadetId}`, {
@@ -550,6 +570,46 @@ export default function EditCadetPage({
                     <option value="Female">Female</option>
                   </select>
                 </div>
+              </div>
+            </div>
+
+            {/* Physical Test Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2">
+                Physical Test
+              </h3>
+              <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                {['PPT', 'IPET', 'BPET', 'SWM'].map((test) => (
+                  <div key={test} className="flex items-center justify-between max-w-md">
+                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {test}
+                    </label>
+                    <div className="flex gap-4">
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name={test.toLowerCase()}
+                          value="Pass"
+                          checked={formData[test.toLowerCase() as keyof typeof formData] === 'Pass'}
+                          onChange={handleInputChange}
+                          className="mr-2"
+                        />
+                        Pass
+                      </label>
+                      <label className="flex items-center">
+                        <input
+                          type="radio"
+                          name={test.toLowerCase()}
+                          value="Fail"
+                          checked={formData[test.toLowerCase() as keyof typeof formData] === 'Fail'}
+                          onChange={handleInputChange}
+                          className="mr-2"
+                        />
+                        Fail
+                      </label>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 

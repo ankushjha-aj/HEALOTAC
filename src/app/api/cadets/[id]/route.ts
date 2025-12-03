@@ -62,7 +62,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { name, battalion, company, joinDate, academyNumber, height, weight, age, course, sex, relegated } = await request.json()
+    const { name, battalion, company, joinDate, academyNumber, height, weight, age, course, sex, relegated, ppt, ipet, bpet, swm } = await request.json()
 
     const [updatedCadet] = await db
       .update(cadets)
@@ -78,6 +78,10 @@ export async function PUT(
         course,
         sex,
         relegated,
+        ppt,
+        ipet,
+        bpet,
+        swm,
         updatedAt: new Date(),
       })
       .where(eq(cadets.id, parseInt(params.id)))
@@ -178,6 +182,20 @@ export async function PATCH(
     }
     if ('hemoglobinLevel' in updates) {
       updateData.hemoglobinLevel = updates.hemoglobinLevel ? parseFloat(updates.hemoglobinLevel) : null
+    }
+
+    // Handle Physical Test updates
+    if ('ppt' in updates) {
+      updateData.ppt = updates.ppt || null
+    }
+    if ('ipet' in updates) {
+      updateData.ipet = updates.ipet || null
+    }
+    if ('bpet' in updates) {
+      updateData.bpet = updates.bpet || null
+    }
+    if ('swm' in updates) {
+      updateData.swm = updates.swm || null
     }
 
     if (Object.keys(updateData).length === 0) {

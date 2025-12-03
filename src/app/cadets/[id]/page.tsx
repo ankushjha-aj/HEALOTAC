@@ -79,6 +79,11 @@ interface CadetInfo {
   surgeryHistory?: string
   medicalCondition?: string
   hemoglobinLevel?: string
+  // Physical Test
+  ppt?: string
+  ipet?: string
+  bpet?: string
+  swm?: string
 }
 
 interface MedicalRecord {
@@ -253,7 +258,7 @@ export default function CadetDetailsPage({
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           totalTrainingDaysMissed: daysMissed,
           medicalStatus: 'Completed' // Mark the admission as completed when cadet returns
         })
@@ -296,7 +301,7 @@ export default function CadetDetailsPage({
   }, 0)
 
   // Memoize active admission check to prevent unnecessary re-renders
-  const hasActiveAdmission = useMemo(() => 
+  const hasActiveAdmission = useMemo(() =>
     medicalRecords.some(record => record.admittedInMH === 'Yes' && record.medicalStatus === 'Active'),
     [medicalRecords]
   )
@@ -332,45 +337,45 @@ export default function CadetDetailsPage({
     if (!cadetInfo) return
 
     const doc = new jsPDF()
-    
+
     // Set up colors and styling
     const primaryColor = [0, 83, 156] // Navy blue
     const secondaryColor = [100, 100, 100] // Gray
     const accentColor = [220, 38, 38] // Red for important info
-    
+
     let yPos = 18
-    
+
     // Header Section
     doc.setFillColor(240, 240, 240)
     doc.rect(0, 0, 210, 40, 'F')
-    
+
     // Header Text
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(18)
     doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2])
     doc.text('MI ROOM', 105, yPos + 12, { align: 'center' })
-    
+
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
     doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
     doc.text('OFFICERS TRAINING ACADEMY - CHENNAI', 105, yPos + 25, { align: 'center' })
-    
+
     // Header border
     doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2])
     doc.setLineWidth(0.5)
     doc.rect(10, 10, 190, 25)
-    
+
     yPos = 50
-    
+
     // Main Content Section
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     doc.setTextColor(0, 0, 0)
-    
+
     // Left Column - Basic Info
     let leftX = 15
     let rightX = 110
-    
+
     // Academy Number
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
@@ -378,9 +383,9 @@ export default function CadetDetailsPage({
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     doc.text(cadetInfo.academyNumber ? String(cadetInfo.academyNumber) : 'ACADEMY NUMBER', leftX + 35, yPos)
-    
+
     yPos += 8
-    
+
     // Name
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
@@ -388,9 +393,9 @@ export default function CadetDetailsPage({
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     doc.text(cadetInfo.name || '', leftX + 15, yPos)
-    
+
     yPos += 8
-    
+
     // Company
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
@@ -398,9 +403,9 @@ export default function CadetDetailsPage({
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     doc.text(cadetInfo.company || '', leftX + 20, yPos)
-    
+
     yPos += 8
-    
+
     // Battalion
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
@@ -408,9 +413,9 @@ export default function CadetDetailsPage({
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     doc.text(cadetInfo.battalion || '', leftX + 22, yPos)
-    
+
     yPos += 8
-    
+
     // Date of Reporting (use profile generation date)
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
@@ -418,27 +423,27 @@ export default function CadetDetailsPage({
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     doc.text(new Date().toLocaleDateString(), leftX + 40, yPos)
-    
+
     yPos += 15
-    
+
     // Total Training Days of Absence Due to Medical Category
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('TOTAL TRG DAYS OF ABSENCE DUE TO MEDICAL CATEGORY:', leftX, yPos)
     yPos += 6
-    
+
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     doc.text(totalTrainingDaysMissed.toFixed(2), leftX + 10, yPos)
-    
+
     yPos += 15
-    
+
     // Diagnosis or Prescription (Cadet Profile Info)
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('DIAGNOSIS OR PRESCRIPTION:', leftX, yPos)
     yPos += 6
-    
+
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     const profileInfo = [
@@ -451,38 +456,38 @@ export default function CadetDetailsPage({
       `Join Date: ${new Date(cadetInfo.joinDate).toLocaleDateString()}`,
       `Medical Records: ${medicalRecords.length} record${medicalRecords.length !== 1 ? 's' : ''}`
     ].join('\n')
-    
+
     const lines = doc.splitTextToSize(profileInfo, 80)
     doc.text(lines, leftX + 5, yPos)
     yPos += lines.length * 4
-    
+
     yPos += 10
-    
+
     // Remarks (empty for cadet profile)
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('REMARKS:', leftX, yPos)
     yPos += 6
-    
+
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     doc.text('', leftX + 5, yPos)
-    
+
     yPos += 15
-    
+
     // What was given section (empty for cadet profile)
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('WHAT WAS GIVEN:', leftX, yPos)
     yPos += 8
-    
+
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(9)
     doc.text('', leftX + 5, yPos)
-    
+
     // Right Column - Vital Signs (blank for manual filling)
     yPos = 50 // Reset to top for right column
-    
+
     // Temp
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
@@ -490,82 +495,82 @@ export default function CadetDetailsPage({
     doc.setDrawColor(0, 0, 0)
     doc.setLineWidth(0.3)
     doc.line(rightX + 12, yPos + 2, rightX + 40, yPos + 2)
-    
+
     yPos += 8
-    
+
     // BP
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('BP:', rightX, yPos)
     doc.line(rightX + 8, yPos + 2, rightX + 40, yPos + 2)
-    
+
     yPos += 8
-    
+
     // Pulse
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('PULSE:', rightX, yPos)
     doc.line(rightX + 15, yPos + 2, rightX + 40, yPos + 2)
-    
+
     yPos += 8
-    
+
     // SpO2
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('SpO2:', rightX, yPos)
     doc.line(rightX + 12, yPos + 2, rightX + 40, yPos + 2)
-    
+
     yPos += 12
-    
+
     // Pallor
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('PALLOR:', rightX, yPos)
     doc.line(rightX + 15, yPos + 2, rightX + 40, yPos + 2)
-    
+
     yPos += 8
-    
+
     // Oedema
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('OEDEMA:', rightX, yPos)
     doc.line(rightX + 17, yPos + 2, rightX + 40, yPos + 2)
-    
+
     yPos += 8
-    
+
     // Icterus
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(10)
     doc.text('ICTERUS:', rightX, yPos)
     doc.line(rightX + 17, yPos + 2, rightX + 40, yPos + 2)
-    
+
     yPos += 15
-    
+
     // Signature Section at bottom
     yPos = 250
-    
+
     // Draw signature lines
     doc.setDrawColor(0, 0, 0)
     doc.setLineWidth(0.3)
-    
+
     doc.line(20, yPos, 80, yPos) // Doctor signature line
     doc.line(130, yPos, 180, yPos) // Date line
-    
+
     yPos += 5
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
     doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
     doc.text("Doctor's Signature", 20, yPos)
     doc.text('Date', 130, yPos)
-    
+
     yPos += 15
-    
+
     // Footer
     doc.setFontSize(8)
     doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2])
     doc.text('This document is generated electronically by HEALOTAC Medical Records Management System', 105, 280, { align: 'center' })
     doc.text(`Record created on: ${new Date().toLocaleDateString()}`, 105, 285, { align: 'center' })
-    
+
     // Save the PDF
     const fileName = `MI_ROOM_${cadetInfo.name.replace(/\s+/g, '_')}_${cadetId}.pdf`
     doc.save(fileName)
@@ -598,214 +603,214 @@ export default function CadetDetailsPage({
     )
   }
 
-    return (
-      <DashboardLayout>
-        <div className="max-w-6xl mx-auto space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <Link
-              href="/cadets"
-              className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Cadets
-            </Link>
+  return (
+    <DashboardLayout>
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <Link
+            href="/cadets"
+            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Cadets
+          </Link>
 
-            <div className="text-right">
-              <div className="space-y-1">
-                <div className="text-sm font-semibold text-gray-500 dark:text-gray-400">Cadet ID</div>
-                <div className="text-2xl font-bold text-primary">#{cadetId}</div>
-              </div>
+          <div className="text-right">
+            <div className="space-y-1">
+              <div className="text-sm font-semibold text-gray-500 dark:text-gray-400">Cadet ID</div>
+              <div className="text-2xl font-bold text-primary">#{cadetId}</div>
             </div>
           </div>
+        </div>
 
-          {/* Cadet Info Card */}
-          <div className="card p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-6">
-                <div className="h-20 w-20 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                  <span className="text-primary font-bold text-2xl">
-                    {cadetInfo.name.split(' ').map((n: string) => n[0]).join('')}
-                  </span>
+        {/* Cadet Info Card */}
+        <div className="card p-6">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-6">
+              <div className="h-20 w-20 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+                <span className="text-primary font-bold text-2xl">
+                  {cadetInfo.name.split(' ').map((n: string) => n[0]).join('')}
+                </span>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      {cadetInfo.name}
+                      {cadetInfo.relegated === 'Y' && (
+                        <>
+                          <span className="text-red-600 dark:text-red-400 font-bold">R</span>
+                          <span className="w-3 h-3 bg-red-500 rounded-full"></span>
+                        </>
+                      )}
+                    </h1>
+                    <Link
+                      href={`/cadets/${cadetId}/edit`}
+                      className="inline-flex items-center justify-center p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                      title="Edit cadet information"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                    </Link>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-4">
+                    <MapPin className="h-4 w-4" />
+                    <span>{cadetInfo.company} Company, {cadetInfo.battalion}</span>
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        {cadetInfo.name}
-                        {cadetInfo.relegated === 'Y' && (
-                          <>
-                            <span className="text-red-600 dark:text-red-400 font-bold">R</span>
-                            <span className="w-3 h-3 bg-red-500 rounded-full"></span>
-                          </>
-                        )}
-                      </h1>
-                      <Link
-                        href={`/cadets/${cadetId}/edit`}
-                        className="inline-flex items-center justify-center p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                        title="Edit cadet information"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                      </Link>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-4">
-                      <MapPin className="h-4 w-4" />
-                      <span>{cadetInfo.company} Company, {cadetInfo.battalion}</span>
+
+                {/* Basic Info Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Join Date</p>
+                      <p className="text-sm font-medium">{new Date(cadetInfo.joinDate).toLocaleDateString()}</p>
                     </div>
                   </div>
 
-                  {/* Basic Info Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-primary" />
-                      <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Join Date</p>
-                        <p className="text-sm font-medium">{new Date(cadetInfo.joinDate).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-
-                    {cadetInfo.academyNumber && (
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-primary" />
-                        <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Academy Number</p>
-                          <p className="text-sm font-medium">{cadetInfo.academyNumber}</p>
-                        </div>
-                      </div>
-                    )}
-
+                  {cadetInfo.academyNumber && (
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4 text-primary" />
                       <div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Medical Records</p>
-                        <p className="text-sm font-medium">{medicalRecords.length}</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-red-500" />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Days Missed</p>
-                          <div className="relative group">
-                            <Info className="h-3 w-3 text-gray-400 cursor-help" />
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                              Sundays are not included in the calculation
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-sm font-medium text-red-600 dark:text-red-400">{totalTrainingDaysMissed.toFixed(2)}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Demographics Section */}
-                  {(cadetInfo.height || cadetInfo.weight || cadetInfo.age || cadetInfo.course || cadetInfo.sex || cadetInfo.academyNumber) && (
-                    <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Demographics</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                        {cadetInfo.height && (
-                          <div className="flex items-center gap-2">
-                            <Ruler className="h-4 w-4 text-primary" />
-                            <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Height</p>
-                              <p className="text-sm font-medium">{cadetInfo.height} cm</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {cadetInfo.initialWeight && (
-                          <div className="flex items-center gap-2">
-                            <Weight className="h-4 w-4 text-primary" />
-                            <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Initial Weight</p>
-                              <p className="text-sm font-medium">{cadetInfo.initialWeight} kg</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {cadetInfo.currentWeight && (
-                          <div className="flex items-center gap-2">
-                            <Weight className="h-4 w-4 text-primary" />
-                            <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Current Weight</p>
-                              <p className="text-sm font-medium">{cadetInfo.currentWeight} kg</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {cadetInfo.age && (
-                          <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-primary" />
-                            <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Age</p>
-                              <p className="text-sm font-medium">{cadetInfo.age} years</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {cadetInfo.course && (
-                          <div className="flex items-center gap-2">
-                            <GraduationCap className="h-4 w-4 text-primary" />
-                            <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Course</p>
-                              <p className="text-sm font-medium">{cadetInfo.course}</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {cadetInfo.sex && (
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4 text-primary" />
-                            <div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sex</p>
-                              <p className="text-sm font-medium">{cadetInfo.sex}</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Edit Button removed - now next to name */}
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Academy Number</p>
+                        <p className="text-sm font-medium">{cadetInfo.academyNumber}</p>
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
-            </div>
 
-            {/* Show More Button - Bottom Right Corner */}
-            <div className="flex justify-end mt-4">
-              <button
-                id="showMoreCadetInfo"
-                onClick={() => setShowMoreCadetInfo(!showMoreCadetInfo)}
-                className="text-primary hover:text-primary/80 text-sm font-medium transition-colors cursor-pointer"
-              >
-                {showMoreCadetInfo ? 'Hide complete info' : 'Show complete info'}
-              </button>
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-primary" />
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Medical Records</p>
+                      <p className="text-sm font-medium">{medicalRecords.length}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-red-500" />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Days Missed</p>
+                        <div className="relative group">
+                          <Info className="h-3 w-3 text-gray-400 cursor-help" />
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                            Sundays are not included in the calculation
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm font-medium text-red-600 dark:text-red-400">{totalTrainingDaysMissed.toFixed(2)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Demographics Section */}
+                {(cadetInfo.height || cadetInfo.weight || cadetInfo.age || cadetInfo.course || cadetInfo.sex || cadetInfo.academyNumber) && (
+                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Demographics</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                      {cadetInfo.height && (
+                        <div className="flex items-center gap-2">
+                          <Ruler className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Height</p>
+                            <p className="text-sm font-medium">{cadetInfo.height} cm</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {cadetInfo.initialWeight && (
+                        <div className="flex items-center gap-2">
+                          <Weight className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Initial Weight</p>
+                            <p className="text-sm font-medium">{cadetInfo.initialWeight} kg</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {cadetInfo.currentWeight && (
+                        <div className="flex items-center gap-2">
+                          <Weight className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Current Weight</p>
+                            <p className="text-sm font-medium">{cadetInfo.currentWeight} kg</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {cadetInfo.age && (
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Age</p>
+                            <p className="text-sm font-medium">{cadetInfo.age} years</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {cadetInfo.course && (
+                        <div className="flex items-center gap-2">
+                          <GraduationCap className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Course</p>
+                            <p className="text-sm font-medium">{cadetInfo.course}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {cadetInfo.sex && (
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sex</p>
+                            <p className="text-sm font-medium">{cadetInfo.sex}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Edit Button removed - now next to name */}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Expanded Cadet Information */}
-          {showMoreCadetInfo && (
-            <div className="card p-6 animate-in slide-in-from-top-2 duration-300">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Complete Cadet Information</h3>
-                {isFemaleCadet && hasMenstrualData && (
-                  <button
-                    onClick={() => setShowMenstrualModal(true)}
-                    className="text-primary hover:text-primary/80 text-sm font-medium transition-colors cursor-pointer"
-                  >
-                    Show Menstrual health
-                  </button>
-                )}
-              </div>
+          {/* Show More Button - Bottom Right Corner */}
+          <div className="flex justify-end mt-4">
+            <button
+              id="showMoreCadetInfo"
+              onClick={() => setShowMoreCadetInfo(!showMoreCadetInfo)}
+              className="text-primary hover:text-primary/80 text-sm font-medium transition-colors cursor-pointer"
+            >
+              {showMoreCadetInfo ? 'Hide complete info' : 'Show complete info'}
+            </button>
+          </div>
+        </div>
 
-              {/* Health Parameters Section */}
-              {(cadetInfo.bloodGroup || cadetInfo.bmi || cadetInfo.bodyFat || cadetInfo.calcanealBoneDensity ||
-                cadetInfo.bp || cadetInfo.pulse || cadetInfo.so2 || cadetInfo.bcaFat ||
-                cadetInfo.ecg || cadetInfo.temp || cadetInfo.smmKg || cadetInfo.pastMedicalHistory) && (
+        {/* Expanded Cadet Information */}
+        {showMoreCadetInfo && (
+          <div className="card p-6 animate-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Complete Cadet Information</h3>
+              {isFemaleCadet && hasMenstrualData && (
+                <button
+                  onClick={() => setShowMenstrualModal(true)}
+                  className="text-primary hover:text-primary/80 text-sm font-medium transition-colors cursor-pointer"
+                >
+                  Show Menstrual health
+                </button>
+              )}
+            </div>
+
+            {/* Health Parameters Section */}
+            {(cadetInfo.bloodGroup || cadetInfo.bmi || cadetInfo.bodyFat || cadetInfo.calcanealBoneDensity ||
+              cadetInfo.bp || cadetInfo.pulse || cadetInfo.so2 || cadetInfo.bcaFat ||
+              cadetInfo.ecg || cadetInfo.temp || cadetInfo.smmKg || cadetInfo.pastMedicalHistory) && (
                 <div className="mb-6">
                   <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Health Parameters</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pl-4 border-l-2 border-blue-200 dark:border-blue-600">
@@ -885,10 +890,10 @@ export default function CadetDetailsPage({
                 </div>
               )}
 
-              {/* Vaccination Status Section */}
-              {(cadetInfo.covidDose1 !== undefined || cadetInfo.hepatitisBDose1 !== undefined ||
-                cadetInfo.tetanusToxoid !== undefined || cadetInfo.chickenPoxDose1 !== undefined ||
-                cadetInfo.yellowFever !== undefined) && (
+            {/* Vaccination Status Section */}
+            {(cadetInfo.covidDose1 !== undefined || cadetInfo.hepatitisBDose1 !== undefined ||
+              cadetInfo.tetanusToxoid !== undefined || cadetInfo.chickenPoxDose1 !== undefined ||
+              cadetInfo.yellowFever !== undefined) && (
                 <div className="mb-6">
                   <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Vaccination Status</h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pl-4 border-l-2 border-green-200 dark:border-green-600">
@@ -973,14 +978,56 @@ export default function CadetDetailsPage({
                 </div>
               )}
 
-              {/* Physical Tests Section */}
-              {(cadetInfo.enduranceTest || cadetInfo.agilityTest || cadetInfo.speedTest ||
-                cadetInfo.verticalJump || cadetInfo.ballThrow || cadetInfo.lowerBackStrength ||
-                cadetInfo.shoulderDynamometerLeft || cadetInfo.shoulderDynamometerRight ||
-                cadetInfo.handGripDynamometerLeft || cadetInfo.handGripDynamometerRight) && (
+            {/* Physical Tests Section */}
+            {(cadetInfo.enduranceTest || cadetInfo.agilityTest || cadetInfo.speedTest ||
+              cadetInfo.verticalJump || cadetInfo.ballThrow || cadetInfo.lowerBackStrength ||
+              cadetInfo.shoulderDynamometerLeft || cadetInfo.shoulderDynamometerRight ||
+              cadetInfo.handGripDynamometerLeft || cadetInfo.handGripDynamometerRight ||
+              cadetInfo.ppt || cadetInfo.ipet || cadetInfo.bpet || cadetInfo.swm) && (
                 <div className="mb-6">
                   <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Physical Tests</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4 border-l-2 border-orange-200 dark:border-orange-600">
+
+                    {/* Physical Proficiency Tests */}
+                    {(cadetInfo.ppt || cadetInfo.ipet || cadetInfo.bpet || cadetInfo.swm) && (
+                      <div>
+                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Physical Proficiency Tests</h5>
+                        <div className="space-y-2">
+                          {cadetInfo.ppt && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">PPT:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.ppt === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.ppt === 'Pass' ? '✓ Pass' : '✗ Fail'}
+                              </span>
+                            </div>
+                          )}
+                          {cadetInfo.ipet && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">IPET:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.ipet === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.ipet === 'Pass' ? '✓ Pass' : '✗ Fail'}
+                              </span>
+                            </div>
+                          )}
+                          {cadetInfo.bpet && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">BPET:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.bpet === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.bpet === 'Pass' ? '✓ Pass' : '✗ Fail'}
+                              </span>
+                            </div>
+                          )}
+                          {cadetInfo.swm && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">SWM:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.swm === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.swm === 'Pass' ? '✓ Pass' : '✗ Fail'}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Endurance, Agility, Speed Tests */}
                     {(cadetInfo.enduranceTest || cadetInfo.agilityTest || cadetInfo.speedTest) && (
@@ -1013,178 +1060,178 @@ export default function CadetDetailsPage({
                     {(cadetInfo.verticalJump || cadetInfo.ballThrow || cadetInfo.lowerBackStrength ||
                       cadetInfo.shoulderDynamometerLeft || cadetInfo.shoulderDynamometerRight ||
                       cadetInfo.handGripDynamometerLeft || cadetInfo.handGripDynamometerRight) && (
-                      <div>
-                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Strength Tests</h5>
-                        <div className="space-y-2">
-                          {cadetInfo.verticalJump && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Vertical Jump:</span>
-                              <span className="text-sm font-medium">{cadetInfo.verticalJump}</span>
-                            </div>
-                          )}
-                          {cadetInfo.ballThrow && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ball Throw:</span>
-                              <span className="text-sm font-medium">{cadetInfo.ballThrow}</span>
-                            </div>
-                          )}
-                          {cadetInfo.lowerBackStrength && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Lower Back:</span>
-                              <span className="text-sm font-medium">{cadetInfo.lowerBackStrength}</span>
-                            </div>
-                          )}
-                          {cadetInfo.shoulderDynamometerLeft && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Shoulder Left:</span>
-                              <span className="text-sm font-medium">{cadetInfo.shoulderDynamometerLeft}</span>
-                            </div>
-                          )}
-                          {cadetInfo.shoulderDynamometerRight && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Shoulder Right:</span>
-                              <span className="text-sm font-medium">{cadetInfo.shoulderDynamometerRight}</span>
-                            </div>
-                          )}
-                          {cadetInfo.handGripDynamometerLeft && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hand Grip Left:</span>
-                              <span className="text-sm font-medium">{cadetInfo.handGripDynamometerLeft}</span>
-                            </div>
-                          )}
-                          {cadetInfo.handGripDynamometerRight && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hand Grip Right:</span>
-                              <span className="text-sm font-medium">{cadetInfo.handGripDynamometerRight}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Overall Assessment */}
-              {cadetInfo.overallAssessment && (
-                <div className="mb-6">
-                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Overall Assessment</h4>
-                  <div className="pl-4 border-l-2 border-purple-200 dark:border-purple-600">
-                    <p className="text-sm bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">{cadetInfo.overallAssessment}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* NOK Contact */}
-              <div className="mb-6">
-                <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Emergency Contact</h4>
-                <div className="pl-4 border-l-2 border-red-200 dark:border-red-600">
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-red-500" />
-                    <div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Next of Kin Contact</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {cadetInfo.nokContact || 'Not provided'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          )}
-
-          {/* Medical History Section */}
-          <div className="card">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                      Medical History
-                    </h2>
-                    <div className="flex items-center gap-3">
-                      {/* Records per page selector */}
-                      <div className="flex items-center gap-2">
-                        <label htmlFor="records-per-page" className="text-sm text-gray-600 dark:text-gray-400">
-                          Records per page:
-                        </label>
-                        <select
-                          id="records-per-page"
-                          value={pagination.itemsPerPage}
-                          onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
-                          className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                        >
-                          <option value={5}>5</option>
-                          <option value={10}>10</option>
-                          <option value={20}>20</option>
-                          <option value={30}>30</option>
-                          <option value={50}>50</option>
-                        </select>
-                      </div>
-                      {(() => {
-                        return hasActiveAdmission ? (
-                          <div
-                            className="inline-flex items-center justify-center p-2 bg-gray-400 text-gray-200 rounded-lg cursor-not-allowed"
-                            title="Cannot add new records while cadet is admitted to MH/BH/CH. Mark as returned first."
-                          >
-                            <Plus className="h-4 w-4" />
+                        <div>
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Strength Tests</h5>
+                          <div className="space-y-2">
+                            {cadetInfo.verticalJump && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Vertical Jump:</span>
+                                <span className="text-sm font-medium">{cadetInfo.verticalJump}</span>
+                              </div>
+                            )}
+                            {cadetInfo.ballThrow && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ball Throw:</span>
+                                <span className="text-sm font-medium">{cadetInfo.ballThrow}</span>
+                              </div>
+                            )}
+                            {cadetInfo.lowerBackStrength && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Lower Back:</span>
+                                <span className="text-sm font-medium">{cadetInfo.lowerBackStrength}</span>
+                              </div>
+                            )}
+                            {cadetInfo.shoulderDynamometerLeft && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Shoulder Left:</span>
+                                <span className="text-sm font-medium">{cadetInfo.shoulderDynamometerLeft}</span>
+                              </div>
+                            )}
+                            {cadetInfo.shoulderDynamometerRight && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Shoulder Right:</span>
+                                <span className="text-sm font-medium">{cadetInfo.shoulderDynamometerRight}</span>
+                              </div>
+                            )}
+                            {cadetInfo.handGripDynamometerLeft && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hand Grip Left:</span>
+                                <span className="text-sm font-medium">{cadetInfo.handGripDynamometerLeft}</span>
+                              </div>
+                            )}
+                            {cadetInfo.handGripDynamometerRight && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hand Grip Right:</span>
+                                <span className="text-sm font-medium">{cadetInfo.handGripDynamometerRight}</span>
+                              </div>
+                            )}
                           </div>
-                        ) : (
-                          <Link
-                            href={`/medical-records/new?cadetId=${cadetId}`}
-                            className="inline-flex items-center justify-center p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                            title="Add another medical record"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Link>
-                        )
-                      })()}
-                    </div>
+                        </div>
+                      )}
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400 mt-2">
-                    Complete medical record history for {cadetInfo.name}
-                  </p>
-                  {/* Record count display */}
-                  {medicalRecords.length > 0 && (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, medicalRecords.length)} of {medicalRecords.length} records
+                </div>
+              )}
+
+            {/* Overall Assessment */}
+            {cadetInfo.overallAssessment && (
+              <div className="mb-6">
+                <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Overall Assessment</h4>
+                <div className="pl-4 border-l-2 border-purple-200 dark:border-purple-600">
+                  <p className="text-sm bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">{cadetInfo.overallAssessment}</p>
+                </div>
+              </div>
+            )}
+
+            {/* NOK Contact */}
+            <div className="mb-6">
+              <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Emergency Contact</h4>
+              <div className="pl-4 border-l-2 border-red-200 dark:border-red-600">
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-red-500" />
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Next of Kin Contact</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {cadetInfo.nokContact || 'Not provided'}
                     </p>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="p-6">
-              {medicalRecords.length === 0 ? (
-                <div className="text-center py-12">
-                  <Activity className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                    No Medical Records
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">
-                    This cadet has no medical records yet.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <MedicalRecordsList records={pagination.getVisibleItems(medicalRecords)} cadetId={cadetId} cadetInfo={cadetInfo} onReturn={handleReturn} />
+          </div>
+        )}
 
-                  {/* Pagination Controls */}
-                  <div className="mt-6 flex flex-col items-center gap-4">
-                    <PaginationControls
-                      currentPage={pagination.currentPage}
-                      totalPages={pagination.totalPages}
-                      onPageChange={pagination.goToPage}
-                      hasNextPage={pagination.hasNextPage}
-                      hasPrevPage={pagination.hasPrevPage}
-                    />
+        {/* Medical History Section */}
+        <div className="card">
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    Medical History
+                  </h2>
+                  <div className="flex items-center gap-3">
+                    {/* Records per page selector */}
+                    <div className="flex items-center gap-2">
+                      <label htmlFor="records-per-page" className="text-sm text-gray-600 dark:text-gray-400">
+                        Records per page:
+                      </label>
+                      <select
+                        id="records-per-page"
+                        value={pagination.itemsPerPage}
+                        onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
+                        className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                        <option value={30}>30</option>
+                        <option value={50}>50</option>
+                      </select>
+                    </div>
+                    {(() => {
+                      return hasActiveAdmission ? (
+                        <div
+                          className="inline-flex items-center justify-center p-2 bg-gray-400 text-gray-200 rounded-lg cursor-not-allowed"
+                          title="Cannot add new records while cadet is admitted to MH/BH/CH. Mark as returned first."
+                        >
+                          <Plus className="h-4 w-4" />
+                        </div>
+                      ) : (
+                        <Link
+                          href={`/medical-records/new?cadetId=${cadetId}`}
+                          className="inline-flex items-center justify-center p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                          title="Add another medical record"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Link>
+                      )
+                    })()}
                   </div>
-                </>
-              )}
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 mt-2">
+                  Complete medical record history for {cadetInfo.name}
+                </p>
+                {/* Record count display */}
+                {medicalRecords.length > 0 && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, medicalRecords.length)} of {medicalRecords.length} records
+                  </p>
+                )}
+              </div>
             </div>
           </div>
+
+          <div className="p-6">
+            {medicalRecords.length === 0 ? (
+              <div className="text-center py-12">
+                <Activity className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  No Medical Records
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  This cadet has no medical records yet.
+                </p>
+              </div>
+            ) : (
+              <>
+                <MedicalRecordsList records={pagination.getVisibleItems(medicalRecords)} cadetId={cadetId} cadetInfo={cadetInfo} onReturn={handleReturn} />
+
+                {/* Pagination Controls */}
+                <div className="mt-6 flex flex-col items-center gap-4">
+                  <PaginationControls
+                    currentPage={pagination.currentPage}
+                    totalPages={pagination.totalPages}
+                    onPageChange={pagination.goToPage}
+                    hasNextPage={pagination.hasNextPage}
+                    hasPrevPage={pagination.hasPrevPage}
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </div>
+      </div>
 
       {/* Menstrual Health Modal */}
       {showMenstrualModal && cadetInfo && (
@@ -1323,5 +1370,5 @@ export default function CadetDetailsPage({
         </div>
       )}
     </DashboardLayout>
-    )
+  )
 }
