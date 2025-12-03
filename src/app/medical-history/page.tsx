@@ -42,6 +42,7 @@ export default function MedicalHistoryPage() {
   })
   const [showCompanySuggestions, setShowCompanySuggestions] = useState(false)
   const [statusFilter, setStatusFilter] = useState('all')
+  const [foreignFilter, setForeignFilter] = useState('all')
   const [currentDateTime, setCurrentDateTime] = useState<string>('')
   const [updatingRecordId, setUpdatingRecordId] = useState<number | null>(null)
 
@@ -221,7 +222,13 @@ export default function MedicalHistoryPage() {
 
     const bloodGroupMatch = !filters.bloodGroup || (record.bloodGroup && record.bloodGroup === filters.bloodGroup)
 
-    const matchesSearch = nameMatch && companyMatch && battalionMatch && problemMatch && bloodGroupMatch
+    const foreignMatch = foreignFilter === 'all'
+      ? true
+      : foreignFilter === 'yes'
+        ? record.isForeign
+        : !record.isForeign
+
+    const matchesSearch = nameMatch && companyMatch && battalionMatch && problemMatch && bloodGroupMatch && foreignMatch
 
     let matchesStatus = true
     if (statusFilter === 'Active') {
@@ -374,7 +381,7 @@ export default function MedicalHistoryPage() {
         <div className="card p-4">
           <div className="space-y-4">
             {/* Multi-filter Search Inputs */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4">
               {/* Name Filter */}
               <div>
                 <label htmlFor="filter-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -529,22 +536,14 @@ export default function MedicalHistoryPage() {
                   <option value="O-">O-</option>
                 </select>
               </div>
-            </div>
 
-            {/* Clear Filters Button */}
-            <div className="flex justify-end">
-              <button
-                onClick={() => setFilters({ name: '', company: '', battalion: '', medicalProblem: '', bloodGroup: '' })}
-                className="text-sm text-primary hover:text-primary/80 font-medium"
-                disabled={!filters.name && !filters.company && !filters.battalion && !filters.medicalProblem && !filters.bloodGroup}
-              >
-                Clear all filters
-              </button>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-4">
-              <div className="flex gap-2 w-full sm:w-auto">
+              {/* Medical Status Filter */}
+              <div>
+                <label htmlFor="filter-status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Medical Status
+                </label>
                 <select
+                  id="filter-status"
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="input-field"
@@ -555,16 +554,36 @@ export default function MedicalHistoryPage() {
                   <option value="monitoring">Monitoring Cases</option>
                   <option value="admitted">Admitted in MH/BH/CH</option>
                 </select>
-                {/* Records per page selector */}
-                <div className="flex items-center gap-2">
-                  <label htmlFor="records-per-page" className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                    Records per page:
+              </div>
+
+              <div className="flex items-end gap-2">
+                {/* Foreign Cadets Dropdown */}
+                <div className="flex-1">
+                  <label htmlFor="filter-foreign" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Foreign
+                  </label>
+                  <select
+                    id="filter-foreign"
+                    value={foreignFilter}
+                    onChange={(e) => setForeignFilter(e.target.value)}
+                    className="input-field"
+                  >
+                    <option value="all">All</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+
+                {/* Records per Page */}
+                <div className="flex-1">
+                  <label htmlFor="records-per-page" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Records
                   </label>
                   <select
                     id="records-per-page"
                     value={pagination.itemsPerPage}
                     onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
-                    className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="input-field"
                   >
                     <option value={5}>5</option>
                     <option value={10}>10</option>
@@ -574,6 +593,21 @@ export default function MedicalHistoryPage() {
                   </select>
                 </div>
               </div>
+            </div>
+
+            {/* Clear Filters Button */}
+            <div className="flex justify-end">
+              <button
+                onClick={() => {
+                  setFilters({ name: '', company: '', battalion: '', medicalProblem: '', bloodGroup: '' })
+                  setStatusFilter('all')
+                  setForeignFilter('all')
+                }}
+                className="text-sm text-primary hover:text-primary/80 font-medium"
+                disabled={!filters.name && !filters.company && !filters.battalion && !filters.medicalProblem && !filters.bloodGroup && statusFilter === 'all' && foreignFilter === 'all'}
+              >
+                Clear all filters
+              </button>
             </div>
           </div>
 
