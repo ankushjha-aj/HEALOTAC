@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
         battalion: cadets.battalion,
         bloodGroup: cadets.bloodGroup,
         isForeign: cadets.isForeign,
+        academyNumber: cadets.academyNumber,
         // Medical record details
         dateOfReporting: medicalRecords.dateOfReporting,
         medicalProblem: medicalRecords.medicalProblem,

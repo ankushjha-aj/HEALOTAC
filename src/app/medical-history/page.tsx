@@ -27,6 +27,7 @@ interface MedicalRecord {
   admittedInMH?: string // New field for admission in MH/BH/CH
   bloodGroup?: string
   isForeign: boolean
+  academyNumber?: string
 }
 
 export default function MedicalHistoryPage() {
@@ -208,11 +209,12 @@ export default function MedicalHistoryPage() {
       setUpdatingRecordId(null)
     }
   }
-
   // Filter records based on search and status
   const filteredRecords = medicalRecords.filter(record => {
     // Apply multi-field filters
-    const nameMatch = !filters.name || record.name.toLowerCase().includes(filters.name.toLowerCase())
+    const nameMatch = !filters.name ||
+      record.name.toLowerCase().includes(filters.name.toLowerCase()) ||
+      (record.academyNumber && String(record.academyNumber).toLowerCase().includes(filters.name.toLowerCase()))
 
     const companyMatch = !filters.company || record.company.toLowerCase().includes(filters.company.toLowerCase())
 
@@ -385,7 +387,7 @@ export default function MedicalHistoryPage() {
               {/* Name Filter */}
               <div>
                 <label htmlFor="filter-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Cadet Name
+                  Name / Academy No.
                 </label>
                 <div className="relative">
                   <input
