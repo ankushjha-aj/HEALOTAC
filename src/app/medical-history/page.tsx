@@ -470,14 +470,40 @@ export default function MedicalHistoryPage() {
                 <label htmlFor="filter-problem" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Medical Problem
                 </label>
-                <input
-                  id="filter-problem"
-                  type="text"
-                  placeholder="Filter problem..."
-                  value={filters.medicalProblem}
-                  onChange={(e) => setFilters(prev => ({ ...prev, medicalProblem: e.target.value }))}
-                  className="input-field"
-                />
+                <div className="relative">
+                  <input
+                    id="filter-problem"
+                    type="text"
+                    placeholder="Filter problem..."
+                    value={filters.medicalProblem}
+                    onChange={(e) => setFilters(prev => ({ ...prev, medicalProblem: e.target.value }))}
+                    className="input-field pr-20"
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center">
+                    <select
+                      className="h-full py-0 pl-2 pr-2 border-none bg-transparent text-gray-500 text-xs focus:ring-0 cursor-pointer"
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setFilters(prev => ({ ...prev, medicalProblem: e.target.value }))
+                        }
+                      }}
+                      value=""
+                    >
+                      <option value="" disabled>Select</option>
+                      <option value="Head">Head</option>
+                      <option value="Chest">Chest</option>
+                      <option value="Shoulders">Shoulders</option>
+                      <option value="Back">Back</option>
+                      <option value="Pelvic">Pelvic</option>
+                      <option value="Knee">Knee</option>
+                      <option value="Ankle">Ankle</option>
+                      <option value="Elbow">Elbow</option>
+                      <option value="Wrist">Wrist</option>
+                      <option value="Hand">Hand</option>
+                      <option value="Foot">Foot</option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
               {/* Blood Group Filter */}
