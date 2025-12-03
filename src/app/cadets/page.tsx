@@ -72,6 +72,7 @@ export default function CadetsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showHighTrainingMissed, setShowHighTrainingMissed] = useState(false)
+  const [foreignFilter, setForeignFilter] = useState('all')
   const [navigatingToNewRecord, setNavigatingToNewRecord] = useState(false)
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
   const [cadetToDelete, setCadetToDelete] = useState<Cadet | null>(null)
@@ -232,6 +233,15 @@ export default function CadetsPage() {
       return false
     }
 
+    // Apply Foreign Cadet filter
+    // Apply Foreign Cadet filter
+    if (foreignFilter === 'yes' && !cadet.isForeign) {
+      return false
+    }
+    if (foreignFilter === 'no' && cadet.isForeign) {
+      return false
+    }
+
     // Then apply multi-field filters
     const nameMatch = !filters.name || cadet.name.toLowerCase().includes(filters.name.toLowerCase()) ||
       (cadet.academyNumber && cadet.academyNumber.toString().includes(filters.name))
@@ -257,7 +267,7 @@ export default function CadetsPage() {
   // Reset pagination to page 1 when search or filter changes
   useEffect(() => {
     pagination.goToPage(1)
-  }, [filters, showHighTrainingMissed, pagination])
+  }, [filters, showHighTrainingMissed, foreignFilter, pagination])
 
   // Get paginated cadets
   const paginatedCadets = useMemo(
@@ -340,7 +350,7 @@ export default function CadetsPage() {
         <div className="card p-4">
           <div className="space-y-4">
             {/* Multi-filter Search Inputs */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {/* Name / Academy Number Filter */}
               <div>
                 <label htmlFor="filter-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -469,39 +479,59 @@ export default function CadetsPage() {
                   <option value="O-">O-</option>
                 </select>
               </div>
-            </div>
 
-            {/* Clear Filters Button */}
-            <div className="flex justify-end">
-              <button
-                onClick={() => setFilters({ name: '', company: '', battalion: '', course: '', bloodGroup: '' })}
-                className="text-sm text-primary hover:text-primary/80 font-medium"
-                disabled={!filters.name && !filters.company && !filters.battalion && !filters.course && !filters.bloodGroup}
-              >
-                Clear all filters
-              </button>
-            </div>
+              <div className="flex items-end gap-2">
+                <div className="flex-1">
+                  <label htmlFor="filter-foreign" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Foreign Cadets
+                  </label>
+                  <select
+                    id="filter-foreign"
+                    value={foreignFilter}
+                    onChange={(e) => setForeignFilter(e.target.value)}
+                    className="input-field"
+                  >
+                    <option value="all">All</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
 
-            {/* Records per Page */}
-            <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
-              <div className="flex items-center gap-2">
-                <label htmlFor="records-per-page" className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                  Records per page:
-                </label>
-                <select
-                  id="records-per-page"
-                  value={pagination.itemsPerPage}
-                  onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
-                  className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                  <option value={30}>30</option>
-                  <option value={50}>50</option>
-                </select>
+                {/* Records per Page */}
+                <div className="flex-1">
+                  <label htmlFor="records-per-page" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Records / Page
+                  </label>
+                  <select
+                    id="records-per-page"
+                    value={pagination.itemsPerPage}
+                    onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
+                    className="input-field"
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={30}>30</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
               </div>
             </div>
+          </div>
+
+          {/* Clear Filters Button */}
+          <div className="flex justify-end">
+            <button
+              onClick={() => setFilters({ name: '', company: '', battalion: '', course: '', bloodGroup: '' })}
+              className="text-sm text-primary hover:text-primary/80 font-medium"
+              disabled={!filters.name && !filters.company && !filters.battalion && !filters.course && !filters.bloodGroup}
+            >
+              Clear all filters
+            </button>
+          </div>
+
+          {/* Records per Page - Moved to grid */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
 
             {/* Results Count */}
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -510,199 +540,201 @@ export default function CadetsPage() {
             </p>
           </div>
         </div>
+      </div>
 
-        {/* Cadets Table */}
-        <div className="card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-800/50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Cadet Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Battalion
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Company
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Training Days Missed
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Academy Number
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Course
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Join Date
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {paginatedCadets.map((cadet) => (
-                  <tr key={cadet.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 flex-shrink-0 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary font-medium">
-                            {cadet.name.split(' ').map(n => n[0]).join('')}
-                          </span>
-                        </div>
-                        <div className="ml-3 flex items-center gap-2">
-                          <Link
-                            href={`/cadets/${cadet.id}`}
-                            className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary"
-                          >
-                            {cadet.name}
-                          </Link>
-                          {cadet.relegated === 'Y' && (
-                            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-red-600 bg-red-100 rounded-full dark:text-red-400 dark:bg-red-900/30" title="Relegated">
-                              R
-                            </span>
-                          )}
-                          {cadet.isForeign && (
-                            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-blue-600 bg-blue-100 rounded-full dark:text-blue-400 dark:bg-blue-900/30" title="Foreign Cadet">
-                              F
-                            </span>
-                          )}
-                        </div>
+      {/* Cadets Table */}
+      <div className="card overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 dark:bg-gray-800/50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Cadet Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Battalion
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Company
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Training Days Missed
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Academy Number
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Course
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Join Date
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              {paginatedCadets.map((cadet) => (
+                <tr key={cadet.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 flex-shrink-0 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+                        <span className="text-primary font-medium">
+                          {cadet.name.split(' ').map(n => n[0]).join('')}
+                        </span>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {cadet.battalion}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {(() => {
-                          const companyMap: { [key: string]: string } = {
-                            'M': 'Meiktila',
-                            'N': 'Naushera',
-                            'Z': 'Zojila',
-                            'J': 'Jessami',
-                            'K': 'Kohima',
-                            'P': 'Phillora'
-                          }
-                          return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
-                        })()}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${cadet.totalTrainingMissed >= 30
-                        ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-                        : cadet.totalTrainingMissed > 0
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                          : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                        }`}>
-                        {cadet.totalTrainingMissed} days
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {cadet.academyNumber || 'N/A'}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {cadet.course || 'N/A'}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(cadet.joinDate).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="ml-3 flex items-center gap-2">
                         <Link
                           href={`/cadets/${cadet.id}`}
-                          className="text-primary hover:text-primary/80"
-                          title="View cadet details"
+                          className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary"
                         >
-                          View
+                          {cadet.name}
                         </Link>
-                        <Link
-                          href={`/cadets/${cadet.id}/edit`}
-                          className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                          title="Edit cadet information"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Link>
-                        {user?.role !== 'user' && (
-                          <button
-                            onClick={() => handleDeleteCadet(cadet)}
-                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                        {cadet.relegated === 'Y' && (
+                          <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-red-600 bg-red-100 rounded-full dark:text-red-400 dark:bg-red-900/30" title="Relegated">
+                            R
+                          </span>
+                        )}
+                        {cadet.isForeign && (
+                          <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-blue-600 bg-blue-100 rounded-full dark:text-blue-400 dark:bg-blue-900/30" title="Foreign Cadet">
+                            F
+                          </span>
                         )}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination Controls */}
-          {filteredCadets.length > 0 && (
-            <div className="mt-6 flex flex-col items-center gap-4">
-              <PaginationControls
-                currentPage={pagination.currentPage}
-                totalPages={pagination.totalPages}
-                onPageChange={pagination.goToPage}
-                hasNextPage={pagination.hasNextPage}
-                hasPrevPage={pagination.hasPrevPage}
-              />
-            </div>
-          )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {cadet.battalion}
+                    </p>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {(() => {
+                        const companyMap: { [key: string]: string } = {
+                          'M': 'Meiktila',
+                          'N': 'Naushera',
+                          'Z': 'Zojila',
+                          'J': 'Jessami',
+                          'K': 'Kohima',
+                          'P': 'Phillora'
+                        }
+                        return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
+                      })()}
+                    </p>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${cadet.totalTrainingMissed >= 30
+                      ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                      : cadet.totalTrainingMissed > 0
+                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                        : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                      }`}>
+                      {cadet.totalTrainingMissed} days
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {cadet.academyNumber || 'N/A'}
+                    </p>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {cadet.course || 'N/A'}
+                    </p>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {new Date(cadet.joinDate).toLocaleDateString()}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/cadets/${cadet.id}`}
+                        className="text-primary hover:text-primary/80"
+                        title="View cadet details"
+                      >
+                        View
+                      </Link>
+                      <Link
+                        href={`/cadets/${cadet.id}/edit`}
+                        className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                        title="Edit cadet information"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Link>
+                      {user?.role !== 'user' && (
+                        <button
+                          onClick={() => handleDeleteCadet(cadet)}
+                          className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+
+        {/* Pagination Controls */}
+        {filteredCadets.length > 0 && (
+          <div className="mt-6 flex flex-col items-center gap-4">
+            <PaginationControls
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              onPageChange={pagination.goToPage}
+              hasNextPage={pagination.hasNextPage}
+              hasPrevPage={pagination.hasPrevPage}
+            />
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteConfirmation && cadetToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowDeleteConfirmation(false)}>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  Confirm Cadet Deletion
-                </h3>
-              </div>
-              <div className="mb-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Are you sure you want to delete cadet &quot;{cadetToDelete.name}&quot;? <br />
-                  <strong className="text-red-600 dark:text-red-400">⚠️ WARNING:</strong> This will also delete all associated medical records for this cadet. <br />
-                  This action cannot be undone.
-                </p>
-              </div>
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setShowDeleteConfirmation(false)}
-                  className="btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmDeleteCadet}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                >
-                  Delete
-                </button>
+      {
+        showDeleteConfirmation && cadetToDelete && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowDeleteConfirmation(false)}>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                    Confirm Cadet Deletion
+                  </h3>
+                </div>
+                <div className="mb-6">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Are you sure you want to delete cadet &quot;{cadetToDelete.name}&quot;? <br />
+                    <strong className="text-red-600 dark:text-red-400">⚠️ WARNING:</strong> This will also delete all associated medical records for this cadet. <br />
+                    This action cannot be undone.
+                  </p>
+                </div>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setShowDeleteConfirmation(false)}
+                    className="btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmDeleteCadet}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </DashboardLayout>
+        )
+      }
+    </DashboardLayout >
   )
 }
