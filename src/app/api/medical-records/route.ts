@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
         company: cadets.company,
         battalion: cadets.battalion,
         bloodGroup: cadets.bloodGroup,
+        isForeign: cadets.isForeign,
         // Medical record details
         dateOfReporting: medicalRecords.dateOfReporting,
         medicalProblem: medicalRecords.medicalProblem,

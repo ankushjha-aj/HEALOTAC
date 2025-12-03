@@ -38,6 +38,8 @@ interface CadetData {
   ipet?: string
   bpet?: string
   swm?: string
+  isForeign?: boolean
+  country?: string
 }
 
 export default function EditCadetPage({
@@ -105,6 +107,8 @@ export default function EditCadetPage({
     ipet: '',
     bpet: '',
     swm: '',
+    isForeign: false,
+    country: '',
   })
 
   const fetchCadetAndFilters = useCallback(async () => {
@@ -188,6 +192,8 @@ export default function EditCadetPage({
         ipet: cadetData.ipet || '',
         bpet: cadetData.bpet || '',
         swm: cadetData.swm || '',
+        isForeign: !!cadetData.isForeign,
+        country: cadetData.country || '',
       })
     } catch (err) {
       console.error('Error fetching data:', err)
@@ -274,6 +280,8 @@ export default function EditCadetPage({
         ipet: formData.ipet || undefined,
         bpet: formData.bpet || undefined,
         swm: formData.swm || undefined,
+        isForeign: formData.isForeign,
+        country: formData.isForeign ? formData.country : null,
       }
 
       const response = await fetch(`/api/cadets/${cadetId}`, {
@@ -379,6 +387,22 @@ export default function EditCadetPage({
                     placeholder="Enter full name"
                     required
                   />
+                </div>
+
+                {/* Foreign Candidate */}
+                <div className="flex items-end pb-2">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="isForeign"
+                      checked={formData.isForeign}
+                      onChange={handleInputChange}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Foreign Candidate
+                    </span>
+                  </label>
                 </div>
 
                 <div>

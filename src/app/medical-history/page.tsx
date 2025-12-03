@@ -26,6 +26,7 @@ interface MedicalRecord {
   monitoringCase: boolean
   admittedInMH?: string // New field for admission in MH/BH/CH
   bloodGroup?: string
+  isForeign: boolean
 }
 
 export default function MedicalHistoryPage() {
@@ -655,12 +656,19 @@ export default function MedicalHistoryPage() {
                             </span>
                           </div>
                           <div className="ml-3">
-                            <Link
-                              href={`/cadets/${record.cadetId}`}
-                              className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary transition-colors"
-                            >
-                              {record.name}
-                            </Link>
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/cadets/${record.cadetId}`}
+                                className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary transition-colors"
+                              >
+                                {record.name}
+                              </Link>
+                              {record.isForeign && (
+                                <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-blue-600 bg-blue-100 rounded-full dark:text-blue-400 dark:bg-blue-900/30" title="Foreign Cadet">
+                                  F
+                                </span>
+                              )}
+                            </div>
                             {record.contactNo && (
                               <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {record.contactNo}

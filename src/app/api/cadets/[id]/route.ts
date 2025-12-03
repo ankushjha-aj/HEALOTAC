@@ -62,7 +62,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { name, battalion, company, joinDate, academyNumber, height, weight, age, course, sex, relegated, ppt, ipet, bpet, swm } = await request.json()
+    const { name, battalion, company, joinDate, academyNumber, height, weight, age, course, sex, relegated, ppt, ipet, bpet, swm, isForeign, country } = await request.json()
 
     const [updatedCadet] = await db
       .update(cadets)
@@ -78,6 +78,8 @@ export async function PUT(
         course,
         sex,
         relegated,
+        isForeign: isForeign !== undefined ? !!isForeign : undefined,
+        country,
         ppt,
         ipet,
         bpet,
@@ -196,6 +198,12 @@ export async function PATCH(
     }
     if ('swm' in updates) {
       updateData.swm = updates.swm || null
+    }
+    if ('isForeign' in updates) {
+      updateData.isForeign = updates.isForeign !== undefined ? !!updates.isForeign : false
+    }
+    if ('country' in updates) {
+      updateData.country = updates.country || null
     }
 
     if (Object.keys(updateData).length === 0) {

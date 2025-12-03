@@ -27,6 +27,7 @@ interface CadetInfo {
   sex?: string
   nokContact?: string
   relegated?: string
+  isForeign?: boolean
   createdAt: string
   updatedAt: string
   // Health Parameters
@@ -652,6 +653,12 @@ export default function CadetDetailsPage({
                           <span className="text-red-600 dark:text-red-400 font-bold">R</span>
                           <span className="w-3 h-3 bg-red-500 rounded-full"></span>
                         </>
+
+                      )}
+                      {cadetInfo.isForeign && (
+                        <>
+                          <span className="text-blue-600 dark:text-blue-400 font-bold">F</span>
+                        </>
                       )}
                     </h1>
                     <Link
@@ -794,6 +801,8 @@ export default function CadetDetailsPage({
                       )}
 
                       {/* Edit Button removed - now next to name */}
+
+
                     </div>
                   </div>
                 )}
@@ -811,356 +820,361 @@ export default function CadetDetailsPage({
               {showMoreCadetInfo ? 'Hide complete info' : 'Show complete info'}
             </button>
           </div>
-        </div>
 
-        {/* Expanded Cadet Information */}
-        {showMoreCadetInfo && (
-          <div className="card p-6 animate-in slide-in-from-top-2 duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Complete Cadet Information</h3>
-              {isFemaleCadet && hasMenstrualData && (
-                <button
-                  onClick={() => setShowMenstrualModal(true)}
-                  className="text-primary hover:text-primary/80 text-sm font-medium transition-colors cursor-pointer"
-                >
-                  Show Menstrual health
-                </button>
-              )}
-            </div>
 
-            {/* Health Parameters Section */}
-            {(cadetInfo.bloodGroup || cadetInfo.bmi || cadetInfo.bodyFat || cadetInfo.calcanealBoneDensity ||
-              cadetInfo.bp || cadetInfo.pulse || cadetInfo.so2 || cadetInfo.bcaFat ||
-              cadetInfo.ecg || cadetInfo.temp || cadetInfo.smmKg || cadetInfo.pastMedicalHistory) && (
-                <div className="mb-6">
-                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Health Parameters</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pl-4 border-l-2 border-blue-200 dark:border-blue-600">
-                    {cadetInfo.bloodGroup && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Blood Group:</span>
-                        <span className="text-sm font-medium">{cadetInfo.bloodGroup}</span>
-                      </div>
-                    )}
-                    {cadetInfo.bmi && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">BMI:</span>
-                        <span className="text-sm font-medium">{cadetInfo.bmi}</span>
-                      </div>
-                    )}
-                    {cadetInfo.bodyFat && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Body Fat:</span>
-                        <span className="text-sm font-medium">{cadetInfo.bodyFat}%</span>
-                      </div>
-                    )}
-                    {cadetInfo.calcanealBoneDensity && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bone Density:</span>
-                        <span className="text-sm font-medium">{cadetInfo.calcanealBoneDensity}</span>
-                      </div>
-                    )}
-                    {cadetInfo.bp && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Blood Pressure:</span>
-                        <span className="text-sm font-medium">{cadetInfo.bp}</span>
-                      </div>
-                    )}
-                    {cadetInfo.pulse && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pulse:</span>
-                        <span className="text-sm font-medium">{cadetInfo.pulse} bpm</span>
-                      </div>
-                    )}
-                    {cadetInfo.so2 && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">SpO2:</span>
-                        <span className="text-sm font-medium">{cadetInfo.so2}%</span>
-                      </div>
-                    )}
-                    {cadetInfo.bcaFat && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">BCA Fat:</span>
-                        <span className="text-sm font-medium">{cadetInfo.bcaFat}</span>
-                      </div>
-                    )}
-                    {cadetInfo.ecg && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">ECG:</span>
-                        <span className="text-sm font-medium">{cadetInfo.ecg}</span>
-                      </div>
-                    )}
-                    {cadetInfo.temp && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Temperature:</span>
-                        <span className="text-sm font-medium">{cadetInfo.temp}°C</span>
-                      </div>
-                    )}
-                    {cadetInfo.smmKg && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">SMM:</span>
-                        <span className="text-sm font-medium">{cadetInfo.smmKg} kg</span>
-                      </div>
-                    )}
-                    {cadetInfo.pastMedicalHistory && (
-                      <div className="col-span-full">
-                        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-1">Past Medical History:</span>
-                        <p className="text-sm bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">{cadetInfo.pastMedicalHistory}</p>
-                      </div>
-                    )}
-                  </div>
+          {/* Expanded Cadet Information */}
+          {
+            showMoreCadetInfo && (
+              <div className="card p-6 animate-in slide-in-from-top-2 duration-300">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Complete Cadet Information</h3>
+                  {isFemaleCadet && hasMenstrualData && (
+                    <button
+                      onClick={() => setShowMenstrualModal(true)}
+                      className="text-primary hover:text-primary/80 text-sm font-medium transition-colors cursor-pointer"
+                    >
+                      Show Menstrual health
+                    </button>
+                  )}
                 </div>
-              )}
 
-            {/* Vaccination Status Section */}
-            {(cadetInfo.covidDose1 !== undefined || cadetInfo.hepatitisBDose1 !== undefined ||
-              cadetInfo.tetanusToxoid !== undefined || cadetInfo.chickenPoxDose1 !== undefined ||
-              cadetInfo.yellowFever !== undefined) && (
-                <div className="mb-6">
-                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Vaccination Status</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pl-4 border-l-2 border-green-200 dark:border-green-600">
-                    <div>
-                      <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">COVID-19</h5>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">Dose 1:</span>
-                          <span className={`text-sm font-medium ${cadetInfo.covidDose1 ? 'text-green-600' : 'text-red-600'}`}>
-                            {cadetInfo.covidDose1 ? '✓ Taken' : '✗ Not Taken'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">Dose 2:</span>
-                          <span className={`text-sm font-medium ${cadetInfo.covidDose2 ? 'text-green-600' : 'text-red-600'}`}>
-                            {cadetInfo.covidDose2 ? '✓ Taken' : '✗ Not Taken'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">Dose 3:</span>
-                          <span className={`text-sm font-medium ${cadetInfo.covidDose3 ? 'text-green-600' : 'text-red-600'}`}>
-                            {cadetInfo.covidDose3 ? '✓ Taken' : '✗ Not Taken'}
-                          </span>
-                        </div>
+
+
+                {/* Health Parameters Section */}
+                {(cadetInfo.bloodGroup || cadetInfo.bmi || cadetInfo.bodyFat || cadetInfo.calcanealBoneDensity ||
+                  cadetInfo.bp || cadetInfo.pulse || cadetInfo.so2 || cadetInfo.bcaFat ||
+                  cadetInfo.ecg || cadetInfo.temp || cadetInfo.smmKg || cadetInfo.pastMedicalHistory) && (
+                    <div className="mb-6">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Health Parameters</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pl-4 border-l-2 border-blue-200 dark:border-blue-600">
+                        {cadetInfo.bloodGroup && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Blood Group:</span>
+                            <span className="text-sm font-medium">{cadetInfo.bloodGroup}</span>
+                          </div>
+                        )}
+                        {cadetInfo.bmi && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">BMI:</span>
+                            <span className="text-sm font-medium">{cadetInfo.bmi}</span>
+                          </div>
+                        )}
+                        {cadetInfo.bodyFat && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Body Fat:</span>
+                            <span className="text-sm font-medium">{cadetInfo.bodyFat}%</span>
+                          </div>
+                        )}
+                        {cadetInfo.calcanealBoneDensity && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bone Density:</span>
+                            <span className="text-sm font-medium">{cadetInfo.calcanealBoneDensity}</span>
+                          </div>
+                        )}
+                        {cadetInfo.bp && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Blood Pressure:</span>
+                            <span className="text-sm font-medium">{cadetInfo.bp}</span>
+                          </div>
+                        )}
+                        {cadetInfo.pulse && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pulse:</span>
+                            <span className="text-sm font-medium">{cadetInfo.pulse} bpm</span>
+                          </div>
+                        )}
+                        {cadetInfo.so2 && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">SpO2:</span>
+                            <span className="text-sm font-medium">{cadetInfo.so2}%</span>
+                          </div>
+                        )}
+                        {cadetInfo.bcaFat && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">BCA Fat:</span>
+                            <span className="text-sm font-medium">{cadetInfo.bcaFat}</span>
+                          </div>
+                        )}
+                        {cadetInfo.ecg && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">ECG:</span>
+                            <span className="text-sm font-medium">{cadetInfo.ecg}</span>
+                          </div>
+                        )}
+                        {cadetInfo.temp && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Temperature:</span>
+                            <span className="text-sm font-medium">{cadetInfo.temp}°C</span>
+                          </div>
+                        )}
+                        {cadetInfo.smmKg && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">SMM:</span>
+                            <span className="text-sm font-medium">{cadetInfo.smmKg} kg</span>
+                          </div>
+                        )}
+                        {cadetInfo.pastMedicalHistory && (
+                          <div className="col-span-full">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-1">Past Medical History:</span>
+                            <p className="text-sm bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">{cadetInfo.pastMedicalHistory}</p>
+                          </div>
+                        )}
                       </div>
                     </div>
+                  )}
 
-                    <div>
-                      <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hepatitis B</h5>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">Dose 1:</span>
-                          <span className={`text-sm font-medium ${cadetInfo.hepatitisBDose1 ? 'text-green-600' : 'text-red-600'}`}>
-                            {cadetInfo.hepatitisBDose1 ? '✓ Taken' : '✗ Not Taken'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">Dose 2:</span>
-                          <span className={`text-sm font-medium ${cadetInfo.hepatitisBDose2 ? 'text-green-600' : 'text-red-600'}`}>
-                            {cadetInfo.hepatitisBDose2 ? '✓ Taken' : '✗ Not Taken'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Other Vaccinations</h5>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">Tetanus Toxoid:</span>
-                          <span className={`text-sm font-medium ${cadetInfo.tetanusToxoid ? 'text-green-600' : 'text-red-600'}`}>
-                            {cadetInfo.tetanusToxoid ? '✓ Taken' : '✗ Not Taken'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">Chicken Pox Dose 1:</span>
-                          <span className={`text-sm font-medium ${cadetInfo.chickenPoxDose1 ? 'text-green-600' : 'text-red-600'}`}>
-                            {cadetInfo.chickenPoxDose1 ? '✓ Taken' : '✗ Not Taken'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">Chicken Pox Dose 2:</span>
-                          <span className={`text-sm font-medium ${cadetInfo.chickenPoxDose2 ? 'text-green-600' : 'text-red-600'}`}>
-                            {cadetInfo.chickenPoxDose2 ? '✓ Taken' : '✗ Not Taken'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">Chicken Pox Suffered:</span>
-                          <span className={`text-sm font-medium ${cadetInfo.chickenPoxSuffered ? 'text-green-600' : 'text-red-600'}`}>
-                            {cadetInfo.chickenPoxSuffered ? '✓ Yes' : '✗ No'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">Yellow Fever:</span>
-                          <span className={`text-sm font-medium ${cadetInfo.yellowFever ? 'text-green-600' : 'text-red-600'}`}>
-                            {cadetInfo.yellowFever ? '✓ Taken' : '✗ Not Taken'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-            {/* Physical Tests Section */}
-            {(cadetInfo.enduranceTest || cadetInfo.agilityTest || cadetInfo.speedTest ||
-              cadetInfo.verticalJump || cadetInfo.ballThrow || cadetInfo.lowerBackStrength ||
-              cadetInfo.shoulderDynamometerLeft || cadetInfo.shoulderDynamometerRight ||
-              cadetInfo.handGripDynamometerLeft || cadetInfo.handGripDynamometerRight ||
-              cadetInfo.ppt || cadetInfo.ipet || cadetInfo.bpet || cadetInfo.swm) && (
-                <div className="mb-6">
-                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Physical Tests</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4 border-l-2 border-orange-200 dark:border-orange-600">
-
-                    {/* Physical Proficiency Tests */}
-                    {(cadetInfo.ppt || cadetInfo.ipet || cadetInfo.bpet || cadetInfo.swm) && (
-                      <div>
-                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Physical Proficiency Tests</h5>
-                        <div className="space-y-2">
-                          {cadetInfo.ppt && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">PPT:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.ppt === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
-                                {cadetInfo.ppt === 'Pass' ? '✓ Pass' : '✗ Fail'}
-                              </span>
-                            </div>
-                          )}
-                          {cadetInfo.ipet && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">IPET:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.ipet === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
-                                {cadetInfo.ipet === 'Pass' ? '✓ Pass' : '✗ Fail'}
-                              </span>
-                            </div>
-                          )}
-                          {cadetInfo.bpet && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">BPET:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.bpet === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
-                                {cadetInfo.bpet === 'Pass' ? '✓ Pass' : '✗ Fail'}
-                              </span>
-                            </div>
-                          )}
-                          {cadetInfo.swm && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">SWM:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.swm === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
-                                {cadetInfo.swm === 'Pass' ? '✓ Pass' : '✗ Fail'}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Endurance, Agility, Speed Tests */}
-                    {(cadetInfo.enduranceTest || cadetInfo.agilityTest || cadetInfo.speedTest) && (
-                      <div>
-                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fitness Tests</h5>
-                        <div className="space-y-2">
-                          {cadetInfo.enduranceTest && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Endurance:</span>
-                              <span className="text-sm font-medium">{cadetInfo.enduranceTest}</span>
-                            </div>
-                          )}
-                          {cadetInfo.agilityTest && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Agility:</span>
-                              <span className="text-sm font-medium">{cadetInfo.agilityTest}</span>
-                            </div>
-                          )}
-                          {cadetInfo.speedTest && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Speed:</span>
-                              <span className="text-sm font-medium">{cadetInfo.speedTest}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Strength Tests */}
-                    {(cadetInfo.verticalJump || cadetInfo.ballThrow || cadetInfo.lowerBackStrength ||
-                      cadetInfo.shoulderDynamometerLeft || cadetInfo.shoulderDynamometerRight ||
-                      cadetInfo.handGripDynamometerLeft || cadetInfo.handGripDynamometerRight) && (
+                {/* Vaccination Status Section */}
+                {(cadetInfo.covidDose1 !== undefined || cadetInfo.hepatitisBDose1 !== undefined ||
+                  cadetInfo.tetanusToxoid !== undefined || cadetInfo.chickenPoxDose1 !== undefined ||
+                  cadetInfo.yellowFever !== undefined) && (
+                    <div className="mb-6">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Vaccination Status</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pl-4 border-l-2 border-green-200 dark:border-green-600">
                         <div>
-                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Strength Tests</h5>
-                          <div className="space-y-2">
-                            {cadetInfo.verticalJump && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Vertical Jump:</span>
-                                <span className="text-sm font-medium">{cadetInfo.verticalJump}</span>
-                              </div>
-                            )}
-                            {cadetInfo.ballThrow && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ball Throw:</span>
-                                <span className="text-sm font-medium">{cadetInfo.ballThrow}</span>
-                              </div>
-                            )}
-                            {cadetInfo.lowerBackStrength && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Lower Back:</span>
-                                <span className="text-sm font-medium">{cadetInfo.lowerBackStrength}</span>
-                              </div>
-                            )}
-                            {cadetInfo.shoulderDynamometerLeft && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Shoulder Left:</span>
-                                <span className="text-sm font-medium">{cadetInfo.shoulderDynamometerLeft}</span>
-                              </div>
-                            )}
-                            {cadetInfo.shoulderDynamometerRight && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Shoulder Right:</span>
-                                <span className="text-sm font-medium">{cadetInfo.shoulderDynamometerRight}</span>
-                              </div>
-                            )}
-                            {cadetInfo.handGripDynamometerLeft && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hand Grip Left:</span>
-                                <span className="text-sm font-medium">{cadetInfo.handGripDynamometerLeft}</span>
-                              </div>
-                            )}
-                            {cadetInfo.handGripDynamometerRight && (
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hand Grip Right:</span>
-                                <span className="text-sm font-medium">{cadetInfo.handGripDynamometerRight}</span>
-                              </div>
-                            )}
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">COVID-19</h5>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">Dose 1:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.covidDose1 ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.covidDose1 ? '✓ Taken' : '✗ Not Taken'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">Dose 2:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.covidDose2 ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.covidDose2 ? '✓ Taken' : '✗ Not Taken'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">Dose 3:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.covidDose3 ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.covidDose3 ? '✓ Taken' : '✗ Not Taken'}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      )}
+
+                        <div>
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hepatitis B</h5>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">Dose 1:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.hepatitisBDose1 ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.hepatitisBDose1 ? '✓ Taken' : '✗ Not Taken'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">Dose 2:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.hepatitisBDose2 ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.hepatitisBDose2 ? '✓ Taken' : '✗ Not Taken'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Other Vaccinations</h5>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">Tetanus Toxoid:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.tetanusToxoid ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.tetanusToxoid ? '✓ Taken' : '✗ Not Taken'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">Chicken Pox Dose 1:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.chickenPoxDose1 ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.chickenPoxDose1 ? '✓ Taken' : '✗ Not Taken'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">Chicken Pox Dose 2:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.chickenPoxDose2 ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.chickenPoxDose2 ? '✓ Taken' : '✗ Not Taken'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">Chicken Pox Suffered:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.chickenPoxSuffered ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.chickenPoxSuffered ? '✓ Yes' : '✗ No'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">Yellow Fever:</span>
+                              <span className={`text-sm font-medium ${cadetInfo.yellowFever ? 'text-green-600' : 'text-red-600'}`}>
+                                {cadetInfo.yellowFever ? '✓ Taken' : '✗ Not Taken'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                {/* Physical Tests Section */}
+                {(cadetInfo.enduranceTest || cadetInfo.agilityTest || cadetInfo.speedTest ||
+                  cadetInfo.verticalJump || cadetInfo.ballThrow || cadetInfo.lowerBackStrength ||
+                  cadetInfo.shoulderDynamometerLeft || cadetInfo.shoulderDynamometerRight ||
+                  cadetInfo.handGripDynamometerLeft || cadetInfo.handGripDynamometerRight ||
+                  cadetInfo.ppt || cadetInfo.ipet || cadetInfo.bpet || cadetInfo.swm) && (
+                    <div className="mb-6">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Physical Tests</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-4 border-l-2 border-orange-200 dark:border-orange-600">
+
+                        {/* Physical Proficiency Tests */}
+                        {(cadetInfo.ppt || cadetInfo.ipet || cadetInfo.bpet || cadetInfo.swm) && (
+                          <div>
+                            <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Physical Proficiency Tests</h5>
+                            <div className="space-y-2">
+                              {cadetInfo.ppt && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">PPT:</span>
+                                  <span className={`text-sm font-medium ${cadetInfo.ppt === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                    {cadetInfo.ppt === 'Pass' ? '✓ Pass' : '✗ Fail'}
+                                  </span>
+                                </div>
+                              )}
+                              {cadetInfo.ipet && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">IPET:</span>
+                                  <span className={`text-sm font-medium ${cadetInfo.ipet === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                    {cadetInfo.ipet === 'Pass' ? '✓ Pass' : '✗ Fail'}
+                                  </span>
+                                </div>
+                              )}
+                              {cadetInfo.bpet && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">BPET:</span>
+                                  <span className={`text-sm font-medium ${cadetInfo.bpet === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                    {cadetInfo.bpet === 'Pass' ? '✓ Pass' : '✗ Fail'}
+                                  </span>
+                                </div>
+                              )}
+                              {cadetInfo.swm && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">SWM:</span>
+                                  <span className={`text-sm font-medium ${cadetInfo.swm === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                    {cadetInfo.swm === 'Pass' ? '✓ Pass' : '✗ Fail'}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Endurance, Agility, Speed Tests */}
+                        {(cadetInfo.enduranceTest || cadetInfo.agilityTest || cadetInfo.speedTest) && (
+                          <div>
+                            <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fitness Tests</h5>
+                            <div className="space-y-2">
+                              {cadetInfo.enduranceTest && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Endurance:</span>
+                                  <span className="text-sm font-medium">{cadetInfo.enduranceTest}</span>
+                                </div>
+                              )}
+                              {cadetInfo.agilityTest && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Agility:</span>
+                                  <span className="text-sm font-medium">{cadetInfo.agilityTest}</span>
+                                </div>
+                              )}
+                              {cadetInfo.speedTest && (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Speed:</span>
+                                  <span className="text-sm font-medium">{cadetInfo.speedTest}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Strength Tests */}
+                        {(cadetInfo.verticalJump || cadetInfo.ballThrow || cadetInfo.lowerBackStrength ||
+                          cadetInfo.shoulderDynamometerLeft || cadetInfo.shoulderDynamometerRight ||
+                          cadetInfo.handGripDynamometerLeft || cadetInfo.handGripDynamometerRight) && (
+                            <div>
+                              <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Strength Tests</h5>
+                              <div className="space-y-2">
+                                {cadetInfo.verticalJump && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Vertical Jump:</span>
+                                    <span className="text-sm font-medium">{cadetInfo.verticalJump}</span>
+                                  </div>
+                                )}
+                                {cadetInfo.ballThrow && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ball Throw:</span>
+                                    <span className="text-sm font-medium">{cadetInfo.ballThrow}</span>
+                                  </div>
+                                )}
+                                {cadetInfo.lowerBackStrength && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Lower Back:</span>
+                                    <span className="text-sm font-medium">{cadetInfo.lowerBackStrength}</span>
+                                  </div>
+                                )}
+                                {cadetInfo.shoulderDynamometerLeft && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Shoulder Left:</span>
+                                    <span className="text-sm font-medium">{cadetInfo.shoulderDynamometerLeft}</span>
+                                  </div>
+                                )}
+                                {cadetInfo.shoulderDynamometerRight && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Shoulder Right:</span>
+                                    <span className="text-sm font-medium">{cadetInfo.shoulderDynamometerRight}</span>
+                                  </div>
+                                )}
+                                {cadetInfo.handGripDynamometerLeft && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hand Grip Left:</span>
+                                    <span className="text-sm font-medium">{cadetInfo.handGripDynamometerLeft}</span>
+                                  </div>
+                                )}
+                                {cadetInfo.handGripDynamometerRight && (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Hand Grip Right:</span>
+                                    <span className="text-sm font-medium">{cadetInfo.handGripDynamometerRight}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                      </div>
+                    </div>
+                  )}
+
+                {/* Overall Assessment */}
+                {cadetInfo.overallAssessment && (
+                  <div className="mb-6">
+                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Overall Assessment</h4>
+                    <div className="pl-4 border-l-2 border-purple-200 dark:border-purple-600">
+                      <p className="text-sm bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">{cadetInfo.overallAssessment}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* NOK Contact */}
+                <div className="mb-6">
+                  <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Emergency Contact</h4>
+                  <div className="pl-4 border-l-2 border-red-200 dark:border-red-600">
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-red-500" />
+                      <div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Next of Kin Contact</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {cadetInfo.nokContact || 'Not provided'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              )}
 
-            {/* Overall Assessment */}
-            {cadetInfo.overallAssessment && (
-              <div className="mb-6">
-                <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Overall Assessment</h4>
-                <div className="pl-4 border-l-2 border-purple-200 dark:border-purple-600">
-                  <p className="text-sm bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">{cadetInfo.overallAssessment}</p>
-                </div>
               </div>
-            )}
-
-            {/* NOK Contact */}
-            <div className="mb-6">
-              <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">Emergency Contact</h4>
-              <div className="pl-4 border-l-2 border-red-200 dark:border-red-600">
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-red-500" />
-                  <div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Next of Kin Contact</p>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {cadetInfo.nokContact || 'Not provided'}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        )}
+            )
+          }
+        </div>
 
         {/* Medical History Section */}
         <div className="card">
@@ -1252,144 +1266,146 @@ export default function CadetDetailsPage({
             )}
           </div>
         </div>
-      </div>
+      </div >
 
       {/* Menstrual Health Modal */}
-      {showMenstrualModal && cadetInfo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowMenstrualModal(false)}>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto mx-4" onClick={(e) => e.stopPropagation()}>
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <svg className="h-6 w-6 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 011.414 1.414L8.414 9.5H5a1 1 0 100 2h3.414l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
-                  </svg>
-                  Menstrual Health Records
-                </h3>
-                <button
-                  onClick={() => setShowMenstrualModal(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {/* Menstrual Cycle */}
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
-                    Menstrual Cycle
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">How frequently</h5>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {cadetInfo!.menstrualFrequency || 'Not recorded'}
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">How many days</h5>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {cadetInfo!.menstrualDays ? `${cadetInfo!.menstrualDays} days` : 'Not recorded'}
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Last menstrual period date</h5>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {cadetInfo!.lastMenstrualDate ? (() => {
-                          const date = new Date(cadetInfo!.lastMenstrualDate);
-                          return isNaN(date.getTime()) ? cadetInfo!.lastMenstrualDate : `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-                        })() : 'Not recorded'}
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Menstrual Cycle Aids</h5>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {(() => {
-                          const aids = cadetInfo!.menstrualAids;
-                          if (!aids) return 'Not recorded';
-                          if (Array.isArray(aids)) return aids.join(', ');
-                          return aids;
-                        })()}
-                      </p>
-                    </div>
-                  </div>
+      {
+        showMenstrualModal && cadetInfo && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowMenstrualModal(false)}>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto mx-4" onClick={(e) => e.stopPropagation()}>
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <svg className="h-6 w-6 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 011.414 1.414L8.414 9.5H5a1 1 0 100 2h3.414l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
+                    </svg>
+                    Menstrual Health Records
+                  </h3>
+                  <button
+                    onClick={() => setShowMenstrualModal(false)}
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
                 </div>
 
-                {/* Sexual & Reproductive Health */}
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
-                    Sexual & Reproductive Health
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Sexually Active</h5>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {cadetInfo!.sexuallyActive || 'Not recorded'}
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Marital Status</h5>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {cadetInfo!.maritalStatus || 'Not recorded'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Pregnancy & Contraceptive History */}
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
-                    Pregnancy & Contraceptive History
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Pregnancy History</h5>
-                      <p className="text-xs text-gray-900 dark:text-gray-100">
-                        {cadetInfo!.pregnancyHistory || 'Not recorded'}
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Contraceptive History</h5>
-                      <p className="text-xs text-gray-900 dark:text-gray-100">
-                        {cadetInfo!.contraceptiveHistory || 'Not recorded'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Medical History */}
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
-                    Medical History
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Surgery History</h5>
-                      <p className="text-xs text-gray-900 dark:text-gray-100">
-                        {cadetInfo!.surgeryHistory || 'Not recorded'}
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Medical Condition</h5>
-                      <p className="text-xs text-gray-900 dark:text-gray-100">
-                        {cadetInfo!.medicalCondition || 'Not recorded'}
-                      </p>
-                    </div>
-                    <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
-                      <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Hemoglobin Level</h5>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {cadetInfo!.hemoglobinLevel ? `${cadetInfo!.hemoglobinLevel} g/dL` : 'Not recorded'}
-                      </p>
+                <div className="space-y-4">
+                  {/* Menstrual Cycle */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
+                      Menstrual Cycle
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                        <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">How frequently</h5>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {cadetInfo!.menstrualFrequency || 'Not recorded'}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                        <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">How many days</h5>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {cadetInfo!.menstrualDays ? `${cadetInfo!.menstrualDays} days` : 'Not recorded'}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                        <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Last menstrual period date</h5>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {cadetInfo!.lastMenstrualDate ? (() => {
+                            const date = new Date(cadetInfo!.lastMenstrualDate);
+                            return isNaN(date.getTime()) ? cadetInfo!.lastMenstrualDate : `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                          })() : 'Not recorded'}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                        <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Menstrual Cycle Aids</h5>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {(() => {
+                            const aids = cadetInfo!.menstrualAids;
+                            if (!aids) return 'Not recorded';
+                            if (Array.isArray(aids)) return aids.join(', ');
+                            return aids;
+                          })()}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
 
+                  {/* Sexual & Reproductive Health */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
+                      Sexual & Reproductive Health
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                        <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Sexually Active</h5>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {cadetInfo!.sexuallyActive || 'Not recorded'}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                        <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Marital Status</h5>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {cadetInfo!.maritalStatus || 'Not recorded'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pregnancy & Contraceptive History */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
+                      Pregnancy & Contraceptive History
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                        <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Pregnancy History</h5>
+                        <p className="text-xs text-gray-900 dark:text-gray-100">
+                          {cadetInfo!.pregnancyHistory || 'Not recorded'}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                        <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Contraceptive History</h5>
+                        <p className="text-xs text-gray-900 dark:text-gray-100">
+                          {cadetInfo!.contraceptiveHistory || 'Not recorded'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Medical History */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 border-b border-gray-200 dark:border-gray-700 pb-1">
+                      Medical History
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                        <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Surgery History</h5>
+                        <p className="text-xs text-gray-900 dark:text-gray-100">
+                          {cadetInfo!.surgeryHistory || 'Not recorded'}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                        <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Medical Condition</h5>
+                        <p className="text-xs text-gray-900 dark:text-gray-100">
+                          {cadetInfo!.medicalCondition || 'Not recorded'}
+                        </p>
+                      </div>
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-md border border-gray-200 dark:border-gray-600">
+                        <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Hemoglobin Level</h5>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                          {cadetInfo!.hemoglobinLevel ? `${cadetInfo!.hemoglobinLevel} g/dL` : 'Not recorded'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </DashboardLayout>
+        )
+      }
+    </DashboardLayout >
   )
 }

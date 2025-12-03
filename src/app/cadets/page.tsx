@@ -33,6 +33,7 @@ interface Cadet {
   relegated?: string
   course?: string
   bloodGroup?: string
+  isForeign: boolean
 }
 
 // Interface for Filters
@@ -564,6 +565,11 @@ export default function CadetsPage() {
                               <span className="text-red-600 dark:text-red-400 font-bold">R</span>
                               <span className="w-2 h-2 bg-red-500 rounded-full"></span>
                             </>
+                          )}
+                          {cadet.isForeign && (
+                            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-blue-600 bg-blue-100 rounded-full dark:text-blue-400 dark:bg-blue-900/30" title="Foreign Cadet">
+                              F
+                            </span>
                           )}
                         </div>
                       </div>

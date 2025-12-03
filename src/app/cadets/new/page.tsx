@@ -21,14 +21,18 @@ export default function NewCadetPage() {
     age: '',
     course: '',
     sex: '',
+    isForeign: false,
+    country: '',
   })
   const [error, setError] = useState<string | null>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
+    const { name, value, type } = e.target
+    const checked = (e.target as HTMLInputElement).checked
+
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }))
   }
 
@@ -105,6 +109,21 @@ export default function NewCadetPage() {
                   className="input-field"
                   placeholder="Enter cadet's full name"
                 />
+              </div>
+
+              {/* Foreign Candidate */}
+              <div className="flex items-center pb-2">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    id="isForeign"
+                    className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    type="checkbox"
+                    name="isForeign"
+                    checked={formData.isForeign}
+                    onChange={handleChange}
+                  />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Foreign Cadet</span>
+                </label>
               </div>
 
               {/* Battalion */}

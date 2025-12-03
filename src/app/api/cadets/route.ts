@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server' 
+import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { cadets } from '@/lib/schema'
 import { desc } from 'drizzle-orm'
@@ -47,11 +47,12 @@ export async function POST(request: NextRequest) {
       // Menstrual & Medical History (Female only)
       menstrualFrequency, menstrualDays, lastMenstrualDate, menstrualAids,
       sexuallyActive, maritalStatus, pregnancyHistory, contraceptiveHistory,
-      surgeryHistory, medicalCondition, hemoglobinLevel
+      surgeryHistory, medicalCondition, hemoglobinLevel,
+      isForeign, country
     } = await request.json()
 
     console.log('📥 RECEIVED CADET DATA:', {
-      name, battalion, company, joinDate, sex, menstrualFrequency, menstrualDays, menstrualAids
+      name, battalion, company, joinDate, sex, menstrualFrequency, menstrualDays, menstrualAids, isForeign, country
     })
 
     // Validate required fields
@@ -74,6 +75,8 @@ export async function POST(request: NextRequest) {
       age: age ? age.toString() : null,
       course: course ? course.toString() : null,
       sex: sex || null,
+      isForeign: !!isForeign,
+      country: country || null,
       nokContact: nokContact ? nokContact.toString() : null,
       relegated: relegated || 'N',
       // Health Parameters
