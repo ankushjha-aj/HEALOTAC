@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
         name: cadets.name,
         company: cadets.company,
         battalion: cadets.battalion,
+        bloodGroup: cadets.bloodGroup,
         // Medical record details
         dateOfReporting: medicalRecords.dateOfReporting,
         medicalProblem: medicalRecords.medicalProblem,
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
 
     // Verify cadet exists
     const cadetExists = await db.select().from(cadets).where(eq(cadets.id, parseInt(cadetId))).limit(1)
-    
+
     if (cadetExists.length === 0) {
       return NextResponse.json(
         { error: 'Selected cadet does not exist' },

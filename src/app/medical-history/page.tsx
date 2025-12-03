@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Calendar, User, MapPin, FileText, Filter, Eye } from 'lucide-react'
+import { Calendar, User, MapPin, FileText, Filter, Eye, Search } from 'lucide-react'
 import Link from 'next/link'
 import { usePagination } from '@/hooks/usePagination'
 import PaginationControls from '@/components/PaginationControls'
@@ -25,13 +25,21 @@ interface MedicalRecord {
   createdAt: string
   monitoringCase: boolean
   admittedInMH?: string // New field for admission in MH/BH/CH
+  bloodGroup?: string
 }
 
 export default function MedicalHistoryPage() {
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [filters, setFilters] = useState({
+    name: '',
+    company: '',
+    battalion: '',
+    medicalProblem: '',
+    bloodGroup: ''
+  })
+  const [showCompanySuggestions, setShowCompanySuggestions] = useState(false)
   const [statusFilter, setStatusFilter] = useState('all')
   const [currentDateTime, setCurrentDateTime] = useState<string>('')
   const [updatingRecordId, setUpdatingRecordId] = useState<number | null>(null)
@@ -201,11 +209,18 @@ export default function MedicalHistoryPage() {
 
   // Filter records based on search and status
   const filteredRecords = medicalRecords.filter(record => {
-    const matchesSearch = searchTerm === '' ||
-      record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.medicalProblem.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      record.battalion.toLowerCase().includes(searchTerm.toLowerCase())
+    // Apply multi-field filters
+    const nameMatch = !filters.name || record.name.toLowerCase().includes(filters.name.toLowerCase())
+
+    const companyMatch = !filters.company || record.company.toLowerCase().includes(filters.company.toLowerCase())
+
+    const battalionMatch = !filters.battalion || record.battalion.toLowerCase().includes(filters.battalion.toLowerCase())
+
+    const problemMatch = !filters.medicalProblem || record.medicalProblem.toLowerCase().includes(filters.medicalProblem.toLowerCase())
+
+    const bloodGroupMatch = !filters.bloodGroup || (record.bloodGroup && record.bloodGroup === filters.bloodGroup)
+
+    const matchesSearch = nameMatch && companyMatch && battalionMatch && problemMatch && bloodGroupMatch
 
     let matchesStatus = true
     if (statusFilter === 'Active') {
@@ -355,46 +370,185 @@ export default function MedicalHistoryPage() {
         </div>
 
         {/* Filters and Search */}
-        <div className="card p-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                placeholder="Search by cadet name, medical problem, company, or battalion..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="input-field"
-              />
-            </div>
-            <div className="flex gap-2">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="input-field"
-              >
-                <option value="all">All Medical Status</option>
-                <option value="Active">Active</option>
-                <option value="Completed">Completed</option>
-                <option value="monitoring">Monitoring Cases</option>
-                <option value="admitted">Admitted in MH/BH/CH</option>
-              </select>
-              {/* Records per page selector */}
-              <div className="flex items-center gap-2">
-                <label htmlFor="records-per-page" className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                  Records per page:
+        <div className="card p-4">
+          <div className="space-y-4">
+            {/* Multi-filter Search Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {/* Name Filter */}
+              <div>
+                <label htmlFor="filter-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Cadet Name
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <input
+                    id="filter-name"
+                    type="text"
+                    placeholder="Search name..."
+                    value={filters.name}
+                    onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
+                    className="input-field pl-10"
+                  />
+                </div>
+              </div>
+
+              {/* Company Filter with Autocomplete */}
+              <div className="relative">
+                <label htmlFor="filter-company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Company
+                </label>
+                <input
+                  id="filter-company"
+                  type="text"
+                  placeholder="Filter company..."
+                  value={filters.company}
+                  onChange={(e) => {
+                    setFilters(prev => ({ ...prev, company: e.target.value }))
+                    setShowCompanySuggestions(true)
+                  }}
+                  onFocus={() => setShowCompanySuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowCompanySuggestions(false), 200)}
+                  className="input-field"
+                />
+                {showCompanySuggestions && (
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    {(() => {
+                      const companyMap: { [key: string]: string } = {
+                        'M': 'Meiktila',
+                        'N': 'Naushera',
+                        'Z': 'Zojila',
+                        'J': 'Jessami',
+                        'K': 'Kohima',
+                        'P': 'Phillora'
+                      }
+
+                      // Create array of {code, name} objects
+                      const companies = Object.entries(companyMap).map(([code, name]) => ({ code, name }))
+
+                      // Filter based on input
+                      const filteredCompanies = companies.filter(c =>
+                        !filters.company ||
+                        c.name.toLowerCase().includes(filters.company.toLowerCase()) ||
+                        c.code.toLowerCase().includes(filters.company.toLowerCase())
+                      )
+
+                      if (filteredCompanies.length === 0) return null
+
+                      return filteredCompanies.map((company) => (
+                        <div
+                          key={company.code}
+                          className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-900 dark:text-white"
+                          onClick={() => {
+                            setFilters(prev => ({ ...prev, company: company.code }))
+                            setShowCompanySuggestions(false)
+                          }}
+                        >
+                          <span className="font-medium">{company.code}</span> - {company.name}
+                        </div>
+                      ))
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              {/* Battalion Filter */}
+              <div>
+                <label htmlFor="filter-battalion" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Battalion
+                </label>
+                <input
+                  id="filter-battalion"
+                  type="text"
+                  placeholder="Filter battalion..."
+                  value={filters.battalion}
+                  onChange={(e) => setFilters(prev => ({ ...prev, battalion: e.target.value }))}
+                  className="input-field"
+                />
+              </div>
+
+              {/* Medical Problem Filter */}
+              <div>
+                <label htmlFor="filter-problem" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Medical Problem
+                </label>
+                <input
+                  id="filter-problem"
+                  type="text"
+                  placeholder="Filter problem..."
+                  value={filters.medicalProblem}
+                  onChange={(e) => setFilters(prev => ({ ...prev, medicalProblem: e.target.value }))}
+                  className="input-field"
+                />
+              </div>
+
+              {/* Blood Group Filter */}
+              <div>
+                <label htmlFor="filter-blood-group" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Blood Group
                 </label>
                 <select
-                  id="records-per-page"
-                  value={pagination.itemsPerPage}
-                  onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
-                  className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  id="filter-blood-group"
+                  value={filters.bloodGroup}
+                  onChange={(e) => setFilters(prev => ({ ...prev, bloodGroup: e.target.value }))}
+                  className="input-field"
                 >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                  <option value={30}>30</option>
-                  <option value={50}>50</option>
+                  <option value="">All Blood Groups</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
                 </select>
+              </div>
+            </div>
+
+            {/* Clear Filters Button */}
+            <div className="flex justify-end">
+              <button
+                onClick={() => setFilters({ name: '', company: '', battalion: '', medicalProblem: '', bloodGroup: '' })}
+                className="text-sm text-primary hover:text-primary/80 font-medium"
+                disabled={!filters.name && !filters.company && !filters.battalion && !filters.medicalProblem && !filters.bloodGroup}
+              >
+                Clear all filters
+              </button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center border-t border-gray-200 dark:border-gray-700 pt-4">
+              <div className="flex gap-2 w-full sm:w-auto">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="input-field"
+                >
+                  <option value="all">All Medical Status</option>
+                  <option value="Active">Active</option>
+                  <option value="Completed">Completed</option>
+                  <option value="monitoring">Monitoring Cases</option>
+                  <option value="admitted">Admitted in MH/BH/CH</option>
+                </select>
+                {/* Records per page selector */}
+                <div className="flex items-center gap-2">
+                  <label htmlFor="records-per-page" className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                    Records per page:
+                  </label>
+                  <select
+                    id="records-per-page"
+                    value={pagination.itemsPerPage}
+                    onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
+                    className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={30}>30</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -402,7 +556,8 @@ export default function MedicalHistoryPage() {
           {/* Results Count */}
           <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
             Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, filteredRecords.length)} of {filteredRecords.length} medical records
-            {searchTerm && ` matching "${searchTerm}"`}
+            Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, filteredRecords.length)} of {filteredRecords.length} medical records
+            {(filters.name || filters.company || filters.battalion || filters.medicalProblem || filters.bloodGroup) && ` matching filters`}
             {statusFilter !== 'all' && ` with status "${statusFilter}"`}
           </div>
         </div>
@@ -417,7 +572,7 @@ export default function MedicalHistoryPage() {
                     Cadet
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Unit
+                    Company
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Medical Problem
@@ -527,14 +682,14 @@ export default function MedicalHistoryPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${record.admittedInMH === 'Yes' && record.medicalStatus === 'Active'
-                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
-                              : record.medicalStatus === 'Active'
-                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                                : record.medicalStatus === 'Completed'
-                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                                  : record.medicalStatus === 'Returned'
-                                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
-                                    : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                            ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
+                            : record.medicalStatus === 'Active'
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                              : record.medicalStatus === 'Completed'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                                : record.medicalStatus === 'Returned'
+                                  ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
+                                  : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
                             }`}>
                             {record.admittedInMH === 'Yes' && record.medicalStatus === 'Active' ? 'Admitted in MH' : record.medicalStatus}
                           </span>

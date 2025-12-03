@@ -32,6 +32,7 @@ interface Cadet {
   createdAt: string
   relegated?: string
   course?: string
+  bloodGroup?: string
 }
 
 // Interface for Filters
@@ -57,7 +58,14 @@ const getWeekdaysBetween = (startDate: Date, endDate: Date): number => {
 }
 
 export default function CadetsPage() {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [filters, setFilters] = useState({
+    name: '',
+    company: '',
+    battalion: '',
+    course: '',
+    bloodGroup: ''
+  })
+  const [showCompanySuggestions, setShowCompanySuggestions] = useState(false)
   const [cadets, setCadets] = useState<Cadet[]>([])
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
   const [loading, setLoading] = useState(true)
@@ -223,20 +231,19 @@ export default function CadetsPage() {
       return false
     }
 
-    // Then apply search filter
-    if (!searchTerm.trim()) return true
+    // Then apply multi-field filters
+    const nameMatch = !filters.name || cadet.name.toLowerCase().includes(filters.name.toLowerCase()) ||
+      (cadet.academyNumber && cadet.academyNumber.toString().includes(filters.name))
 
-    const searchLower = searchTerm.toLowerCase()
-    const joinDateFormatted = new Date(cadet.joinDate).toLocaleDateString()
+    const companyMatch = !filters.company || cadet.company.toLowerCase().includes(filters.company.toLowerCase())
 
-    return (
-      cadet.name.toLowerCase().includes(searchLower) ||
-      (cadet.academyNumber && cadet.academyNumber.toString().includes(searchLower)) ||
-      (cadet.course && cadet.course.toLowerCase().includes(searchLower)) ||
-      cadet.battalion.toLowerCase().includes(searchLower) ||
-      cadet.company.toLowerCase().includes(searchLower) ||
-      joinDateFormatted.toLowerCase().includes(searchLower)
-    )
+    const battalionMatch = !filters.battalion || cadet.battalion.toLowerCase().includes(filters.battalion.toLowerCase())
+
+    const courseMatch = !filters.course || (cadet.course && cadet.course.toLowerCase().includes(filters.course.toLowerCase()))
+
+    const bloodGroupMatch = !filters.bloodGroup || (cadet.bloodGroup && cadet.bloodGroup === filters.bloodGroup)
+
+    return nameMatch && companyMatch && battalionMatch && courseMatch && bloodGroupMatch
   })
 
   // Pagination for cadets table
@@ -249,7 +256,7 @@ export default function CadetsPage() {
   // Reset pagination to page 1 when search or filter changes
   useEffect(() => {
     pagination.goToPage(1)
-  }, [searchTerm, showHighTrainingMissed, pagination])
+  }, [filters, showHighTrainingMissed, pagination])
 
   // Get paginated cadets
   const paginatedCadets = useMemo(
@@ -290,8 +297,8 @@ export default function CadetsPage() {
             <button
               onClick={() => setShowHighTrainingMissed(!showHighTrainingMissed)}
               className={`relative px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg ${showHighTrainingMissed
-                  ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white border-orange-400 shadow-orange-200 dark:shadow-orange-900/50'
-                  : 'bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900/20 dark:hover:to-blue-800/20 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-300 dark:hover:border-blue-500'
+                ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white border-orange-400 shadow-orange-200 dark:shadow-orange-900/50'
+                : 'bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900/20 dark:hover:to-blue-800/20 hover:text-blue-700 dark:hover:text-blue-300 hover:border-blue-300 dark:hover:border-blue-500'
                 }`}
               title="Show cadets with ≥30 days training missed"
             >
@@ -329,19 +336,156 @@ export default function CadetsPage() {
         </div>
 
         {/* Search Section */}
-        <div className="card p-6">
+        <div className="card p-4">
           <div className="space-y-4">
-            {/* Search Bar and Records per Page */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
+            {/* Multi-filter Search Inputs */}
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {/* Name / Academy Number Filter */}
+              <div>
+                <label htmlFor="filter-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Name / Academy No.
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 text-gray-400" />
+                  </div>
+                  <input
+                    id="filter-name"
+                    type="text"
+                    placeholder="Search name..."
+                    value={filters.name}
+                    onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
+                    className="input-field pl-10"
+                  />
+                </div>
+              </div>
+
+              {/* Company Filter with Autocomplete */}
+              <div className="relative">
+                <label htmlFor="filter-company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Company
+                </label>
                 <input
+                  id="filter-company"
                   type="text"
-                  placeholder="Search by name, academy number, course, battalion, company, or join date..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Filter company..."
+                  value={filters.company}
+                  onChange={(e) => {
+                    setFilters(prev => ({ ...prev, company: e.target.value }))
+                    setShowCompanySuggestions(true)
+                  }}
+                  onFocus={() => setShowCompanySuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowCompanySuggestions(false), 200)}
+                  className="input-field"
+                />
+                {showCompanySuggestions && (
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    {(() => {
+                      const companyMap: { [key: string]: string } = {
+                        'M': 'Meiktila',
+                        'N': 'Naushera',
+                        'Z': 'Zojila',
+                        'J': 'Jessami',
+                        'K': 'Kohima',
+                        'P': 'Phillora'
+                      }
+
+                      // Create array of {code, name} objects
+                      const companies = Object.entries(companyMap).map(([code, name]) => ({ code, name }))
+
+                      // Filter based on input
+                      const filteredCompanies = companies.filter(c =>
+                        !filters.company ||
+                        c.name.toLowerCase().includes(filters.company.toLowerCase()) ||
+                        c.code.toLowerCase().includes(filters.company.toLowerCase())
+                      )
+
+                      if (filteredCompanies.length === 0) return null
+
+                      return filteredCompanies.map((company) => (
+                        <div
+                          key={company.code}
+                          className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-900 dark:text-white"
+                          onClick={() => {
+                            setFilters(prev => ({ ...prev, company: company.code }))
+                            setShowCompanySuggestions(false)
+                          }}
+                        >
+                          <span className="font-medium">{company.code}</span> - {company.name}
+                        </div>
+                      ))
+                    })()}
+                  </div>
+                )}
+              </div>
+
+              {/* Battalion Filter */}
+              <div>
+                <label htmlFor="filter-battalion" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Battalion
+                </label>
+                <input
+                  id="filter-battalion"
+                  type="text"
+                  placeholder="Filter battalion..."
+                  value={filters.battalion}
+                  onChange={(e) => setFilters(prev => ({ ...prev, battalion: e.target.value }))}
                   className="input-field"
                 />
               </div>
+
+              {/* Course Filter */}
+              <div>
+                <label htmlFor="filter-course" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Course
+                </label>
+                <input
+                  id="filter-course"
+                  type="text"
+                  placeholder="Filter course..."
+                  value={filters.course}
+                  onChange={(e) => setFilters(prev => ({ ...prev, course: e.target.value }))}
+                  className="input-field"
+                />
+              </div>
+
+              {/* Blood Group Filter */}
+              <div>
+                <label htmlFor="filter-blood-group" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Blood Group
+                </label>
+                <select
+                  id="filter-blood-group"
+                  value={filters.bloodGroup}
+                  onChange={(e) => setFilters(prev => ({ ...prev, bloodGroup: e.target.value }))}
+                  className="input-field"
+                >
+                  <option value="">All Blood Groups</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Clear Filters Button */}
+            <div className="flex justify-end">
+              <button
+                onClick={() => setFilters({ name: '', company: '', battalion: '', course: '', bloodGroup: '' })}
+                className="text-sm text-primary hover:text-primary/80 font-medium"
+                disabled={!filters.name && !filters.company && !filters.battalion && !filters.course && !filters.bloodGroup}
+              >
+                Clear all filters
+              </button>
+            </div>
+
+            {/* Records per Page */}
+            <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
               <div className="flex items-center gap-2">
                 <label htmlFor="records-per-page" className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
                   Records per page:
@@ -449,10 +593,10 @@ export default function CadetsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${cadet.totalTrainingMissed >= 30
-                          ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-                          : cadet.totalTrainingMissed > 0
-                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                            : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                        ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                        : cadet.totalTrainingMissed > 0
+                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                          : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                         }`}>
                         {cadet.totalTrainingMissed} days
                       </span>
