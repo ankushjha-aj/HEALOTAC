@@ -519,180 +519,179 @@ export default function CadetsPage() {
             </div>
           </div>
 
-          {/* Clear Filters Button */}
-          <div className="flex justify-end">
+          {/* Clear Filters and Results Count */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400 order-2 sm:order-1">
+              Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, filteredCadets.length)} of {filteredCadets.length} cadets
+              {showHighTrainingMissed && ` (filtered: ≥30 days training missed)`}
+            </p>
+
             <button
-              onClick={() => setFilters({ name: '', company: '', battalion: '', course: '', bloodGroup: '' })}
-              className="text-sm text-primary hover:text-primary/80 font-medium"
-              disabled={!filters.name && !filters.company && !filters.battalion && !filters.course && !filters.bloodGroup}
+              onClick={() => {
+                setFilters({ name: '', company: '', battalion: '', course: '', bloodGroup: '' })
+                setForeignFilter('all')
+              }}
+              className="text-sm text-primary hover:text-primary/80 font-medium order-1 sm:order-2 whitespace-nowrap"
+              disabled={!filters.name && !filters.company && !filters.battalion && !filters.course && !filters.bloodGroup && foreignFilter === 'all'}
             >
               Clear all filters
             </button>
           </div>
-
-          {/* Records per Page - Moved to grid */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-
-            {/* Results Count */}
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, filteredCadets.length)} of {filteredCadets.length} cadets
-              {showHighTrainingMissed && ` (filtered: ≥30 days training missed)`}
-            </p>
-          </div>
         </div>
-      </div>
 
-      {/* Cadets Table */}
-      <div className="card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-800/50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Cadet Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Battalion
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Company
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Training Days Missed
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Academy Number
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Course
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Join Date
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {paginatedCadets.map((cadet) => (
-                <tr key={cadet.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 flex-shrink-0 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                        <span className="text-primary font-medium">
-                          {cadet.name.split(' ').map(n => n[0]).join('')}
-                        </span>
+
+        {/* Cadets Table */}
+        <div className="card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 dark:bg-gray-800/50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Cadet Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Battalion
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Company
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Training Days Missed
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Academy Number
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Course
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Join Date
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {paginatedCadets.map((cadet) => (
+                  <tr key={cadet.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="h-10 w-10 flex-shrink-0 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+                          <span className="text-primary font-medium">
+                            {cadet.name.split(' ').map(n => n[0]).join('')}
+                          </span>
+                        </div>
+                        <div className="ml-3 flex items-center gap-2">
+                          <Link
+                            href={`/cadets/${cadet.id}`}
+                            className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary"
+                          >
+                            {cadet.name}
+                          </Link>
+                          {cadet.relegated === 'Y' && (
+                            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-red-600 bg-red-100 rounded-full dark:text-red-400 dark:bg-red-900/30" title="Relegated">
+                              R
+                            </span>
+                          )}
+                          {cadet.isForeign && (
+                            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-blue-600 bg-blue-100 rounded-full dark:text-blue-400 dark:bg-blue-900/30" title="Foreign Cadet">
+                              F
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="ml-3 flex items-center gap-2">
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {cadet.battalion}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {(() => {
+                          const companyMap: { [key: string]: string } = {
+                            'M': 'Meiktila',
+                            'N': 'Naushera',
+                            'Z': 'Zojila',
+                            'J': 'Jessami',
+                            'K': 'Kohima',
+                            'P': 'Phillora'
+                          }
+                          return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
+                        })()}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${cadet.totalTrainingMissed >= 30
+                        ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                        : cadet.totalTrainingMissed > 0
+                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                          : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                        }`}>
+                        {cadet.totalTrainingMissed} days
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {cadet.academyNumber || 'N/A'}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {cadet.course || 'N/A'}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {new Date(cadet.joinDate).toLocaleDateString()}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end gap-2">
                         <Link
                           href={`/cadets/${cadet.id}`}
-                          className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary"
+                          className="text-primary hover:text-primary/80"
+                          title="View cadet details"
                         >
-                          {cadet.name}
+                          View
                         </Link>
-                        {cadet.relegated === 'Y' && (
-                          <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-red-600 bg-red-100 rounded-full dark:text-red-400 dark:bg-red-900/30" title="Relegated">
-                            R
-                          </span>
-                        )}
-                        {cadet.isForeign && (
-                          <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-blue-600 bg-blue-100 rounded-full dark:text-blue-400 dark:bg-blue-900/30" title="Foreign Cadet">
-                            F
-                          </span>
+                        <Link
+                          href={`/cadets/${cadet.id}/edit`}
+                          className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                          title="Edit cadet information"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Link>
+                        {user?.role !== 'user' && (
+                          <button
+                            onClick={() => handleDeleteCadet(cadet)}
+                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         )}
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {cadet.battalion}
-                    </p>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {(() => {
-                        const companyMap: { [key: string]: string } = {
-                          'M': 'Meiktila',
-                          'N': 'Naushera',
-                          'Z': 'Zojila',
-                          'J': 'Jessami',
-                          'K': 'Kohima',
-                          'P': 'Phillora'
-                        }
-                        return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
-                      })()}
-                    </p>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${cadet.totalTrainingMissed >= 30
-                      ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-                      : cadet.totalTrainingMissed > 0
-                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                        : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                      }`}>
-                      {cadet.totalTrainingMissed} days
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {cadet.academyNumber || 'N/A'}
-                    </p>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {cadet.course || 'N/A'}
-                    </p>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(cadet.joinDate).toLocaleDateString()}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex items-center justify-end gap-2">
-                      <Link
-                        href={`/cadets/${cadet.id}`}
-                        className="text-primary hover:text-primary/80"
-                        title="View cadet details"
-                      >
-                        View
-                      </Link>
-                      <Link
-                        href={`/cadets/${cadet.id}/edit`}
-                        className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                        title="Edit cadet information"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                      {user?.role !== 'user' && (
-                        <button
-                          onClick={() => handleDeleteCadet(cadet)}
-                          className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination Controls */}
-        {filteredCadets.length > 0 && (
-          <div className="mt-6 flex flex-col items-center gap-4">
-            <PaginationControls
-              currentPage={pagination.currentPage}
-              totalPages={pagination.totalPages}
-              onPageChange={pagination.goToPage}
-              hasNextPage={pagination.hasNextPage}
-              hasPrevPage={pagination.hasPrevPage}
-            />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
+
+          {/* Pagination Controls */}
+          {filteredCadets.length > 0 && (
+            <div className="mt-6 flex flex-col items-center gap-4">
+              <PaginationControls
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                onPageChange={pagination.goToPage}
+                hasNextPage={pagination.hasNextPage}
+                hasPrevPage={pagination.hasPrevPage}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Delete Confirmation Modal */}
