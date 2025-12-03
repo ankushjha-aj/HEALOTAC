@@ -480,7 +480,7 @@ export default function CadetsPage() {
                 </select>
               </div>
 
-              <div className="flex items-end gap-2">
+              <div className="flex items-end gap-4">
                 <div className="flex-1">
                   <label htmlFor="filter-foreign" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Foreign Cadets
@@ -500,7 +500,7 @@ export default function CadetsPage() {
                 {/* Records per Page */}
                 <div className="flex-1">
                   <label htmlFor="records-per-page" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Records / Page
+                    Records/Page
                   </label>
                   <select
                     id="records-per-page"
