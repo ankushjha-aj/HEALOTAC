@@ -93,6 +93,11 @@ interface CadetFormData {
   surgeryHistory?: string
   medicalCondition?: string
   hemoglobinLevel?: string
+  // Physical Test
+  ppt?: string
+  ipet?: string
+  bpet?: string
+  swm?: string
 }
 
 function NewMedicalRecordPageInner() {
@@ -193,11 +198,16 @@ function NewMedicalRecordPageInner() {
     surgeryHistory: '',
     medicalCondition: '',
     hemoglobinLevel: '',
+    // Physical Test
+    ppt: '',
+    ipet: '',
+    bpet: '',
+    swm: '',
   })
 
   const [cadetError, setCadetError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({})
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({})
 
   // Fetch cadets for the dropdown
   useEffect(() => {
@@ -437,8 +447,8 @@ function NewMedicalRecordPageInner() {
 
       setSelectedCadet(cadet)
       setCadetSearchTerm(`${cadet.name} - ${cadet.company} Company, ${cadet.battalion}`)
-      setFormData(prev => ({ 
-        ...prev, 
+      setFormData(prev => ({
+        ...prev,
         cadetId: cadet.id.toString()
       }))
       setShowCadetSuggestions(false)
@@ -447,8 +457,8 @@ function NewMedicalRecordPageInner() {
       // Allow selection if check fails to avoid blocking functionality
       setSelectedCadet(cadet)
       setCadetSearchTerm(`${cadet.name} - ${cadet.company} Company, ${cadet.battalion}`)
-      setFormData(prev => ({ 
-        ...prev, 
+      setFormData(prev => ({
+        ...prev,
         cadetId: cadet.id.toString()
       }))
       setShowCadetSuggestions(false)
@@ -468,14 +478,14 @@ function NewMedicalRecordPageInner() {
   // Helper function to convert menstrual aids array to dropdown value
   const getMenstrualAidsDropdownValue = (aids: string[]) => {
     if (!aids || aids.length === 0) return ''
-    
+
     const sortedAids = [...aids].sort()
     const aidsMap: { [key: string]: string } = {
       'Menstrual Cup': '1',
-      'Sanitary Pads': '2', 
+      'Sanitary Pads': '2',
       'Tampon': '3'
     }
-    
+
     const numericValue = sortedAids.map(aid => aidsMap[aid]).join('')
     return numericValue
   }
@@ -666,7 +676,7 @@ function NewMedicalRecordPageInner() {
   }
 
   const validateForm = () => {
-    const errors: {[key: string]: string} = {}
+    const errors: { [key: string]: string } = {}
 
     if (!formData.cadetId || formData.cadetId.trim() === '') {
       errors.cadetId = 'Please select a cadet'
@@ -1453,1414 +1463,1454 @@ function NewMedicalRecordPageInner() {
                     </div>
                   )}
 
-                <div className="grid grid-cols-1 gap-4">
-                  {/* Cadet Name */}
-                  <div>
-                    <label htmlFor="cadetName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      id="cadetName"
-                      name="name"
-                      required
-                      value={cadetFormData.name}
-                      onChange={handleCadetFormChange}
-                      className="input-field" 
-                      placeholder="Enter full name"
-                    />
-                  </div>
-
-                  {/* Foreign Candidate Checkbox */}
-                  <div>
-                    <label className="flex items-center">
+                  <div className="grid grid-cols-1 gap-4">
+                    {/* Cadet Name */}
+                    <div>
+                      <label htmlFor="cadetName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Full Name *
+                      </label>
                       <input
-                        type="checkbox"
-                        id="isForeign"
-                        name="isForeign"
-                        checked={cadetFormData.isForeign}
+                        type="text"
+                        id="cadetName"
+                        name="name"
+                        required
+                        value={cadetFormData.name}
                         onChange={handleCadetFormChange}
-                        className="mr-2"
+                        className="input-field"
+                        placeholder="Enter full name"
                       />
-                      Foreign Cadet
-                    </label>
-                  </div>
+                    </div>
 
-                  {/* Demographics Section */}
-                  <div className="col-span-full">
-                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                      Demographics
-                    </h4>
-                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
-                      <div className="grid grid-cols-2 gap-4">
-                        {/* Battalion */}
-                        <div>
-                          <label htmlFor="cadetBattalion" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Battalion *
-                          </label>
-                          <select
-                            id="cadetBattalion"
-                            name="battalion"
-                            required
-                            value={cadetFormData.battalion}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                          >
-                            <option value="">Select battalion...</option>
-                            <option value="Shivaji">Shivaji</option>
-                            <option value="Ranjit Singh">Ranjit Singh</option>
-                          </select>
-                        </div>
+                    {/* Foreign Candidate Checkbox */}
+                    <div>
+                      <label className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="isForeign"
+                          name="isForeign"
+                          checked={cadetFormData.isForeign}
+                          onChange={handleCadetFormChange}
+                          className="mr-2"
+                        />
+                        Foreign Cadet
+                      </label>
+                    </div>
 
-                        {/* Company */}
-                        <div>
-                          <label htmlFor="cadetCompany" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Company *
-                          </label>
-                          <select
-                            id="cadetCompany"
-                            name="company"
-                            required
-                            value={cadetFormData.company}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                          >
-                            <option value="">Select company...</option>
-                            <option value="M">M</option>
-                            <option value="N">N</option>
-                            <option value="Z">Z</option>
-                            <option value="J">J</option>
-                            <option value="K">K</option>
-                            <option value="P">P</option>
-                          </select>
-                        </div>
-
-                        {/* Academy Number */}
-                        <div>
-                          <label htmlFor="academyNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Academy Number *
-                          </label>
-                          <input
-                            type="number"
-                            id="academyNumber"
-                            name="academyNumber"
-                            required
-                            value={cadetFormData.academyNumber}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 12345"
-                            min={1} 
-                            maxLength={5}
-                          />
-                        </div> 
-
-                        {/* Join Date */}
-                        <div>
-                          <label htmlFor="cadetJoinDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Join Date *
-                          </label>
-                          <input
-                            type="date"
-                            id="cadetJoinDate"
-                            name="joinDate"
-                            required
-                            value={cadetFormData.joinDate}
-                            onChange={handleCadetFormChange}
-                            max={new Date().toISOString().split('T')[0]} // Prevent future dates
-                            className="input-field"
-                          />
-                        </div>
-
-                        {/* Height (cm) */}
-                        <div>
-                          <label htmlFor="height" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Height (cm) *
-                          </label>
-                          <input
-                            type="number"
-                            id="height"
-                            name="height"
-                            required
-                            min={0}
-                            max={300}
-                            value={cadetFormData.height}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 175"
-                            maxLength={3}
-                          />
-                        </div>
-
-                        {/* Initial Weight (kg) */}
-                        <div>
-                          <label htmlFor="initialWeight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Initial Weight (kg) *
-                          </label>
-                          <input
-                            type="number"
-                            id="initialWeight"
-                            name="initialWeight"
-                            required
-                            min={0}
-                            step="0.1"
-                            value={cadetFormData.initialWeight}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 68.5"
-                            max={300}
-                          />
-                        </div>
-
-                        {/* Age */}
-                        <div>
-                          <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Age *
-                          </label>
-                          <input
-                            type="number"
-                            id="age"
-                            name="age"
-                            required
-                            min={0}
-                            max={99}
-                            value={cadetFormData.age}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 21"
-                            maxLength={2}
-                          />
-                        </div>
-
-                        {/* Course */}
-                        <div>
-                          <label htmlFor="course" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Course *
-                          </label>
-                          <input
-                            type="number"
-                            id="course"
-                            name="course"
-                            required
-                            min={1}
-                            max={99999}
-                            value={cadetFormData.course}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 121, 122, 123"
-                            maxLength={5}
-                          />
-                        </div>
-
-                        {/* Sex */}
-                        <div>
-                          <label htmlFor="sex" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Sex *
-                          </label>
-                          <select
-                            id="sex"
-                            name="sex"
-                            required
-                            value={cadetFormData.sex}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                          >
-                            <option value="">Select...</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                          </select>
-                        </div>
-
-                        {/* NOK Contact */}
-                        <div>
-                          <label htmlFor="nokContact" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            NOK Contact *
-                          </label>
-                          <input
-                            type="tel"
-                            id="nokContact"
-                            name="nokContact"
-                            required
-                            value={cadetFormData.nokContact}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 9876543210"
-                            maxLength={10}
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="relegated" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Relegated *
-                          </label>
-                          <select
-                            id="relegated"
-                            name="relegated"
-                            required
-                            value={cadetFormData.relegated}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                          >
-                            <option value="N">N</option>
-                            <option value="Y">Y</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      {/* Country */}
-                      {cadetFormData.isForeign && (
-                        <div className="grid grid-cols-1 gap-4">
+                    {/* Demographics Section */}
+                    <div className="col-span-full">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                        Demographics
+                      </h4>
+                      <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                        <div className="grid grid-cols-2 gap-4">
+                          {/* Battalion */}
                           <div>
-                            <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              Country
+                            <label htmlFor="cadetBattalion" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Battalion *
                             </label>
                             <select
-                              id="country"
-                              name="country"
-                              value={cadetFormData.country}
+                              id="cadetBattalion"
+                              name="battalion"
+                              required
+                              value={cadetFormData.battalion}
                               onChange={handleCadetFormChange}
                               className="input-field"
                             >
-                              <option value="">Select country...</option>
-                            <option value="Afghanistan">Afghanistan</option>
-                            <option value="Albania">Albania</option>
-                            <option value="Algeria">Algeria</option>
-                            <option value="Andorra">Andorra</option>
-                            <option value="Angola">Angola</option>
-                            <option value="Antigua and Barbuda">Antigua and Barbuda</option>
-                            <option value="Argentina">Argentina</option>
-                            <option value="Armenia">Armenia</option>
-                            <option value="Australia">Australia</option>
-                            <option value="Austria">Austria</option>
-                            <option value="Azerbaijan">Azerbaijan</option>
-                            <option value="Bahamas">Bahamas</option>
-                            <option value="Bahrain">Bahrain</option>
-                            <option value="Bangladesh">Bangladesh</option>
-                            <option value="Barbados">Barbados</option>
-                            <option value="Belarus">Belarus</option>
-                            <option value="Belgium">Belgium</option>
-                            <option value="Belize">Belize</option>
-                            <option value="Benin">Benin</option>
-                            <option value="Bhutan">Bhutan</option>
-                            <option value="Bolivia">Bolivia</option>
-                            <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
-                            <option value="Botswana">Botswana</option>
-                            <option value="Brazil">Brazil</option>
-                            <option value="Brunei">Brunei</option>
-                            <option value="Bulgaria">Bulgaria</option>
-                            <option value="Burkina Faso">Burkina Faso</option>
-                            <option value="Burundi">Burundi</option>
-                            <option value="Cabo Verde">Cabo Verde</option>
-                            <option value="Cambodia">Cambodia</option>
-                            <option value="Cameroon">Cameroon</option>
-                            <option value="Canada">Canada</option>
-                            <option value="Central African Republic">Central African Republic</option>
-                            <option value="Chad">Chad</option>
-                            <option value="Chile">Chile</option>
-                            <option value="China">China</option>
-                            <option value="Colombia">Colombia</option>
-                            <option value="Comoros">Comoros</option>
-                            <option value="Congo">Congo</option>
-                            <option value="Costa Rica">Costa Rica</option>
-                            <option value="Croatia">Croatia</option>
-                            <option value="Cuba">Cuba</option>
-                            <option value="Cyprus">Cyprus</option>
-                            <option value="Czech Republic">Czech Republic</option>
-                            <option value="Denmark">Denmark</option>
-                            <option value="Djibouti">Djibouti</option>
-                            <option value="Dominica">Dominica</option>
-                            <option value="Dominican Republic">Dominican Republic</option>
-                            <option value="Ecuador">Ecuador</option>
-                            <option value="Egypt">Egypt</option>
-                            <option value="El Salvador">El Salvador</option>
-                            <option value="Equatorial Guinea">Equatorial Guinea</option>
-                            <option value="Eritrea">Eritrea</option>
-                            <option value="Estonia">Estonia</option>
-                            <option value="Eswatini">Eswatini</option>
-                            <option value="Ethiopia">Ethiopia</option>
-                            <option value="Fiji">Fiji</option>
-                            <option value="Finland">Finland</option>
-                            <option value="France">France</option>
-                            <option value="Gabon">Gabon</option>
-                            <option value="Gambia">Gambia</option>
-                            <option value="Georgia">Georgia</option>
-                            <option value="Germany">Germany</option>
-                            <option value="Ghana">Ghana</option>
-                            <option value="Greece">Greece</option>
-                            <option value="Grenada">Grenada</option>
-                            <option value="Guatemala">Guatemala</option>
-                            <option value="Guinea">Guinea</option>
-                            <option value="Guinea-Bissau">Guinea-Bissau</option>
-                            <option value="Guyana">Guyana</option>
-                            <option value="Haiti">Haiti</option>
-                            <option value="Honduras">Honduras</option>
-                            <option value="Hungary">Hungary</option>
-                            <option value="Iceland">Iceland</option>
-                            <option value="India">India</option>
-                            <option value="Indonesia">Indonesia</option>
-                            <option value="Iran">Iran</option>
-                            <option value="Iraq">Iraq</option>
-                            <option value="Ireland">Ireland</option>
-                            <option value="Israel">Israel</option>
-                            <option value="Italy">Italy</option>
-                            <option value="Jamaica">Jamaica</option>
-                            <option value="Japan">Japan</option>
-                            <option value="Jordan">Jordan</option>
-                            <option value="Kazakhstan">Kazakhstan</option>
-                            <option value="Kenya">Kenya</option>
-                            <option value="Kiribati">Kiribati</option>
-                            <option value="Korea, North">Korea, North</option>
-                            <option value="Korea, South">Korea, South</option>
-                            <option value="Kosovo">Kosovo</option>
-                            <option value="Kuwait">Kuwait</option>
-                            <option value="Kyrgyzstan">Kyrgyzstan</option>
-                            <option value="Laos">Laos</option>
-                            <option value="Latvia">Latvia</option>
-                            <option value="Lebanon">Lebanon</option>
-                            <option value="Lesotho">Lesotho</option>
-                            <option value="Liberia">Liberia</option>
-                            <option value="Libya">Libya</option>
-                            <option value="Liechtenstein">Liechtenstein</option>
-                            <option value="Lithuania">Lithuania</option>
-                            <option value="Luxembourg">Luxembourg</option>
-                            <option value="Madagascar">Madagascar</option>
-                            <option value="Malawi">Malawi</option>
-                            <option value="Malaysia">Malaysia</option>
-                            <option value="Maldives">Maldives</option>
-                            <option value="Mali">Mali</option>
-                            <option value="Malta">Malta</option>
-                            <option value="Marshall Islands">Marshall Islands</option>
-                            <option value="Mauritania">Mauritania</option>
-                            <option value="Mauritius">Mauritius</option>
-                            <option value="Mexico">Mexico</option>
-                            <option value="Micronesia">Micronesia</option>
-                            <option value="Moldova">Moldova</option>
-                            <option value="Monaco">Monaco</option>
-                            <option value="Mongolia">Mongolia</option>
-                            <option value="Montenegro">Montenegro</option>
-                            <option value="Morocco">Morocco</option>
-                            <option value="Mozambique">Mozambique</option>
-                            <option value="Myanmar">Myanmar</option>
-                            <option value="Namibia">Namibia</option>
-                            <option value="Nauru">Nauru</option>
-                            <option value="Nepal">Nepal</option>
-                            <option value="Netherlands">Netherlands</option>
-                            <option value="New Zealand">New Zealand</option>
-                            <option value="Nicaragua">Nicaragua</option>
-                            <option value="Niger">Niger</option>
-                            <option value="Nigeria">Nigeria</option>
-                            <option value="North Macedonia">North Macedonia</option>
-                            <option value="Norway">Norway</option>
-                            <option value="Oman">Oman</option>
-                            <option value="Pakistan">Pakistan</option>
-                            <option value="Palau">Palau</option>
-                            <option value="Palestine">Palestine</option>
-                            <option value="Panama">Panama</option>
-                            <option value="Papua New Guinea">Papua New Guinea</option>
-                            <option value="Paraguay">Paraguay</option>
-                            <option value="Peru">Peru</option>
-                            <option value="Philippines">Philippines</option>
-                            <option value="Poland">Poland</option>
-                            <option value="Portugal">Portugal</option>
-                            <option value="Qatar">Qatar</option>
-                            <option value="Romania">Romania</option>
-                            <option value="Russia">Russia</option>
-                            <option value="Rwanda">Rwanda</option>
-                            <option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
-                            <option value="Saint Lucia">Saint Lucia</option>
-                            <option value="Saint Vincent and the Grenadines">Saint Vincent and the Grenadines</option>
-                            <option value="Samoa">Samoa</option>
-                            <option value="San Marino">San Marino</option>
-                            <option value="Sao Tome and Principe">Sao Tome and Principe</option>
-                            <option value="Saudi Arabia">Saudi Arabia</option>
-                            <option value="Senegal">Senegal</option>
-                            <option value="Serbia">Serbia</option>
-                            <option value="Seychelles">Seychelles</option>
-                            <option value="Sierra Leone">Sierra Leone</option>
-                            <option value="Singapore">Singapore</option>
-                            <option value="Slovakia">Slovakia</option>
-                            <option value="Slovenia">Slovenia</option>
-                            <option value="Solomon Islands">Solomon Islands</option>
-                            <option value="Somalia">Somalia</option>
-                            <option value="South Africa">South Africa</option>
-                            <option value="South Sudan">South Sudan</option>
-                            <option value="Spain">Spain</option>
-                            <option value="Sri Lanka">Sri Lanka</option>
-                            <option value="Sudan">Sudan</option>
-                            <option value="Suriname">Suriname</option>
-                            <option value="Sweden">Sweden</option>
-                            <option value="Switzerland">Switzerland</option>
-                            <option value="Syria">Syria</option>
-                            <option value="Taiwan">Taiwan</option>
-                            <option value="Tajikistan">Tajikistan</option>
-                            <option value="Tanzania">Tanzania</option>
-                            <option value="Thailand">Thailand</option>
-                            <option value="Timor-Leste">Timor-Leste</option>
-                            <option value="Togo">Togo</option>
-                            <option value="Tonga">Tonga</option>
-                            <option value="Trinidad and Tobago">Trinidad and Tobago</option>
-                            <option value="Tunisia">Tunisia</option>
-                            <option value="Turkey">Turkey</option>
-                            <option value="Turkmenistan">Turkmenistan</option>
-                            <option value="Tuvalu">Tuvalu</option>
-                            <option value="Uganda">Uganda</option>
-                            <option value="Ukraine">Ukraine</option>
-                            <option value="United Arab Emirates">United Arab Emirates</option>
-                            <option value="United Kingdom">United Kingdom</option>
-                            <option value="United States">United States</option>
-                            <option value="Uruguay">Uruguay</option>
-                            <option value="Uzbekistan">Uzbekistan</option>
-                            <option value="Vanuatu">Vanuatu</option>
-                            <option value="Vatican City">Vatican City</option>
-                            <option value="Venezuela">Venezuela</option>
-                            <option value="Vietnam">Vietnam</option>
-                            <option value="Yemen">Yemen</option>
-                            <option value="Zambia">Zambia</option>
-                            <option value="Zimbabwe">Zimbabwe</option>
-                          </select>
-                        </div>
-                      </div>
-                      )}
-                    </div>
-                  </div>
+                              <option value="">Select battalion...</option>
+                              <option value="Shivaji">Shivaji</option>
+                              <option value="Ranjit Singh">Ranjit Singh</option>
+                            </select>
+                          </div>
 
-                  {/* Health Parameters Section */}
-                  <div className="col-span-full">
-                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                      Health Parameters
-                    </h4>
-                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor="bloodGroup" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Blood Group *
-                          </label>
-                          <select
-                            id="bloodGroup"
-                            name="bloodGroup"
-                            required
-                            value={cadetFormData.bloodGroup}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                          >
-                            <option value="">Select blood group...</option>
-                            <option value="A+">A+</option>
-                            <option value="A-">A-</option>
-                            <option value="B+">B+</option>
-                            <option value="B-">B-</option>
-                            <option value="AB+">AB+</option>
-                            <option value="AB-">AB-</option>
-                            <option value="O+">O+</option>
-                            <option value="O-">O-</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label htmlFor="bmi" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            BMI
-                          </label>
-                          <input
-                            type="text"
-                            id="bmi"
-                            name="bmi"
-                            value={cadetFormData.bmi}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 22.5"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="bodyFat" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Body Fat %
-                          </label>
-                          <input
-                            type="text"
-                            id="bodyFat"
-                            name="bodyFat"
-                            value={cadetFormData.bodyFat}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 15.2"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="calcanealBoneDensity" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Calcaneal Bone Density
-                          </label>
-                          <input
-                            type="text"
-                            id="calcanealBoneDensity"
-                            name="calcanealBoneDensity"
-                            value={cadetFormData.calcanealBoneDensity}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 0.85"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="bp" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            BP
-                          </label>
-                          <input
-                            type="text"
-                            id="bp"
-                            name="bp"
-                            value={cadetFormData.bp}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 120/80"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="pulse" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Pulse
-                          </label>
-                          <input
-                            type="text"
-                            id="pulse"
-                            name="pulse"
-                            value={cadetFormData.pulse}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 72"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="so2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            SpO2
-                          </label>
-                          <input
-                            type="text"
-                            id="so2"
-                            name="so2"
-                            value={cadetFormData.so2}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 98"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="bcaFat" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            BCA Fat (%)
-                          </label>
-                          <input
-                            type="text"
-                            id="bcaFat"
-                            name="bcaFat"
-                            value={cadetFormData.bcaFat}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 12.3"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="ecg" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            ECG
-                          </label>
-                          <input
-                            type="text"
-                            id="ecg"
-                            name="ecg"
-                            value={cadetFormData.ecg}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="Normal/Abnormal"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="temp" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Temperature (TEMP)
-                          </label>
-                          <input
-                            type="text"
-                            id="temp"
-                            name="temp"
-                            value={cadetFormData.temp}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 98.6"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="smmKg" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            SMM (KG)
-                          </label>
-                          <input
-                            type="text"
-                            id="smmKg"
-                            name="smmKg"
-                            value={cadetFormData.smmKg}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 35.2"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Vaccination Status Section */}
-                  <div className="col-span-full">
-                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                      Vaccination Status
-                    </h4>
-                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
-                      <div>
-                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Covid Vaccine:</h5>
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input
-                              type="checkbox"
-                              name="covidDose1"
-                              checked={cadetFormData.covidDose1}
+                          {/* Company */}
+                          <div>
+                            <label htmlFor="cadetCompany" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Company *
+                            </label>
+                            <select
+                              id="cadetCompany"
+                              name="company"
+                              required
+                              value={cadetFormData.company}
                               onChange={handleCadetFormChange}
-                              className="mr-2"
-                            />
-                            1st Dose
-                          </label>
-                          <label className="flex items-center">
-                            <input
-                              type="checkbox"
-                              name="covidDose2"
-                              checked={cadetFormData.covidDose2}
-                              onChange={handleCadetFormChange}
-                              className="mr-2"
-                            />
-                            2nd Dose
-                          </label>
-                          <label className="flex items-center">
-                            <input
-                              type="checkbox"
-                              name="covidDose3"
-                              checked={cadetFormData.covidDose3}
-                              onChange={handleCadetFormChange}
-                              className="mr-2"
-                            />
-                            3rd Dose
-                          </label>
-                        </div>
-                      </div>
-                      <div>
-                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hepatitis B Vaccine:</h5>
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input
-                              type="checkbox"
-                              name="hepatitisBDose1"
-                              checked={cadetFormData.hepatitisBDose1}
-                              onChange={handleCadetFormChange}
-                              className="mr-2"
-                            />
-                            1st Dose
-                          </label>
-                          <label className="flex items-center">
-                            <input
-                              type="checkbox"
-                              name="hepatitisBDose2"
-                              checked={cadetFormData.hepatitisBDose2}
-                              onChange={handleCadetFormChange}
-                              className="mr-2"
-                            />
-                            2nd Dose
-                          </label>
-                        </div>
-                      </div>
-                      <div>
-                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tetanus Toxoid:</h5>
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input
-                              type="radio"
-                              name="tetanusToxoid"
-                              value="true"
-                              checked={cadetFormData.tetanusToxoid === true}
-                              onChange={() => setCadetFormData(prev => ({ ...prev, tetanusToxoid: true }))}
-                              className="mr-2"
-                            />
-                            Yes
-                          </label>
-                          <label className="flex items-center">
-                            <input
-                              type="radio"
-                              name="tetanusToxoid"
-                              value="false"
-                              checked={cadetFormData.tetanusToxoid === false}
-                              onChange={() => setCadetFormData(prev => ({ ...prev, tetanusToxoid: false }))}
-                              className="mr-2"
-                            />
-                            No
-                          </label>
-                        </div>
-                      </div>
-                      <div>
-                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Chicken Pox:</h5>
-                        <div className="flex gap-4 flex-wrap">
-                          <label className="flex items-center">
-                            <input
-                              type="checkbox"
-                              name="chickenPoxDose1"
-                              checked={cadetFormData.chickenPoxDose1}
-                              onChange={handleCadetFormChange}
-                              className="mr-2"
-                            />
-                            1st Dose
-                          </label>
-                          <label className="flex items-center">
-                            <input
-                              type="checkbox"
-                              name="chickenPoxDose2"
-                              checked={cadetFormData.chickenPoxDose2}
-                              onChange={handleCadetFormChange}
-                              className="mr-2"
-                            />
-                            2nd Dose
-                          </label>
-                          <label className="flex items-center">
-                            <input
-                              type="checkbox"
-                              name="chickenPoxSuffered"
-                              checked={cadetFormData.chickenPoxSuffered}
-                              onChange={handleCadetFormChange}
-                              className="mr-2"
-                            />
-                            Suffered in childhood
-                          </label>
-                        </div>
-                      </div>
-                      {cadetFormData.isForeign && (
-                      <div>
-                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Yellow Fever (Foreign Cadets only):</h5>
-                        <div className="flex gap-4">
-                          <label className="flex items-center">
-                            <input
-                              type="radio"
-                              name="yellowFever"
-                              value="true"
-                              checked={cadetFormData.yellowFever === true}
-                              onChange={() => setCadetFormData(prev => ({ ...prev, yellowFever: true }))}
-                              className="mr-2"
-                            />
-                            Yes
-                          </label>
-                          <label className="flex items-center">
-                            <input
-                              type="radio"
-                              name="yellowFever"
-                              value="false"
-                              checked={cadetFormData.yellowFever === false}
-                              onChange={() => setCadetFormData(prev => ({ ...prev, yellowFever: false }))}
-                              className="mr-2"
-                            />
-                            No
-                          </label>
-                        </div>
-                      </div>
-                      )}
-                      <div>
-                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Past Medical History:</h5>
-                        <textarea
-                          id="pastMedicalHistory"
-                          name="pastMedicalHistory"
-                          rows={3}
-                          value={cadetFormData.pastMedicalHistory}
-                          onChange={handleCadetFormChange}
-                          className="input-field"
-                          placeholder="Detailed history of injuries, fractures, surgeries, diseases, depression, or suicidal attempts..."
-                        />
-                      </div>
-                    </div>
-                  </div>
+                              className="input-field"
+                            >
+                              <option value="">Select company...</option>
+                              <option value="M">M</option>
+                              <option value="N">N</option>
+                              <option value="Z">Z</option>
+                              <option value="J">J</option>
+                              <option value="K">K</option>
+                              <option value="P">P</option>
+                            </select>
+                          </div>
 
-                  {/* Endurance Test Section */}
-                  <div className="col-span-full">
-                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                      Endurance Test
-                    </h4>
-                    <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
-                      <div>
-                        <label htmlFor="enduranceTest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Multi-Stage Fitness Test / 800m Running
-                        </label>
-                        <input
-                          type="text"
-                          id="enduranceTest"
-                          name="enduranceTest"
-                          value={cadetFormData.enduranceTest}
-                          onChange={handleCadetFormChange}
-                          className="input-field"
-                          placeholder="e.g., Level 12, 8:45"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                          {/* Academy Number */}
+                          <div>
+                            <label htmlFor="academyNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Academy Number *
+                            </label>
+                            <input
+                              type="number"
+                              id="academyNumber"
+                              name="academyNumber"
+                              required
+                              value={cadetFormData.academyNumber}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 12345"
+                              min={1}
+                              maxLength={5}
+                            />
+                          </div>
 
-                  {/* Agility Test Section */}
-                  <div className="col-span-full">
-                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                      Agility Test
-                    </h4>
-                    <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
-                      <div>
-                        <label htmlFor="agilityTest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Illinois Agility Run Test
-                        </label>
-                        <input
-                          type="text"
-                          id="agilityTest"
-                          name="agilityTest"
-                          value={cadetFormData.agilityTest}
-                          onChange={handleCadetFormChange}
-                          className="input-field"
-                          placeholder="e.g., 15.2 seconds"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                          {/* Join Date */}
+                          <div>
+                            <label htmlFor="cadetJoinDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Join Date *
+                            </label>
+                            <input
+                              type="date"
+                              id="cadetJoinDate"
+                              name="joinDate"
+                              required
+                              value={cadetFormData.joinDate}
+                              onChange={handleCadetFormChange}
+                              max={new Date().toISOString().split('T')[0]} // Prevent future dates
+                              className="input-field"
+                            />
+                          </div>
 
-                  {/* Speed Test Section */}
-                  <div className="col-span-full">
-                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                      Speed Test
-                    </h4>
-                    <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
-                      <div>
-                        <label htmlFor="speedTest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          30 Meter Fly
-                        </label>
-                        <input
-                          type="text"
-                          id="speedTest"
-                          name="speedTest"
-                          value={cadetFormData.speedTest}
-                          onChange={handleCadetFormChange}
-                          className="input-field"
-                          placeholder="e.g., 4.2 seconds"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                          {/* Height (cm) */}
+                          <div>
+                            <label htmlFor="height" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Height (cm) *
+                            </label>
+                            <input
+                              type="number"
+                              id="height"
+                              name="height"
+                              required
+                              min={0}
+                              max={300}
+                              value={cadetFormData.height}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 175"
+                              maxLength={3}
+                            />
+                          </div>
 
-                  {/* Strength Test Section */}
-                  <div className="col-span-full">
-                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                      Strength Tests
-                    </h4>
-                    <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor="verticalJump" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Vertical Jump *
-                          </label>
-                          <input
-                            type="text"
-                            id="verticalJump"
-                            name="verticalJump"
-                            required
-                            value={cadetFormData.verticalJump}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 45 cm"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="ballThrow" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Ball Throw *
-                          </label>
-                          <input
-                            type="text"
-                            id="ballThrow"
-                            name="ballThrow"
-                            required
-                            value={cadetFormData.ballThrow}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 8.5 m"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="lowerBackStrength" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Lower Back Strength *
-                          </label>
-                          <input
-                            type="text"
-                            id="lowerBackStrength"
-                            name="lowerBackStrength"
-                            required
-                            value={cadetFormData.lowerBackStrength}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 120 kg"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="shoulderDynamometerLeft" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Shoulder Dynamometer (Left) *
-                          </label>
-                          <input
-                            type="text"
-                            id="shoulderDynamometerLeft"
-                            name="shoulderDynamometerLeft"
-                            required
-                            value={cadetFormData.shoulderDynamometerLeft}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 25 kg"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="shoulderDynamometerRight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Shoulder Dynamometer (Right) *
-                          </label>
-                          <input
-                            type="text"
-                            id="shoulderDynamometerRight"
-                            name="shoulderDynamometerRight"
-                            required
-                            value={cadetFormData.shoulderDynamometerRight}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 28 kg"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="handGripDynamometerLeft" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Hand Grip Dynamometer (Left) *
-                          </label>
-                          <input
-                            type="text"
-                            id="handGripDynamometerLeft"
-                            name="handGripDynamometerLeft"
-                            required
-                            value={cadetFormData.handGripDynamometerLeft}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 45 kg"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="handGripDynamometerRight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Hand Grip Dynamometer (Right) *
-                          </label>
-                          <input
-                            type="text"
-                            id="handGripDynamometerRight"
-                            name="handGripDynamometerRight"
-                            required
-                            value={cadetFormData.handGripDynamometerRight}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 48 kg"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                          {/* Initial Weight (kg) */}
+                          <div>
+                            <label htmlFor="initialWeight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Initial Weight (kg) *
+                            </label>
+                            <input
+                              type="number"
+                              id="initialWeight"
+                              name="initialWeight"
+                              required
+                              min={0}
+                              step="0.1"
+                              value={cadetFormData.initialWeight}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 68.5"
+                              max={300}
+                            />
+                          </div>
 
-                  {/* Overall Assessment Section */}
-                  <div className="col-span-full">
-                    <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                      Overall Assessment
-                    </h4>
-                    <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
-                      <div>
-                        <label htmlFor="overallAssessment" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Overall Assessment
-                        </label>
-                        <textarea
-                          id="overallAssessment"
-                          name="overallAssessment"
-                          rows={3}
-                          value={cadetFormData.overallAssessment}
-                          onChange={handleCadetFormChange}
-                          className="input-field"
-                          placeholder="Overall remarks or grading"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                          {/* Age */}
+                          <div>
+                            <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Age *
+                            </label>
+                            <input
+                              type="number"
+                              id="age"
+                              name="age"
+                              required
+                              min={0}
+                              max={99}
+                              value={cadetFormData.age}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 21"
+                              maxLength={2}
+                            />
+                          </div>
 
-                  {/* Menstrual & Medical History Section - Only show for Female cadets */}
-                  {cadetFormData.sex === 'Female' && (
-                    <div className="col-span-full">
-                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                        Menstrual & Medical History (For Female Cadets Only)
-                      </h4>
-                      <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600 bg-pink-50 dark:bg-pink-900/10 p-4 rounded-lg">
+                          {/* Course */}
+                          <div>
+                            <label htmlFor="course" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Course *
+                            </label>
+                            <input
+                              type="number"
+                              id="course"
+                              name="course"
+                              required
+                              min={1}
+                              max={99999}
+                              value={cadetFormData.course}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 121, 122, 123"
+                              maxLength={5}
+                            />
+                          </div>
 
-                        {/* Menstrual Cycle */}
-                        <div className="col-span-full">
-                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Menstrual Cycle:</h5>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                              <label htmlFor="menstrualFrequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                How frequently
-                              </label>
-                              <select
-                                id="menstrualFrequency"
-                                name="menstrualFrequency"
-                                value={cadetFormData.menstrualFrequency}
-                                onChange={handleCadetFormChange}
-                                className="input-field"
-                              >
-                                <option value="">Select frequency...</option>
-                                <option value="Regular">Regular</option>
-                                <option value="Irregular">Irregular</option>
-                              </select>
-                            </div>
-                            <div>
-                              <label htmlFor="menstrualDays" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                How many days
-                              </label>
-                              <input
-                                type="number"
-                                id="menstrualDays"
-                                name="menstrualDays"
-                                min="1"
-                                max="10"
-                                value={cadetFormData.menstrualDays}
-                                onChange={handleCadetFormChange}
-                                className="input-field"
-                                placeholder="e.g., 5"
-                              />
-                            </div>
-                            <div>
-                              <label htmlFor="lastMenstrualDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Last menstrual period date
-                              </label>
-                              <input
-                                type="date"
-                                id="lastMenstrualDate"
-                                name="lastMenstrualDate"
-                                value={cadetFormData.lastMenstrualDate}
-                                onChange={handleCadetFormChange}
-                                className={`input-field ${fieldErrors.lastMenstrualDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
-                              />
-                              {fieldErrors.lastMenstrualDate && (
-                                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.lastMenstrualDate}</p>
-                              )}
-                            </div>
+                          {/* Sex */}
+                          <div>
+                            <label htmlFor="sex" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Sex *
+                            </label>
+                            <select
+                              id="sex"
+                              name="sex"
+                              required
+                              value={cadetFormData.sex}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                            >
+                              <option value="">Select...</option>
+                              <option value="Male">Male</option>
+                              <option value="Female">Female</option>
+                            </select>
+                          </div>
+
+                          {/* NOK Contact */}
+                          <div>
+                            <label htmlFor="nokContact" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              NOK Contact *
+                            </label>
+                            <input
+                              type="tel"
+                              id="nokContact"
+                              name="nokContact"
+                              required
+                              value={cadetFormData.nokContact}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 9876543210"
+                              maxLength={10}
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="relegated" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Relegated *
+                            </label>
+                            <select
+                              id="relegated"
+                              name="relegated"
+                              required
+                              value={cadetFormData.relegated}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                            >
+                              <option value="N">N</option>
+                              <option value="Y">Y</option>
+                            </select>
                           </div>
                         </div>
 
-                        {/* Menstrual Cycle Aids */}
-                        <div className="col-span-full">
-                          <label htmlFor="menstrualAidsDropdown" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Menstrual Cycle Aids
-                          </label>
-                          <select
-                            id="menstrualAidsDropdown"
-                            name="menstrualAidsDropdown"
-                            value={getMenstrualAidsDropdownValue(cadetFormData.menstrualAids || [])}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                          >
-                            <option value="">Select menstrual aids...</option>
-                            <option value="1">Menstrual Cup</option>
-                            <option value="2">Sanitary Pads</option>
-                            <option value="3">Tampon</option>
-                            <option value="12">Menstrual Cup + Sanitary Pads</option>
-                            <option value="13">Menstrual Cup + Tampon</option>
-                            <option value="23">Sanitary Pads + Tampon</option>
-                            <option value="123">All (Menstrual Cup + Sanitary Pads + Tampon)</option>
-                          </select>
-                        </div>
+                        {/* Country */}
+                        {cadetFormData.isForeign && (
+                          <div className="grid grid-cols-1 gap-4">
+                            <div>
+                              <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Country
+                              </label>
+                              <select
+                                id="country"
+                                name="country"
+                                value={cadetFormData.country}
+                                onChange={handleCadetFormChange}
+                                className="input-field"
+                              >
+                                <option value="">Select country...</option>
+                                <option value="Afghanistan">Afghanistan</option>
+                                <option value="Albania">Albania</option>
+                                <option value="Algeria">Algeria</option>
+                                <option value="Andorra">Andorra</option>
+                                <option value="Angola">Angola</option>
+                                <option value="Antigua and Barbuda">Antigua and Barbuda</option>
+                                <option value="Argentina">Argentina</option>
+                                <option value="Armenia">Armenia</option>
+                                <option value="Australia">Australia</option>
+                                <option value="Austria">Austria</option>
+                                <option value="Azerbaijan">Azerbaijan</option>
+                                <option value="Bahamas">Bahamas</option>
+                                <option value="Bahrain">Bahrain</option>
+                                <option value="Bangladesh">Bangladesh</option>
+                                <option value="Barbados">Barbados</option>
+                                <option value="Belarus">Belarus</option>
+                                <option value="Belgium">Belgium</option>
+                                <option value="Belize">Belize</option>
+                                <option value="Benin">Benin</option>
+                                <option value="Bhutan">Bhutan</option>
+                                <option value="Bolivia">Bolivia</option>
+                                <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+                                <option value="Botswana">Botswana</option>
+                                <option value="Brazil">Brazil</option>
+                                <option value="Brunei">Brunei</option>
+                                <option value="Bulgaria">Bulgaria</option>
+                                <option value="Burkina Faso">Burkina Faso</option>
+                                <option value="Burundi">Burundi</option>
+                                <option value="Cabo Verde">Cabo Verde</option>
+                                <option value="Cambodia">Cambodia</option>
+                                <option value="Cameroon">Cameroon</option>
+                                <option value="Canada">Canada</option>
+                                <option value="Central African Republic">Central African Republic</option>
+                                <option value="Chad">Chad</option>
+                                <option value="Chile">Chile</option>
+                                <option value="China">China</option>
+                                <option value="Colombia">Colombia</option>
+                                <option value="Comoros">Comoros</option>
+                                <option value="Congo">Congo</option>
+                                <option value="Costa Rica">Costa Rica</option>
+                                <option value="Croatia">Croatia</option>
+                                <option value="Cuba">Cuba</option>
+                                <option value="Cyprus">Cyprus</option>
+                                <option value="Czech Republic">Czech Republic</option>
+                                <option value="Denmark">Denmark</option>
+                                <option value="Djibouti">Djibouti</option>
+                                <option value="Dominica">Dominica</option>
+                                <option value="Dominican Republic">Dominican Republic</option>
+                                <option value="Ecuador">Ecuador</option>
+                                <option value="Egypt">Egypt</option>
+                                <option value="El Salvador">El Salvador</option>
+                                <option value="Equatorial Guinea">Equatorial Guinea</option>
+                                <option value="Eritrea">Eritrea</option>
+                                <option value="Estonia">Estonia</option>
+                                <option value="Eswatini">Eswatini</option>
+                                <option value="Ethiopia">Ethiopia</option>
+                                <option value="Fiji">Fiji</option>
+                                <option value="Finland">Finland</option>
+                                <option value="France">France</option>
+                                <option value="Gabon">Gabon</option>
+                                <option value="Gambia">Gambia</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Germany">Germany</option>
+                                <option value="Ghana">Ghana</option>
+                                <option value="Greece">Greece</option>
+                                <option value="Grenada">Grenada</option>
+                                <option value="Guatemala">Guatemala</option>
+                                <option value="Guinea">Guinea</option>
+                                <option value="Guinea-Bissau">Guinea-Bissau</option>
+                                <option value="Guyana">Guyana</option>
+                                <option value="Haiti">Haiti</option>
+                                <option value="Honduras">Honduras</option>
+                                <option value="Hungary">Hungary</option>
+                                <option value="Iceland">Iceland</option>
+                                <option value="India">India</option>
+                                <option value="Indonesia">Indonesia</option>
+                                <option value="Iran">Iran</option>
+                                <option value="Iraq">Iraq</option>
+                                <option value="Ireland">Ireland</option>
+                                <option value="Israel">Israel</option>
+                                <option value="Italy">Italy</option>
+                                <option value="Jamaica">Jamaica</option>
+                                <option value="Japan">Japan</option>
+                                <option value="Jordan">Jordan</option>
+                                <option value="Kazakhstan">Kazakhstan</option>
+                                <option value="Kenya">Kenya</option>
+                                <option value="Kiribati">Kiribati</option>
+                                <option value="Korea, North">Korea, North</option>
+                                <option value="Korea, South">Korea, South</option>
+                                <option value="Kosovo">Kosovo</option>
+                                <option value="Kuwait">Kuwait</option>
+                                <option value="Kyrgyzstan">Kyrgyzstan</option>
+                                <option value="Laos">Laos</option>
+                                <option value="Latvia">Latvia</option>
+                                <option value="Lebanon">Lebanon</option>
+                                <option value="Lesotho">Lesotho</option>
+                                <option value="Liberia">Liberia</option>
+                                <option value="Libya">Libya</option>
+                                <option value="Liechtenstein">Liechtenstein</option>
+                                <option value="Lithuania">Lithuania</option>
+                                <option value="Luxembourg">Luxembourg</option>
+                                <option value="Madagascar">Madagascar</option>
+                                <option value="Malawi">Malawi</option>
+                                <option value="Malaysia">Malaysia</option>
+                                <option value="Maldives">Maldives</option>
+                                <option value="Mali">Mali</option>
+                                <option value="Malta">Malta</option>
+                                <option value="Marshall Islands">Marshall Islands</option>
+                                <option value="Mauritania">Mauritania</option>
+                                <option value="Mauritius">Mauritius</option>
+                                <option value="Mexico">Mexico</option>
+                                <option value="Micronesia">Micronesia</option>
+                                <option value="Moldova">Moldova</option>
+                                <option value="Monaco">Monaco</option>
+                                <option value="Mongolia">Mongolia</option>
+                                <option value="Montenegro">Montenegro</option>
+                                <option value="Morocco">Morocco</option>
+                                <option value="Mozambique">Mozambique</option>
+                                <option value="Myanmar">Myanmar</option>
+                                <option value="Namibia">Namibia</option>
+                                <option value="Nauru">Nauru</option>
+                                <option value="Nepal">Nepal</option>
+                                <option value="Netherlands">Netherlands</option>
+                                <option value="New Zealand">New Zealand</option>
+                                <option value="Nicaragua">Nicaragua</option>
+                                <option value="Niger">Niger</option>
+                                <option value="Nigeria">Nigeria</option>
+                                <option value="North Macedonia">North Macedonia</option>
+                                <option value="Norway">Norway</option>
+                                <option value="Oman">Oman</option>
+                                <option value="Pakistan">Pakistan</option>
+                                <option value="Palau">Palau</option>
+                                <option value="Palestine">Palestine</option>
+                                <option value="Panama">Panama</option>
+                                <option value="Papua New Guinea">Papua New Guinea</option>
+                                <option value="Paraguay">Paraguay</option>
+                                <option value="Peru">Peru</option>
+                                <option value="Philippines">Philippines</option>
+                                <option value="Poland">Poland</option>
+                                <option value="Portugal">Portugal</option>
+                                <option value="Qatar">Qatar</option>
+                                <option value="Romania">Romania</option>
+                                <option value="Russia">Russia</option>
+                                <option value="Rwanda">Rwanda</option>
+                                <option value="Saint Kitts and Nevis">Saint Kitts and Nevis</option>
+                                <option value="Saint Lucia">Saint Lucia</option>
+                                <option value="Saint Vincent and the Grenadines">Saint Vincent and the Grenadines</option>
+                                <option value="Samoa">Samoa</option>
+                                <option value="San Marino">San Marino</option>
+                                <option value="Sao Tome and Principe">Sao Tome and Principe</option>
+                                <option value="Saudi Arabia">Saudi Arabia</option>
+                                <option value="Senegal">Senegal</option>
+                                <option value="Serbia">Serbia</option>
+                                <option value="Seychelles">Seychelles</option>
+                                <option value="Sierra Leone">Sierra Leone</option>
+                                <option value="Singapore">Singapore</option>
+                                <option value="Slovakia">Slovakia</option>
+                                <option value="Slovenia">Slovenia</option>
+                                <option value="Solomon Islands">Solomon Islands</option>
+                                <option value="Somalia">Somalia</option>
+                                <option value="South Africa">South Africa</option>
+                                <option value="South Sudan">South Sudan</option>
+                                <option value="Spain">Spain</option>
+                                <option value="Sri Lanka">Sri Lanka</option>
+                                <option value="Sudan">Sudan</option>
+                                <option value="Suriname">Suriname</option>
+                                <option value="Sweden">Sweden</option>
+                                <option value="Switzerland">Switzerland</option>
+                                <option value="Syria">Syria</option>
+                                <option value="Taiwan">Taiwan</option>
+                                <option value="Tajikistan">Tajikistan</option>
+                                <option value="Tanzania">Tanzania</option>
+                                <option value="Thailand">Thailand</option>
+                                <option value="Timor-Leste">Timor-Leste</option>
+                                <option value="Togo">Togo</option>
+                                <option value="Tonga">Tonga</option>
+                                <option value="Trinidad and Tobago">Trinidad and Tobago</option>
+                                <option value="Tunisia">Tunisia</option>
+                                <option value="Turkey">Turkey</option>
+                                <option value="Turkmenistan">Turkmenistan</option>
+                                <option value="Tuvalu">Tuvalu</option>
+                                <option value="Uganda">Uganda</option>
+                                <option value="Ukraine">Ukraine</option>
+                                <option value="United Arab Emirates">United Arab Emirates</option>
+                                <option value="United Kingdom">United Kingdom</option>
+                                <option value="United States">United States</option>
+                                <option value="Uruguay">Uruguay</option>
+                                <option value="Uzbekistan">Uzbekistan</option>
+                                <option value="Vanuatu">Vanuatu</option>
+                                <option value="Vatican City">Vatican City</option>
+                                <option value="Venezuela">Venezuela</option>
+                                <option value="Vietnam">Vietnam</option>
+                                <option value="Yemen">Yemen</option>
+                                <option value="Zambia">Zambia</option>
+                                <option value="Zimbabwe">Zimbabwe</option>
+                              </select>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
-                        {/* Whether Sexually Active */}
+                    {/* Health Parameters Section */}
+                    <div className="col-span-full">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                        Health Parameters
+                      </h4>
+                      <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label htmlFor="bloodGroup" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Blood Group *
+                            </label>
+                            <select
+                              id="bloodGroup"
+                              name="bloodGroup"
+                              required
+                              value={cadetFormData.bloodGroup}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                            >
+                              <option value="">Select blood group...</option>
+                              <option value="A+">A+</option>
+                              <option value="A-">A-</option>
+                              <option value="B+">B+</option>
+                              <option value="B-">B-</option>
+                              <option value="AB+">AB+</option>
+                              <option value="AB-">AB-</option>
+                              <option value="O+">O+</option>
+                              <option value="O-">O-</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label htmlFor="bmi" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              BMI
+                            </label>
+                            <input
+                              type="text"
+                              id="bmi"
+                              name="bmi"
+                              value={cadetFormData.bmi}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 22.5"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="bodyFat" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Body Fat %
+                            </label>
+                            <input
+                              type="text"
+                              id="bodyFat"
+                              name="bodyFat"
+                              value={cadetFormData.bodyFat}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 15.2"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="calcanealBoneDensity" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Calcaneal Bone Density
+                            </label>
+                            <input
+                              type="text"
+                              id="calcanealBoneDensity"
+                              name="calcanealBoneDensity"
+                              value={cadetFormData.calcanealBoneDensity}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 0.85"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="bp" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              BP
+                            </label>
+                            <input
+                              type="text"
+                              id="bp"
+                              name="bp"
+                              value={cadetFormData.bp}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 120/80"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="pulse" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Pulse
+                            </label>
+                            <input
+                              type="text"
+                              id="pulse"
+                              name="pulse"
+                              value={cadetFormData.pulse}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 72"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="so2" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              SpO2
+                            </label>
+                            <input
+                              type="text"
+                              id="so2"
+                              name="so2"
+                              value={cadetFormData.so2}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 98"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="bcaFat" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              BCA Fat (%)
+                            </label>
+                            <input
+                              type="text"
+                              id="bcaFat"
+                              name="bcaFat"
+                              value={cadetFormData.bcaFat}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 12.3"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="ecg" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              ECG
+                            </label>
+                            <input
+                              type="text"
+                              id="ecg"
+                              name="ecg"
+                              value={cadetFormData.ecg}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="Normal/Abnormal"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="temp" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Temperature (TEMP)
+                            </label>
+                            <input
+                              type="text"
+                              id="temp"
+                              name="temp"
+                              value={cadetFormData.temp}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 98.6"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="smmKg" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              SMM (KG)
+                            </label>
+                            <input
+                              type="text"
+                              id="smmKg"
+                              name="smmKg"
+                              value={cadetFormData.smmKg}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 35.2"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Vaccination Status Section */}
+                    <div className="col-span-full">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                        Vaccination Status
+                      </h4>
+                      <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Whether Sexually Active
-                          </label>
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Covid Vaccine:</h5>
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input
+                                type="checkbox"
+                                name="covidDose1"
+                                checked={cadetFormData.covidDose1}
+                                onChange={handleCadetFormChange}
+                                className="mr-2"
+                              />
+                              1st Dose
+                            </label>
+                            <label className="flex items-center">
+                              <input
+                                type="checkbox"
+                                name="covidDose2"
+                                checked={cadetFormData.covidDose2}
+                                onChange={handleCadetFormChange}
+                                className="mr-2"
+                              />
+                              2nd Dose
+                            </label>
+                            <label className="flex items-center">
+                              <input
+                                type="checkbox"
+                                name="covidDose3"
+                                checked={cadetFormData.covidDose3}
+                                onChange={handleCadetFormChange}
+                                className="mr-2"
+                              />
+                              3rd Dose
+                            </label>
+                          </div>
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Hepatitis B Vaccine:</h5>
+                          <div className="flex gap-4">
+                            <label className="flex items-center">
+                              <input
+                                type="checkbox"
+                                name="hepatitisBDose1"
+                                checked={cadetFormData.hepatitisBDose1}
+                                onChange={handleCadetFormChange}
+                                className="mr-2"
+                              />
+                              1st Dose
+                            </label>
+                            <label className="flex items-center">
+                              <input
+                                type="checkbox"
+                                name="hepatitisBDose2"
+                                checked={cadetFormData.hepatitisBDose2}
+                                onChange={handleCadetFormChange}
+                                className="mr-2"
+                              />
+                              2nd Dose
+                            </label>
+                          </div>
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tetanus Toxoid:</h5>
                           <div className="flex gap-4">
                             <label className="flex items-center">
                               <input
                                 type="radio"
-                                name="sexuallyActive"
-                                value="Yes"
-                                checked={cadetFormData.sexuallyActive === 'Yes'}
+                                name="tetanusToxoid"
+                                value="true"
+                                checked={cadetFormData.tetanusToxoid === true}
+                                onChange={() => setCadetFormData(prev => ({ ...prev, tetanusToxoid: true }))}
+                                className="mr-2"
+                              />
+                              Yes
+                            </label>
+                            <label className="flex items-center">
+                              <input
+                                type="radio"
+                                name="tetanusToxoid"
+                                value="false"
+                                checked={cadetFormData.tetanusToxoid === false}
+                                onChange={() => setCadetFormData(prev => ({ ...prev, tetanusToxoid: false }))}
+                                className="mr-2"
+                              />
+                              No
+                            </label>
+                          </div>
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Chicken Pox:</h5>
+                          <div className="flex gap-4 flex-wrap">
+                            <label className="flex items-center">
+                              <input
+                                type="checkbox"
+                                name="chickenPoxDose1"
+                                checked={cadetFormData.chickenPoxDose1}
                                 onChange={handleCadetFormChange}
                                 className="mr-2"
                               />
-                              Yes
+                              1st Dose
                             </label>
                             <label className="flex items-center">
                               <input
-                                type="radio"
-                                name="sexuallyActive"
-                                value="No"
-                                checked={cadetFormData.sexuallyActive === 'No'}
+                                type="checkbox"
+                                name="chickenPoxDose2"
+                                checked={cadetFormData.chickenPoxDose2}
                                 onChange={handleCadetFormChange}
                                 className="mr-2"
                               />
-                              No
+                              2nd Dose
+                            </label>
+                            <label className="flex items-center">
+                              <input
+                                type="checkbox"
+                                name="chickenPoxSuffered"
+                                checked={cadetFormData.chickenPoxSuffered}
+                                onChange={handleCadetFormChange}
+                                className="mr-2"
+                              />
+                              Suffered in childhood
                             </label>
                           </div>
                         </div>
-
-                        {/* Marital Status */}
+                        {cadetFormData.isForeign && (
+                          <div>
+                            <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Yellow Fever (Foreign Cadets only):</h5>
+                            <div className="flex gap-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name="yellowFever"
+                                  value="true"
+                                  checked={cadetFormData.yellowFever === true}
+                                  onChange={() => setCadetFormData(prev => ({ ...prev, yellowFever: true }))}
+                                  className="mr-2"
+                                />
+                                Yes
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name="yellowFever"
+                                  value="false"
+                                  checked={cadetFormData.yellowFever === false}
+                                  onChange={() => setCadetFormData(prev => ({ ...prev, yellowFever: false }))}
+                                  className="mr-2"
+                                />
+                                No
+                              </label>
+                            </div>
+                          </div>
+                        )}
                         <div>
-                          <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Marital Status
-                          </label>
-                          <select
-                            id="maritalStatus"
-                            name="maritalStatus"
-                            value={cadetFormData.maritalStatus}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                          >
-                            <option value="">Select status...</option>
-                            <option value="Single">Single</option>
-                            <option value="Married">Married</option>
-                            <option value="Divorced">Divorced</option>
-                            <option value="Widowed">Widowed</option>
-                          </select>
-                        </div>
-
-                        {/* History of any Pregnancy / Abortion */}
-                        <div className="col-span-full">
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            History of any Pregnancy / Abortion
-                          </label>
-                          <div className="flex gap-4 items-center">
-                            <label className="flex items-center">
-                              <input
-                                type="radio"
-                                name="pregnancyRadio"
-                                value="Yes"
-                                checked={cadetFormData.pregnancyHistory !== '' && cadetFormData.pregnancyHistory !== undefined}
-                                onChange={() => setCadetFormData(prev => ({ ...prev, pregnancyHistory: 'Please specify...' }))}
-                                className="mr-2"
-                              />
-                              Yes
-                            </label>
-                            <label className="flex items-center">
-                              <input
-                                type="radio"
-                                name="pregnancyRadio"
-                                value="No"
-                                checked={cadetFormData.pregnancyHistory === ''}
-                                onChange={() => setCadetFormData(prev => ({ ...prev, pregnancyHistory: '' }))}
-                                className="mr-2"
-                              />
-                              No
-                            </label>
-                          </div>
-                          {(cadetFormData.pregnancyHistory !== '' && cadetFormData.pregnancyHistory !== undefined) && (
-                            <input
-                              type="text"
-                              name="pregnancyHistory"
-                              value={cadetFormData.pregnancyHistory}
-                              onChange={handleCadetFormChange}
-                              className="input-field mt-2"
-                              placeholder="Please specify..."
-                            />
-                          )}
-                        </div>
-
-                        {/* History of Contraceptive Used */}
-                        <div className="col-span-full">
-                          <label htmlFor="contraceptiveHistory" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            History of Contraceptive Used (Past or Present)
-                          </label>
+                          <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Past Medical History:</h5>
                           <textarea
-                            id="contraceptiveHistory"
-                            name="contraceptiveHistory"
-                            rows={2}
-                            value={cadetFormData.contraceptiveHistory}
+                            id="pastMedicalHistory"
+                            name="pastMedicalHistory"
+                            rows={3}
+                            value={cadetFormData.pastMedicalHistory}
                             onChange={handleCadetFormChange}
                             className="input-field"
-                            placeholder="e.g., Oral contraceptives, IUD, etc."
-                          />
-                        </div>
-
-                        {/* Underwent any Surgery */}
-                        <div className="col-span-full">
-                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Underwent any Surgery
-                          </label>
-                          <div className="flex gap-4 items-center">
-                            <label className="flex items-center">
-                              <input
-                                type="radio"
-                                name="surgeryRadio"
-                                value="Yes"
-                                checked={cadetFormData.surgeryHistory !== '' && cadetFormData.surgeryHistory !== undefined}
-                                onChange={() => setCadetFormData(prev => ({ ...prev, surgeryHistory: 'Please specify the surgery...' }))}
-                                className="mr-2"
-                              />
-                              Yes
-                            </label>
-                            <label className="flex items-center">
-                              <input
-                                type="radio"
-                                name="surgeryRadio"
-                                value="No"
-                                checked={cadetFormData.surgeryHistory === ''}
-                                onChange={() => setCadetFormData(prev => ({ ...prev, surgeryHistory: '' }))}
-                                className="mr-2"
-                              />
-                              No
-                            </label>
-                          </div>
-                          {(cadetFormData.surgeryHistory !== '' && cadetFormData.surgeryHistory !== undefined) && (
-                            <input
-                              type="text"
-                              name="surgeryHistory"
-                              value={cadetFormData.surgeryHistory}
-                              onChange={handleCadetFormChange}
-                              className="input-field mt-2"
-                              placeholder="Please specify the surgery..."
-                            />
-                          )}
-                        </div>
-
-                        {/* Any Medical Condition under Medication */}
-                        <div className="col-span-full">
-                          <label htmlFor="medicalCondition" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Any Medical Condition under Medication
-                          </label>
-                          <textarea
-                            id="medicalCondition"
-                            name="medicalCondition"
-                            rows={2}
-                            value={cadetFormData.medicalCondition}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., PCOS, Thyroid disorder, etc."
-                          />
-                        </div>
-
-                        {/* Latest Hb % / Hemoglobin Level */}
-                        <div>
-                          <label htmlFor="hemoglobinLevel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Latest Hb % / Hemoglobin Level
-                          </label>
-                          <input
-                            type="number"
-                            id="hemoglobinLevel"
-                            name="hemoglobinLevel"
-                            min="0"
-                            max="20"
-                            step="0.1"
-                            value={cadetFormData.hemoglobinLevel}
-                            onChange={handleCadetFormChange}
-                            className="input-field"
-                            placeholder="e.g., 12.5"
+                            placeholder="Detailed history of injuries, fractures, surgeries, diseases, depression, or suicidal attempts..."
                           />
                         </div>
                       </div>
                     </div>
-                  )}
-                </div>
 
-                {/* Modal Actions */}
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    {/* Physical Test Section */}
+                    <div className="col-span-full">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                        Physical Test
+                      </h4>
+                      <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                        {['PPT', 'IPET', 'BPET', 'SWM'].map((test) => (
+                          <div key={test} className="flex items-center justify-between max-w-md">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              {test}
+                            </label>
+                            <div className="flex gap-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name={test.toLowerCase()}
+                                  value="Pass"
+                                  checked={cadetFormData[test.toLowerCase() as keyof CadetFormData] === 'Pass'}
+                                  onChange={handleCadetFormChange}
+                                  className="mr-2"
+                                />
+                                Pass
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name={test.toLowerCase()}
+                                  value="Fail"
+                                  checked={cadetFormData[test.toLowerCase() as keyof CadetFormData] === 'Fail'}
+                                  onChange={handleCadetFormChange}
+                                  className="mr-2"
+                                />
+                                Fail
+                              </label>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Endurance Test Section */}
+                    <div className="col-span-full">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                        Endurance Test
+                      </h4>
+                      <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                        <div>
+                          <label htmlFor="enduranceTest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Multi-Stage Fitness Test / 800m Running
+                          </label>
+                          <input
+                            type="text"
+                            id="enduranceTest"
+                            name="enduranceTest"
+                            value={cadetFormData.enduranceTest}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., Level 12, 8:45"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Agility Test Section */}
+                    <div className="col-span-full">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                        Agility Test
+                      </h4>
+                      <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                        <div>
+                          <label htmlFor="agilityTest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Illinois Agility Run Test
+                          </label>
+                          <input
+                            type="text"
+                            id="agilityTest"
+                            name="agilityTest"
+                            value={cadetFormData.agilityTest}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 15.2 seconds"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Speed Test Section */}
+                    <div className="col-span-full">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                        Speed Test
+                      </h4>
+                      <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                        <div>
+                          <label htmlFor="speedTest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            30 Meter Fly
+                          </label>
+                          <input
+                            type="text"
+                            id="speedTest"
+                            name="speedTest"
+                            value={cadetFormData.speedTest}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="e.g., 4.2 seconds"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Strength Test Section */}
+                    <div className="col-span-full">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                        Strength Tests
+                      </h4>
+                      <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label htmlFor="verticalJump" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Vertical Jump *
+                            </label>
+                            <input
+                              type="text"
+                              id="verticalJump"
+                              name="verticalJump"
+                              required
+                              value={cadetFormData.verticalJump}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 45 cm"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="ballThrow" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Ball Throw *
+                            </label>
+                            <input
+                              type="text"
+                              id="ballThrow"
+                              name="ballThrow"
+                              required
+                              value={cadetFormData.ballThrow}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 8.5 m"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="lowerBackStrength" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Lower Back Strength *
+                            </label>
+                            <input
+                              type="text"
+                              id="lowerBackStrength"
+                              name="lowerBackStrength"
+                              required
+                              value={cadetFormData.lowerBackStrength}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 120 kg"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="shoulderDynamometerLeft" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Shoulder Dynamometer (Left) *
+                            </label>
+                            <input
+                              type="text"
+                              id="shoulderDynamometerLeft"
+                              name="shoulderDynamometerLeft"
+                              required
+                              value={cadetFormData.shoulderDynamometerLeft}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 25 kg"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="shoulderDynamometerRight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Shoulder Dynamometer (Right) *
+                            </label>
+                            <input
+                              type="text"
+                              id="shoulderDynamometerRight"
+                              name="shoulderDynamometerRight"
+                              required
+                              value={cadetFormData.shoulderDynamometerRight}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 28 kg"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="handGripDynamometerLeft" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Hand Grip Dynamometer (Left) *
+                            </label>
+                            <input
+                              type="text"
+                              id="handGripDynamometerLeft"
+                              name="handGripDynamometerLeft"
+                              required
+                              value={cadetFormData.handGripDynamometerLeft}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 45 kg"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="handGripDynamometerRight" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Hand Grip Dynamometer (Right) *
+                            </label>
+                            <input
+                              type="text"
+                              id="handGripDynamometerRight"
+                              name="handGripDynamometerRight"
+                              required
+                              value={cadetFormData.handGripDynamometerRight}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 48 kg"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Overall Assessment Section */}
+                    <div className="col-span-full">
+                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                        Overall Assessment
+                      </h4>
+                      <div className="pl-4 border-l-2 border-gray-200 dark:border-gray-600">
+                        <div>
+                          <label htmlFor="overallAssessment" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Overall Assessment
+                          </label>
+                          <textarea
+                            id="overallAssessment"
+                            name="overallAssessment"
+                            rows={3}
+                            value={cadetFormData.overallAssessment}
+                            onChange={handleCadetFormChange}
+                            className="input-field"
+                            placeholder="Overall remarks or grading"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Menstrual & Medical History Section - Only show for Female cadets */}
+                    {cadetFormData.sex === 'Female' && (
+                      <div className="col-span-full">
+                        <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                          Menstrual & Medical History (For Female Cadets Only)
+                        </h4>
+                        <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600 bg-pink-50 dark:bg-pink-900/10 p-4 rounded-lg">
+
+                          {/* Menstrual Cycle */}
+                          <div className="col-span-full">
+                            <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Menstrual Cycle:</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div>
+                                <label htmlFor="menstrualFrequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                  How frequently
+                                </label>
+                                <select
+                                  id="menstrualFrequency"
+                                  name="menstrualFrequency"
+                                  value={cadetFormData.menstrualFrequency}
+                                  onChange={handleCadetFormChange}
+                                  className="input-field"
+                                >
+                                  <option value="">Select frequency...</option>
+                                  <option value="Regular">Regular</option>
+                                  <option value="Irregular">Irregular</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label htmlFor="menstrualDays" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                  How many days
+                                </label>
+                                <input
+                                  type="number"
+                                  id="menstrualDays"
+                                  name="menstrualDays"
+                                  min="1"
+                                  max="10"
+                                  value={cadetFormData.menstrualDays}
+                                  onChange={handleCadetFormChange}
+                                  className="input-field"
+                                  placeholder="e.g., 5"
+                                />
+                              </div>
+                              <div>
+                                <label htmlFor="lastMenstrualDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                  Last menstrual period date
+                                </label>
+                                <input
+                                  type="date"
+                                  id="lastMenstrualDate"
+                                  name="lastMenstrualDate"
+                                  value={cadetFormData.lastMenstrualDate}
+                                  onChange={handleCadetFormChange}
+                                  className={`input-field ${fieldErrors.lastMenstrualDate ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                                />
+                                {fieldErrors.lastMenstrualDate && (
+                                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{fieldErrors.lastMenstrualDate}</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Menstrual Cycle Aids */}
+                          <div className="col-span-full">
+                            <label htmlFor="menstrualAidsDropdown" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              Menstrual Cycle Aids
+                            </label>
+                            <select
+                              id="menstrualAidsDropdown"
+                              name="menstrualAidsDropdown"
+                              value={getMenstrualAidsDropdownValue(cadetFormData.menstrualAids || [])}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                            >
+                              <option value="">Select menstrual aids...</option>
+                              <option value="1">Menstrual Cup</option>
+                              <option value="2">Sanitary Pads</option>
+                              <option value="3">Tampon</option>
+                              <option value="12">Menstrual Cup + Sanitary Pads</option>
+                              <option value="13">Menstrual Cup + Tampon</option>
+                              <option value="23">Sanitary Pads + Tampon</option>
+                              <option value="123">All (Menstrual Cup + Sanitary Pads + Tampon)</option>
+                            </select>
+                          </div>
+
+                          {/* Whether Sexually Active */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              Whether Sexually Active
+                            </label>
+                            <div className="flex gap-4">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name="sexuallyActive"
+                                  value="Yes"
+                                  checked={cadetFormData.sexuallyActive === 'Yes'}
+                                  onChange={handleCadetFormChange}
+                                  className="mr-2"
+                                />
+                                Yes
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name="sexuallyActive"
+                                  value="No"
+                                  checked={cadetFormData.sexuallyActive === 'No'}
+                                  onChange={handleCadetFormChange}
+                                  className="mr-2"
+                                />
+                                No
+                              </label>
+                            </div>
+                          </div>
+
+                          {/* Marital Status */}
+                          <div>
+                            <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Marital Status
+                            </label>
+                            <select
+                              id="maritalStatus"
+                              name="maritalStatus"
+                              value={cadetFormData.maritalStatus}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                            >
+                              <option value="">Select status...</option>
+                              <option value="Single">Single</option>
+                              <option value="Married">Married</option>
+                              <option value="Divorced">Divorced</option>
+                              <option value="Widowed">Widowed</option>
+                            </select>
+                          </div>
+
+                          {/* History of any Pregnancy / Abortion */}
+                          <div className="col-span-full">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              History of any Pregnancy / Abortion
+                            </label>
+                            <div className="flex gap-4 items-center">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name="pregnancyRadio"
+                                  value="Yes"
+                                  checked={cadetFormData.pregnancyHistory !== '' && cadetFormData.pregnancyHistory !== undefined}
+                                  onChange={() => setCadetFormData(prev => ({ ...prev, pregnancyHistory: 'Please specify...' }))}
+                                  className="mr-2"
+                                />
+                                Yes
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name="pregnancyRadio"
+                                  value="No"
+                                  checked={cadetFormData.pregnancyHistory === ''}
+                                  onChange={() => setCadetFormData(prev => ({ ...prev, pregnancyHistory: '' }))}
+                                  className="mr-2"
+                                />
+                                No
+                              </label>
+                            </div>
+                            {(cadetFormData.pregnancyHistory !== '' && cadetFormData.pregnancyHistory !== undefined) && (
+                              <input
+                                type="text"
+                                name="pregnancyHistory"
+                                value={cadetFormData.pregnancyHistory}
+                                onChange={handleCadetFormChange}
+                                className="input-field mt-2"
+                                placeholder="Please specify..."
+                              />
+                            )}
+                          </div>
+
+                          {/* History of Contraceptive Used */}
+                          <div className="col-span-full">
+                            <label htmlFor="contraceptiveHistory" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              History of Contraceptive Used (Past or Present)
+                            </label>
+                            <textarea
+                              id="contraceptiveHistory"
+                              name="contraceptiveHistory"
+                              rows={2}
+                              value={cadetFormData.contraceptiveHistory}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., Oral contraceptives, IUD, etc."
+                            />
+                          </div>
+
+                          {/* Underwent any Surgery */}
+                          <div className="col-span-full">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              Underwent any Surgery
+                            </label>
+                            <div className="flex gap-4 items-center">
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name="surgeryRadio"
+                                  value="Yes"
+                                  checked={cadetFormData.surgeryHistory !== '' && cadetFormData.surgeryHistory !== undefined}
+                                  onChange={() => setCadetFormData(prev => ({ ...prev, surgeryHistory: 'Please specify the surgery...' }))}
+                                  className="mr-2"
+                                />
+                                Yes
+                              </label>
+                              <label className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name="surgeryRadio"
+                                  value="No"
+                                  checked={cadetFormData.surgeryHistory === ''}
+                                  onChange={() => setCadetFormData(prev => ({ ...prev, surgeryHistory: '' }))}
+                                  className="mr-2"
+                                />
+                                No
+                              </label>
+                            </div>
+                            {(cadetFormData.surgeryHistory !== '' && cadetFormData.surgeryHistory !== undefined) && (
+                              <input
+                                type="text"
+                                name="surgeryHistory"
+                                value={cadetFormData.surgeryHistory}
+                                onChange={handleCadetFormChange}
+                                className="input-field mt-2"
+                                placeholder="Please specify the surgery..."
+                              />
+                            )}
+                          </div>
+
+                          {/* Any Medical Condition under Medication */}
+                          <div className="col-span-full">
+                            <label htmlFor="medicalCondition" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Any Medical Condition under Medication
+                            </label>
+                            <textarea
+                              id="medicalCondition"
+                              name="medicalCondition"
+                              rows={2}
+                              value={cadetFormData.medicalCondition}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., PCOS, Thyroid disorder, etc."
+                            />
+                          </div>
+
+                          {/* Latest Hb % / Hemoglobin Level */}
+                          <div>
+                            <label htmlFor="hemoglobinLevel" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Latest Hb % / Hemoglobin Level
+                            </label>
+                            <input
+                              type="number"
+                              id="hemoglobinLevel"
+                              name="hemoglobinLevel"
+                              min="0"
+                              max="20"
+                              step="0.1"
+                              value={cadetFormData.hemoglobinLevel}
+                              onChange={handleCadetFormChange}
+                              className="input-field"
+                              placeholder="e.g., 12.5"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Modal Actions */}
+                  <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddCadetModal(false)}
+                      className="btn-secondary"
+                      disabled={isCreatingCadet}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isCreatingCadet}
+                      className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isCreatingCadet ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          Adding Cadet...
+                        </div>
+                      ) : (
+                        'Add Cadet'
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Medical Record Confirmation Modal */}
+        {showRecordConfirmation && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowRecordConfirmation(false)}>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <svg className="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    Confirm Medical Record Addition
+                  </h3>
+                </div>
+                <div className="mb-6">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Please confirm your action. <br />
+                    Adding this Medical record is a permanent operation and cannot be reversed. <br />
+                    Ensure all information has been verified before proceeding.
+                  </p>
+                </div>
+                <div className="flex justify-end gap-3">
                   <button
-                    type="button"
-                    onClick={() => setShowAddCadetModal(false)}
+                    onClick={() => setShowRecordConfirmation(false)}
                     className="btn-secondary"
-                    disabled={isCreatingCadet}
                   >
                     Cancel
                   </button>
                   <button
-                    type="submit"
+                    onClick={confirmSubmit}
+                    disabled={isSubmitting}
+                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Adding...' : 'Confirm'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Confirmation Modal */}
+        {showConfirmation && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowConfirmation(false)}>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <svg className="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    Confirm Cadet Addition
+                  </h3>
+                </div>
+                <div className="mb-6">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Please confirm your action. <br />
+                    Adding this cadet record is a permanent operation and cannot be reversed. <br />
+                    Ensure all information has been verified before proceeding.
+                  </p>
+                </div>
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setShowConfirmation(false)}
+                    className="btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={confirmCreateCadet}
                     disabled={isCreatingCadet}
                     className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isCreatingCadet ? (
-                      <div className="flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Adding Cadet...
-                      </div>
-                    ) : (
-                      'Add Cadet'
-                    )}
+                    {isCreatingCadet ? 'Adding...' : 'Confirm'}
                   </button>
                 </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Medical Record Confirmation Modal */}
-      {showRecordConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowRecordConfirmation(false)}>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <svg className="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  Confirm Medical Record Addition
-                </h3>
-              </div>
-              <div className="mb-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Please confirm your action. <br />
-                  Adding this Medical record is a permanent operation and cannot be reversed. <br />
-                  Ensure all information has been verified before proceeding.
-                </p>
-              </div>
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setShowRecordConfirmation(false)}
-                  className="btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmSubmit}
-                  disabled={isSubmitting}
-                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? 'Adding...' : 'Confirm'}
-                </button>
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Confirmation Modal */}
-      {showConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4" onClick={() => setShowConfirmation(false)}>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <svg className="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  Confirm Cadet Addition
-                </h3>
-              </div>
-              <div className="mb-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                  Please confirm your action. <br />
-                  Adding this cadet record is a permanent operation and cannot be reversed. <br />
-                  Ensure all information has been verified before proceeding.
-                </p>
-              </div>
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setShowConfirmation(false)}
-                  className="btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmCreateCadet}
-                  disabled={isCreatingCadet}
-                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isCreatingCadet ? 'Adding...' : 'Confirm'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
     </DashboardLayout>
   )
 }
