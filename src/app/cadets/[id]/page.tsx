@@ -649,16 +649,14 @@ export default function CadetDetailsPage({
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                       {cadetInfo.name}
                       {cadetInfo.relegated === 'Y' && (
-                        <>
-                          <span className="text-red-600 dark:text-red-400 font-bold">R</span>
-                          <span className="w-3 h-3 bg-red-500 rounded-full"></span>
-                        </>
-
+                        <span className="inline-flex items-center justify-center w-6 h-6 text-sm font-bold text-red-600 bg-red-100 rounded-full dark:text-red-400 dark:bg-red-900/30" title="Relegated">
+                          R
+                        </span>
                       )}
                       {cadetInfo.isForeign && (
-                        <>
-                          <span className="text-blue-600 dark:text-blue-400 font-bold">F</span>
-                        </>
+                        <span className="inline-flex items-center justify-center w-6 h-6 text-sm font-bold text-blue-600 bg-blue-100 rounded-full dark:text-blue-400 dark:bg-blue-900/30" title="Foreign Cadet">
+                          F
+                        </span>
                       )}
                     </h1>
                     <Link
