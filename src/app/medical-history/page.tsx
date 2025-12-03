@@ -380,16 +380,13 @@ export default function MedicalHistoryPage() {
                   Cadet Name
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 text-gray-400" />
-                  </div>
                   <input
                     id="filter-name"
                     type="text"
                     placeholder="Search name..."
                     value={filters.name}
                     onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
-                    className="input-field pl-10"
+                    className="input-field"
                   />
                 </div>
               </div>
