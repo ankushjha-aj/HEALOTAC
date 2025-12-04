@@ -642,7 +642,7 @@ export default function CadetDetailsPage({
                 <span className="text-primary font-bold text-2xl">
                   {cadetInfo.name.split(' ').map((n: string) => n[0]).join('')}
                 </span>
-              </div>
+              </div> 
               <div className="space-y-3">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
