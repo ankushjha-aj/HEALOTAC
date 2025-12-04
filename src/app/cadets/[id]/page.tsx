@@ -866,7 +866,7 @@ export default function CadetDetailsPage({
                         {cadetInfo.calcanealBoneDensity && (
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Bone Density:</span>
-                            <span className="text-sm font-medium">{cadetInfo.calcanealBoneDensity}</span>
+                            <span className={`text-sm font-medium ${parseFloat(cadetInfo.calcanealBoneDensity) < 0 ? 'text-[#DC2626]' : 'text-green-600 dark:text-green-400'}`}>{cadetInfo.calcanealBoneDensity}</span>
                           </div>
                         )}
                         {cadetInfo.bp && (
@@ -933,19 +933,19 @@ export default function CadetDetailsPage({
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 dark:text-gray-400">Dose 1:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.covidDose1 ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className={`text-sm font-medium ${cadetInfo.covidDose1 ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                 {cadetInfo.covidDose1 ? '✓ Taken' : '✗ Not Taken'}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 dark:text-gray-400">Dose 2:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.covidDose2 ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className={`text-sm font-medium ${cadetInfo.covidDose2 ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                 {cadetInfo.covidDose2 ? '✓ Taken' : '✗ Not Taken'}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 dark:text-gray-400">Dose 3:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.covidDose3 ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className={`text-sm font-medium ${cadetInfo.covidDose3 ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                 {cadetInfo.covidDose3 ? '✓ Taken' : '✗ Not Taken'}
                               </span>
                             </div>
@@ -957,13 +957,13 @@ export default function CadetDetailsPage({
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 dark:text-gray-400">Dose 1:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.hepatitisBDose1 ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className={`text-sm font-medium ${cadetInfo.hepatitisBDose1 ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                 {cadetInfo.hepatitisBDose1 ? '✓ Taken' : '✗ Not Taken'}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 dark:text-gray-400">Dose 2:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.hepatitisBDose2 ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className={`text-sm font-medium ${cadetInfo.hepatitisBDose2 ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                 {cadetInfo.hepatitisBDose2 ? '✓ Taken' : '✗ Not Taken'}
                               </span>
                             </div>
@@ -975,31 +975,31 @@ export default function CadetDetailsPage({
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 dark:text-gray-400">Tetanus Toxoid:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.tetanusToxoid ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className={`text-sm font-medium ${cadetInfo.tetanusToxoid ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                 {cadetInfo.tetanusToxoid ? '✓ Taken' : '✗ Not Taken'}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 dark:text-gray-400">Chicken Pox Dose 1:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.chickenPoxDose1 ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className={`text-sm font-medium ${cadetInfo.chickenPoxDose1 ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                 {cadetInfo.chickenPoxDose1 ? '✓ Taken' : '✗ Not Taken'}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 dark:text-gray-400">Chicken Pox Dose 2:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.chickenPoxDose2 ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className={`text-sm font-medium ${cadetInfo.chickenPoxDose2 ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                 {cadetInfo.chickenPoxDose2 ? '✓ Taken' : '✗ Not Taken'}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 dark:text-gray-400">Chicken Pox Suffered:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.chickenPoxSuffered ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className={`text-sm font-medium ${cadetInfo.chickenPoxSuffered ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                 {cadetInfo.chickenPoxSuffered ? '✓ Yes' : '✗ No'}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 dark:text-gray-400">Yellow Fever:</span>
-                              <span className={`text-sm font-medium ${cadetInfo.yellowFever ? 'text-green-600' : 'text-red-600'}`}>
+                              <span className={`text-sm font-medium ${cadetInfo.yellowFever ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                 {cadetInfo.yellowFever ? '✓ Taken' : '✗ Not Taken'}
                               </span>
                             </div>
