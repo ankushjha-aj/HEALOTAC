@@ -649,7 +649,7 @@ export default function CadetDetailsPage({
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                       {cadetInfo.name}
                       {cadetInfo.relegated === 'Y' && (
-                        <span className="inline-flex items-center justify-center w-6 h-6 text-sm font-bold text-red-600 bg-red-100 rounded-full dark:text-red-400 dark:bg-red-900/30" title="Relegated">
+                        <span className="inline-flex items-center justify-center w-6 h-6 text-sm font-bold text-[#DC2626] bg-red-100 rounded-full dark:bg-red-900/30" title="Relegated">
                           R
                         </span>
                       )}
@@ -728,7 +728,7 @@ export default function CadetDetailsPage({
                           </div>
                         </div>
                       </div>
-                      <p className="text-sm font-medium text-red-600 dark:text-red-400">{totalTrainingDaysMissed.toFixed(2)}</p>
+                      <p className="text-sm font-medium text-[#DC2626]">{totalTrainingDaysMissed.toFixed(2)}</p>
                     </div>
                   </div>
                 </div>
@@ -1027,7 +1027,7 @@ export default function CadetDetailsPage({
                               {cadetInfo.ppt && (
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">PPT:</span>
-                                  <span className={`text-sm font-medium ${cadetInfo.ppt === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                  <span className={`text-sm font-medium ${cadetInfo.ppt === 'Pass' ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                     {cadetInfo.ppt === 'Pass' ? '✓ Pass' : '✗ Fail'}
                                   </span>
                                 </div>
@@ -1035,7 +1035,7 @@ export default function CadetDetailsPage({
                               {cadetInfo.ipet && (
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">IPET:</span>
-                                  <span className={`text-sm font-medium ${cadetInfo.ipet === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                  <span className={`text-sm font-medium ${cadetInfo.ipet === 'Pass' ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                     {cadetInfo.ipet === 'Pass' ? '✓ Pass' : '✗ Fail'}
                                   </span>
                                 </div>
@@ -1043,7 +1043,7 @@ export default function CadetDetailsPage({
                               {cadetInfo.bpet && (
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">BPET:</span>
-                                  <span className={`text-sm font-medium ${cadetInfo.bpet === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                  <span className={`text-sm font-medium ${cadetInfo.bpet === 'Pass' ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                     {cadetInfo.bpet === 'Pass' ? '✓ Pass' : '✗ Fail'}
                                   </span>
                                 </div>
@@ -1051,7 +1051,7 @@ export default function CadetDetailsPage({
                               {cadetInfo.swm && (
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">SWM:</span>
-                                  <span className={`text-sm font-medium ${cadetInfo.swm === 'Pass' ? 'text-green-600' : 'text-red-600'}`}>
+                                  <span className={`text-sm font-medium ${cadetInfo.swm === 'Pass' ? 'text-green-600' : 'text-[#DC2626]'}`}>
                                     {cadetInfo.swm === 'Pass' ? '✓ Pass' : '✗ Fail'}
                                   </span>
                                 </div>
