@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Users, Activity, Plus, FileText, LogOut } from 'lucide-react'
+import { Home, Users, Activity, Plus, FileText, LogOut } from 'lucide-react' 
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import Image from 'next/image'
