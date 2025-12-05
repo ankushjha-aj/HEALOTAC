@@ -32,32 +32,37 @@ export async function GET(request: NextRequest) {
             queryDateString = `${year}-${month}-${day}`
         }
 
-        // Fetch attendance records for the date, joined with cadet details
-        // Use explicit table.column to ensure correct SQL generation
+        // Fetch attendance records for the date using raw SQL
+        // Build query string manually to avoid Drizzle parameter binding issues
+        const querySQL = `SELECT 
+            a.id as attendance_id, a.cadet_id, a.date, a.morning, a.evening,
+            c.id, c.name, c.battalion, c.company, c.academy_number, c.blood_group
+        FROM attendance a
+        LEFT JOIN cadets c ON a.cadet_id = c.id
+        WHERE a.date::date = '${queryDateString}'::date`
 
-        const attendanceRecords = await db.select({
-            attendance: attendance,
-            cadet: cadets
-        })
-            .from(attendance)
-            .leftJoin(cadets, eq(attendance.cadetId, cadets.id))
-            .where(sql`TO_CHAR(attendance.date, 'YYYY-MM-DD') = ${queryDateString}`)
-
+        const attendanceRecords = await db.execute(sql.raw(querySQL))
 
         let morningCount = 0
         let eveningCount = 0
         const attendees: any[] = []
 
-        attendanceRecords.forEach(({ attendance: record, cadet }) => {
-            if (record.morning) morningCount++
-            if (record.evening) eveningCount++
+        const rows = attendanceRecords.rows || []
+        rows.forEach((row: any) => {
+            if (row.morning) morningCount++
+            if (row.evening) eveningCount++
 
-            if ((record.morning || record.evening) && cadet) {
+            if (row.morning || row.evening) {
                 attendees.push({
-                    ...cadet,
+                    id: row.id,
+                    name: row.name,
+                    battalion: row.battalion,
+                    company: row.company,
+                    academyNumber: row.academy_number,
+                    bloodGroup: row.blood_group,
                     attendanceStatus: {
-                        morning: record.morning,
-                        evening: record.evening
+                        morning: row.morning,
+                        evening: row.evening
                     }
                 })
             }

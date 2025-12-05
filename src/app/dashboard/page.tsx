@@ -194,19 +194,20 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchStats()
-    // Poll for stats every 30 seconds
-    const interval = setInterval(fetchStats, 30000)
+    // Poll for stats every 5 seconds for near real-time updates
+    const interval = setInterval(fetchStats, 5000)
     return () => clearInterval(interval)
   }, [fetchStats])
 
+
   const stats = [
     {
-      label: 'Morning Attendance',
+      label: 'AM Attendance',
       value: attendanceData ? attendanceData.stats.morning.toString() : '0',
       icon: Users,
     },
     {
-      label: 'Evening Attendance',
+      label: 'PM Attendance',
       value: attendanceData ? attendanceData.stats.evening.toString() : '0',
       icon: Users,
     },
@@ -377,12 +378,12 @@ export default function DashboardPage() {
                         <div className="flex gap-2">
                           {cadet.attendanceStatus.morning && (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                              Morning
+                              AM
                             </span>
                           )}
                           {cadet.attendanceStatus.evening && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                              Evening
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                              PM
                             </span>
                           )}
                         </div>
