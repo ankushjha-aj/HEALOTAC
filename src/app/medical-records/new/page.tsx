@@ -25,6 +25,7 @@ interface Cadet {
   sex?: string | null
   relegated?: string
   createdAt: string
+  bloodGroup?: string
 }
 
 interface CadetFormData {
@@ -208,6 +209,13 @@ function NewMedicalRecordPageInner() {
   const [cadetError, setCadetError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({})
+
+  // Search filters for Cadet Management view
+  const [searchName, setSearchName] = useState('')
+  const [searchCompany, setSearchCompany] = useState('')
+  const [searchBattalion, setSearchBattalion] = useState('')
+  const [searchBloodGroup, setSearchBloodGroup] = useState('')
+  const [searchAcademyNumber, setSearchAcademyNumber] = useState('')
 
   // Fetch cadets for the dropdown
   useEffect(() => {
@@ -827,52 +835,171 @@ function NewMedicalRecordPageInner() {
               </button>
             </div>
 
+            {/* Search Filters */}
+            <div className="mt-8 mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Filter Cadets</h3>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div>
+                  <label htmlFor="searchName" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="searchName"
+                    value={searchName}
+                    onChange={(e) => setSearchName(e.target.value)}
+                    placeholder="Search by Name"
+                    className="input-field py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="searchCompany" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Company
+                  </label>
+                  <select
+                    id="searchCompany"
+                    value={searchCompany}
+                    onChange={(e) => setSearchCompany(e.target.value)}
+                    className="input-field py-2 text-sm"
+                  >
+                    <option value="">All Companies</option>
+                    <option value="M">M - Meiktila</option>
+                    <option value="N">N - Naushera</option>
+                    <option value="Z">Z - Zojila</option>
+                    <option value="J">J - Jessami</option>
+                    <option value="K">K - Kohima</option>
+                    <option value="P">P - Phillora</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="searchBattalion" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Battalion
+                  </label>
+                  <select
+                    id="searchBattalion"
+                    value={searchBattalion}
+                    onChange={(e) => setSearchBattalion(e.target.value)}
+                    className="input-field py-2 text-sm"
+                  >
+                    <option value="">All Battalions</option>
+                    <option value="Shivaji">Shivaji</option>
+                    <option value="Ranjit Singh">Ranjit Singh</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="searchBloodGroup" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Blood Group
+                  </label>
+                  <select
+                    id="searchBloodGroup"
+                    value={searchBloodGroup}
+                    onChange={(e) => setSearchBloodGroup(e.target.value)}
+                    className="input-field py-2 text-sm"
+                  >
+                    <option value="">All Blood Groups</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="searchAcademyNumber" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Academy Number
+                  </label>
+                  <input
+                    type="text"
+                    id="searchAcademyNumber"
+                    value={searchAcademyNumber}
+                    onChange={(e) => setSearchAcademyNumber(e.target.value)}
+                    placeholder="Search by Academy No."
+                    className="input-field py-2 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Display added cadets */}
             {cadets.length > 0 && (
               <div className="mt-8">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Added Cadets</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  Added Cadets
+                  {(searchName || searchCompany || searchBattalion || searchBloodGroup || searchAcademyNumber) && (
+                    <span className="text-sm font-normal text-gray-500 ml-2">
+                      (Filtered)
+                    </span>
+                  )}
+                </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {cadets.map((cadet) => (
-                    <div key={cadet.id} className="card p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 dark:text-white">{cadet.name}</h3>
-                          <div className="mt-2 space-y-1">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              <span className="font-medium">Battalion:</span> {cadet.battalion}
-                            </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              <span className="font-medium">Academy Number:</span> {cadet.academyNumber || 'N/A'}
-                            </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              <span className="font-medium">Company:</span> {(() => {
-                                const companyMap: { [key: string]: string } = {
-                                  'M': 'Meiktila',
-                                  'N': 'Naushera',
-                                  'Z': 'Zojila',
-                                  'J': 'Jessami',
-                                  'K': 'Kohima',
-                                  'P': 'Phillora'
-                                }
-                                return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
-                              })()}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            Added {new Date(cadet.createdAt).toLocaleDateString()}
-                          </div>
-                          {cadet.relegated === 'Y' && (
-                            <div className="mt-1">
-                              <span className="text-red-600 dark:text-red-400 font-bold">R</span>
-                              <span className="w-2 h-2 bg-red-500 rounded-full inline-block ml-1"></span>
+                  {cadets
+                    .filter(cadet => {
+                      // Filter by Name
+                      if (searchName && !cadet.name.toLowerCase().includes(searchName.toLowerCase())) {
+                        return false
+                      }
+                      // Filter by Company
+                      if (searchCompany && cadet.company !== searchCompany) {
+                        return false
+                      }
+                      // Filter by Battalion
+                      if (searchBattalion && cadet.battalion !== searchBattalion) {
+                        return false
+                      }
+                      // Filter by Blood Group
+                      if (searchBloodGroup && cadet.bloodGroup !== searchBloodGroup) {
+                        return false
+                      }
+                      // Filter by Academy Number
+                      if (searchAcademyNumber && (!cadet.academyNumber || !cadet.academyNumber.toString().includes(searchAcademyNumber))) {
+                        return false
+                      }
+                      return true
+                    })
+                    .map((cadet) => (
+                      <div key={cadet.id} className="card p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-900 dark:text-white">{cadet.name}</h3>
+                            <div className="mt-2 space-y-1">
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <span className="font-medium">Battalion:</span> {cadet.battalion}
+                              </p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <span className="font-medium">Academy Number:</span> {cadet.academyNumber || 'N/A'}
+                              </p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <span className="font-medium">Company:</span> {(() => {
+                                  const companyMap: { [key: string]: string } = {
+                                    'M': 'Meiktila',
+                                    'N': 'Naushera',
+                                    'Z': 'Zojila',
+                                    'J': 'Jessami',
+                                    'K': 'Kohima',
+                                    'P': 'Phillora'
+                                  }
+                                  return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
+                                })()}
+                              </p>
                             </div>
-                          )}
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              Added {new Date(cadet.createdAt).toLocaleDateString()}
+                            </div>
+                            {cadet.relegated === 'Y' && (
+                              <div className="mt-1">
+                                <span className="text-red-600 dark:text-red-400 font-bold">R</span>
+                                <span className="w-2 h-2 bg-red-500 rounded-full inline-block ml-1"></span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
             )}
