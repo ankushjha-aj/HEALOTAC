@@ -6,7 +6,7 @@ import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import Link from 'next/link'
-import { X, Plus, User } from 'lucide-react'
+import { X, Plus, User, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useUser } from '@/hooks/useUser'
 
 interface Cadet {
@@ -27,6 +27,7 @@ interface Cadet {
   isForeign?: boolean
   createdAt: string
   bloodGroup?: string
+  attendance?: Record<string, { morning: boolean; evening: boolean }>
 }
 
 interface CadetFormData {
@@ -218,6 +219,10 @@ function NewMedicalRecordPageInner() {
   const [searchBloodGroup, setSearchBloodGroup] = useState('')
   const [searchDate, setSearchDate] = useState('')
   const [searchAcademyNumber, setSearchAcademyNumber] = useState('')
+
+  // Attendance Sheet State
+  const [viewStartDate, setViewStartDate] = useState(new Date())
+  const [viewingCadet, setViewingCadet] = useState<Cadet | null>(null)
 
   // Fetch cadets for the dropdown
   useEffect(() => {
@@ -966,85 +971,199 @@ function NewMedicalRecordPageInner() {
                     </span>
                   )}
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {cadets
-                    .filter(cadet => {
-                      // Filter by Name
-                      if (searchName && !cadet.name.toLowerCase().includes(searchName.toLowerCase())) {
-                        return false
-                      }
-                      // Filter by Company
-                      if (searchCompany && cadet.company !== searchCompany) {
-                        return false
-                      }
-                      // Filter by Battalion
-                      if (searchBattalion && cadet.battalion !== searchBattalion) {
-                        return false
-                      }
-                      // Filter by Blood Group
-                      if (searchBloodGroup && cadet.bloodGroup !== searchBloodGroup) {
-                        return false
-                      }
-                      // Filter by Date
-                      if (searchDate) {
-                        const cadetDate = new Date(cadet.createdAt).toISOString().split('T')[0]
-                        if (cadetDate !== searchDate) {
-                          return false
-                        }
-                      }
-                      // Filter by Academy Number
-                      if (searchAcademyNumber && (!cadet.academyNumber || !cadet.academyNumber.toString().includes(searchAcademyNumber))) {
-                        return false
-                      }
-                      return true
-                    })
-                    .map((cadet) => (
-                      <div key={cadet.id} className="card p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-gray-900 dark:text-white">{cadet.name}</h3>
-                            <div className="mt-2 space-y-1">
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                <span className="font-medium">Battalion:</span> {cadet.battalion}
-                              </p>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                <span className="font-medium">Academy Number:</span> {cadet.academyNumber || 'N/A'}
-                              </p>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
-                                <span className="font-medium">Company:</span> {(() => {
-                                  const companyMap: { [key: string]: string } = {
-                                    'M': 'Meiktila',
-                                    'N': 'Naushera',
-                                    'Z': 'Zojila',
-                                    'J': 'Jessami',
-                                    'K': 'Kohima',
-                                    'P': 'Phillora'
-                                  }
-                                  return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
-                                })()}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              Added {new Date(cadet.createdAt).toLocaleDateString()}
-                            </div>
-                            <div className="flex justify-end gap-1 mt-1">
-                              {cadet.relegated === 'Y' && (
-                                <div>
-                                  <span className="text-red-600 dark:text-red-400 font-bold">R</span>
+
+                {/* Date Navigation */}
+                <div className="flex items-center justify-between mb-4 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={() => {
+                      const newDate = new Date(viewStartDate)
+                      newDate.setDate(newDate.getDate() - 7)
+                      setViewStartDate(newDate)
+                    }}
+                    className="flex items-center gap-1 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-400"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Previous Week
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">View from:</span>
+                    <input
+                      type="date"
+                      value={viewStartDate.toISOString().split('T')[0]}
+                      onChange={(e) => setViewStartDate(new Date(e.target.value))}
+                      className="input-field py-1 px-2 text-sm w-auto"
+                    />
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      const newDate = new Date(viewStartDate)
+                      newDate.setDate(newDate.getDate() + 7)
+                      setViewStartDate(newDate)
+                    }}
+                    className="flex items-center gap-1 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-400"
+                  >
+                    Next Week
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead className="bg-gray-50 dark:bg-gray-800">
+                      <tr>
+                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider sticky left-0 bg-gray-50 dark:bg-gray-800 z-10 w-48">
+                          Cadet Name
+                        </th>
+                        <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32">
+                          Academy No
+                        </th>
+                        {/* Dynamic Date Columns */}
+                        {Array.from({ length: 7 }).map((_, index) => {
+                          const date = new Date(viewStartDate)
+                          date.setDate(date.getDate() + index)
+                          return (
+                            <th key={index} scope="col" className="px-2 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-[80px]">
+                              {date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                            </th>
+                          )
+                        })}
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                      {cadets
+                        .filter(cadet => {
+                          // Filter by Name
+                          if (searchName && !cadet.name.toLowerCase().includes(searchName.toLowerCase())) {
+                            return false
+                          }
+                          // Filter by Company
+                          if (searchCompany && cadet.company !== searchCompany) {
+                            return false
+                          }
+                          // Filter by Battalion
+                          if (searchBattalion && cadet.battalion !== searchBattalion) {
+                            return false
+                          }
+                          // Filter by Blood Group
+                          if (searchBloodGroup && cadet.bloodGroup !== searchBloodGroup) {
+                            return false
+                          }
+                          // Filter by Date (Added Date) - keeping this filter logic as is, though it filters the rows not the columns
+                          if (searchDate) {
+                            const cadetDate = new Date(cadet.createdAt).toISOString().split('T')[0]
+                            if (cadetDate !== searchDate) {
+                              return false
+                            }
+                          }
+                          // Filter by Academy Number
+                          if (searchAcademyNumber && (!cadet.academyNumber || !cadet.academyNumber.toString().includes(searchAcademyNumber))) {
+                            return false
+                          }
+                          return true
+                        })
+                        .map((cadet) => (
+                          <tr key={cadet.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            <td className="px-4 py-4 whitespace-nowrap sticky left-0 bg-white dark:bg-gray-900 z-10">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => setViewingCadet(cadet)}
+                                  className="text-base font-semibold text-gray-900 dark:text-white hover:underline text-left"
+                                >
+                                  {cadet.name}
+                                </button>
+                                <div className="flex gap-1">
+                                  {cadet.relegated === 'Y' && (
+                                    <span className="text-xs text-red-600 dark:text-red-400 font-bold">R</span>
+                                  )}
+                                  {cadet.isForeign && (
+                                    <span className="text-xs text-blue-600 dark:text-blue-400 font-bold">F</span>
+                                  )}
                                 </div>
-                              )}
-                              {cadet.isForeign && (
-                                <div>
-                                  <span className="text-blue-600 dark:text-blue-400 font-bold">F</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                              {cadet.academyNumber || 'N/A'}
+                            </td>
+                            {/* Checkboxes for dates */}
+                            {Array.from({ length: 7 }).map((_, index) => {
+                              const date = new Date(viewStartDate)
+                              date.setDate(date.getDate() + index)
+                              const dateKey = date.toISOString().split('T')[0]
+                              const attendance = cadet.attendance?.[dateKey] || { morning: false, evening: false }
+
+                              // Check if date is in the future
+                              const today = new Date()
+                              today.setHours(0, 0, 0, 0)
+                              const isFutureDate = date > today
+
+                              return (
+                                <td key={index} className="px-2 py-4 whitespace-nowrap text-center">
+                                  <div className="flex flex-col gap-1 items-center">
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-[10px] font-medium text-gray-500 w-3">M</span>
+                                      <input
+                                        type="checkbox"
+                                        checked={attendance.morning}
+                                        disabled={isFutureDate}
+                                        onChange={(e) => {
+                                          const newChecked = e.target.checked
+                                          setCadets(prevCadets => prevCadets.map(c => {
+                                            if (c.id === cadet.id) {
+                                              const currentAttendance = c.attendance?.[dateKey] || { morning: false, evening: false }
+                                              return {
+                                                ...c,
+                                                attendance: {
+                                                  ...c.attendance,
+                                                  [dateKey]: { ...currentAttendance, morning: newChecked }
+                                                }
+                                              }
+                                            }
+                                            return c
+                                          }))
+                                        }}
+                                        className={`h-3 w-3 rounded border-gray-300 ${isFutureDate
+                                            ? 'text-gray-300 cursor-not-allowed bg-gray-100'
+                                            : 'text-blue-600 focus:ring-blue-500 cursor-pointer'
+                                          }`}
+                                      />
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-[10px] font-medium text-gray-500 w-3">E</span>
+                                      <input
+                                        type="checkbox"
+                                        checked={attendance.evening}
+                                        disabled={isFutureDate}
+                                        onChange={(e) => {
+                                          const newChecked = e.target.checked
+                                          setCadets(prevCadets => prevCadets.map(c => {
+                                            if (c.id === cadet.id) {
+                                              const currentAttendance = c.attendance?.[dateKey] || { morning: false, evening: false }
+                                              return {
+                                                ...c,
+                                                attendance: {
+                                                  ...c.attendance,
+                                                  [dateKey]: { ...currentAttendance, evening: newChecked }
+                                                }
+                                              }
+                                            }
+                                            return c
+                                          }))
+                                        }}
+                                        className={`h-3 w-3 rounded border-gray-300 ${isFutureDate
+                                            ? 'text-gray-300 cursor-not-allowed bg-gray-100'
+                                            : 'text-blue-600 focus:ring-blue-500 cursor-pointer'
+                                          }`}
+                                      />
+                                    </div>
+                                  </div>
+                                </td>
+                              )
+                            })}
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             )}
@@ -1057,6 +1176,94 @@ function NewMedicalRecordPageInner() {
                   </svg>
                   <p className="text-lg font-medium">No cadets added yet</p>
                   <p className="text-sm">Click the &quot;Add New Cadet&quot; button to get started</p>
+                </div>
+              </div>
+            )}
+
+            {/* Cadet Details Modal */}
+            {viewingCadet && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-lg overflow-hidden">
+                  <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Cadet Details</h3>
+                    <button
+                      onClick={() => setViewingCadet(null)}
+                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{viewingCadet.name}</h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Added on {new Date(viewingCadet.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        {viewingCadet.relegated === 'Y' && (
+                          <span className="px-2 py-1 text-xs font-bold text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-900/30 rounded-full">
+                            Relegated
+                          </span>
+                        )}
+                        {viewingCadet.isForeign && (
+                          <span className="px-2 py-1 text-xs font-bold text-blue-700 bg-blue-100 dark:text-blue-300 dark:bg-blue-900/30 rounded-full">
+                            Foreign
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Academy Number</p>
+                        <p className="text-base font-medium text-gray-900 dark:text-white">{viewingCadet.academyNumber || 'N/A'}</p>
+                      </div>
+                      <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Blood Group</p>
+                        <p className="text-base font-medium text-gray-900 dark:text-white">{viewingCadet.bloodGroup || 'N/A'}</p>
+                      </div>
+                      <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Company</p>
+                        <p className="text-base font-medium text-gray-900 dark:text-white">
+                          {(() => {
+                            const companyMap: { [key: string]: string } = {
+                              'M': 'Meiktila',
+                              'N': 'Naushera',
+                              'Z': 'Zojila',
+                              'J': 'Jessami',
+                              'K': 'Kohima',
+                              'P': 'Phillora'
+                            }
+                            return companyMap[viewingCadet.company] ? `${viewingCadet.company} - ${companyMap[viewingCadet.company]}` : viewingCadet.company
+                          })()}
+                        </p>
+                      </div>
+                      <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Battalion</p>
+                        <p className="text-base font-medium text-gray-900 dark:text-white">{viewingCadet.battalion}</p>
+                      </div>
+                      {viewingCadet.course && (
+                        <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Course</p>
+                          <p className="text-base font-medium text-gray-900 dark:text-white">{viewingCadet.course}</p>
+                        </div>
+                      )}
+                      {viewingCadet.sex && (
+                        <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Sex</p>
+                          <p className="text-base font-medium text-gray-900 dark:text-white">{viewingCadet.sex}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex justify-end">
+                    <button
+                      onClick={() => setViewingCadet(null)}
+                      className="btn-secondary px-4 py-2 text-sm"
+                    >
+                      Close
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
