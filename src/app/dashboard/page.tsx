@@ -178,10 +178,15 @@ export default function DashboardPage() {
   const fetchStats = useCallback(async () => {
     if (!jwtToken) return
     try {
-      const response = await fetch(`/api/dashboard/stats?date=${selectedDate}`, {
+      // Add timestamp to prevent browser caching
+      const timestamp = Date.now()
+      const response = await fetch(`/api/dashboard/stats?date=${selectedDate}&_t=${timestamp}`, {
         headers: {
-          'Authorization': `Bearer ${jwtToken}`
-        }
+          'Authorization': `Bearer ${jwtToken}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        },
+        cache: 'no-store'
       })
       if (response.ok) {
         const data = await response.json()
@@ -192,12 +197,42 @@ export default function DashboardPage() {
     }
   }, [jwtToken, selectedDate])
 
+  // Initial fetch and backup polling
   useEffect(() => {
     fetchStats()
-    // Poll for stats every 5 seconds for near real-time updates
+    // Backup polling every 5 seconds (fallback)
     const interval = setInterval(fetchStats, 5000)
     return () => clearInterval(interval)
   }, [fetchStats])
+
+  // Store fetchStats in a ref so BroadcastChannel listener can access latest version
+  const fetchStatsRef = useRef(fetchStats)
+  useEffect(() => {
+    fetchStatsRef.current = fetchStats
+  }, [fetchStats])
+
+  // INSTANT UPDATES: Listen for attendance changes from Cadet Records page
+  // Empty dependency array - channel stays open for entire component lifecycle
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    console.log('📡 Dashboard: BroadcastChannel listener STARTED (will stay open)')
+    const channel = new BroadcastChannel('attendance-updates')
+
+    channel.onmessage = (event) => {
+      console.log('📨 Dashboard received message:', event.data)
+      if (event.data.type === 'attendance-changed') {
+        // Immediately refresh data when attendance is updated
+        console.log('🚀 Instant update triggered for date:', event.data.date)
+        fetchStatsRef.current()
+      }
+    }
+
+    return () => {
+      console.log('📡 Dashboard: BroadcastChannel listener STOPPED')
+      channel.close()
+    }
+  }, []) // Empty dependency - only run once
 
 
   const stats = [

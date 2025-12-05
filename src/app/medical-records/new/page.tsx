@@ -1153,7 +1153,7 @@ function NewMedicalRecordPageInner() {
                                     payload.evening = checked
                                   }
 
-                                  await fetch('/api/attendance', {
+                                  const response = await fetch('/api/attendance', {
                                     method: 'POST',
                                     headers: {
                                       'Content-Type': 'application/json',
@@ -1161,6 +1161,25 @@ function NewMedicalRecordPageInner() {
                                     },
                                     body: JSON.stringify(payload),
                                   })
+
+                                  // Wait for response to complete - this ensures DB is updated
+                                  if (response.ok) {
+                                    // Small delay to ensure DB transaction is fully committed
+                                    await new Promise(resolve => setTimeout(resolve, 100))
+
+                                    // INSTANT UPDATE: Broadcast to Dashboard to refresh immediately
+                                    if (typeof window !== 'undefined') {
+                                      const channel = new BroadcastChannel('attendance-updates')
+                                      console.log('🔔 Broadcasting attendance update for:', dateKey)
+                                      channel.postMessage({
+                                        type: 'attendance-changed',
+                                        date: dateKey,
+                                        timestamp: Date.now()
+                                      })
+                                      // Keep channel open briefly to ensure message is sent
+                                      setTimeout(() => channel.close(), 100)
+                                    }
+                                  }
                                 } catch (error) {
                                   console.error('Failed to save attendance:', error)
                                   // Revert optimistic update on error (optional but good practice)
