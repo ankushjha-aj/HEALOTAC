@@ -24,6 +24,7 @@ interface Cadet {
   course?: string | null
   sex?: string | null
   relegated?: string
+  isForeign?: boolean
   createdAt: string
   bloodGroup?: string
 }
@@ -990,12 +991,18 @@ function NewMedicalRecordPageInner() {
                             <div className="text-xs text-gray-500 dark:text-gray-400">
                               Added {new Date(cadet.createdAt).toLocaleDateString()}
                             </div>
-                            {cadet.relegated === 'Y' && (
-                              <div className="mt-1">
-                                <span className="text-red-600 dark:text-red-400 font-bold">R</span>
-                                <span className="w-2 h-2 bg-red-500 rounded-full inline-block ml-1"></span>
-                              </div>
-                            )}
+                            <div className="flex justify-end gap-1 mt-1">
+                              {cadet.relegated === 'Y' && (
+                                <div>
+                                  <span className="text-red-600 dark:text-red-400 font-bold">R</span>
+                                </div>
+                              )}
+                              {cadet.isForeign && (
+                                <div>
+                                  <span className="text-blue-600 dark:text-blue-400 font-bold">F</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
