@@ -819,13 +819,13 @@ function NewMedicalRecordPageInner() {
         {user?.role === 'user' ? (
           // NA user: Cadet management interface
           <>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cadet Management</h1>
-              <p className="text-gray-600 dark:text-gray-400">Add new cadets to the system</p>
-            </div>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cadet Management</h1>
+                <p className="text-gray-600 dark:text-gray-400">Add new cadets to the system</p>
+              </div>
 
-            {/* Add Cadet Button */}
-            <div className="flex justify-center">
+              {/* Add Cadet Button */}
               <button
                 onClick={() => setShowAddCadetModal(true)}
                 className="btn-primary flex items-center gap-2 px-6 py-3 text-lg"
