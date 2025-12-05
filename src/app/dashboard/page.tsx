@@ -235,6 +235,7 @@ export default function DashboardPage() {
             <input
               type="date"
               value={selectedDate}
+              max={new Date().toLocaleDateString('sv', { timeZone: 'Asia/Kolkata' })}
               onChange={(e) => setSelectedDate(e.target.value)}
               className="p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:ring-primary focus:border-primary"
             />

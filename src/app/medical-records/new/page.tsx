@@ -1011,15 +1011,7 @@ function NewMedicalRecordPageInner() {
                     Previous Week
                   </button>
 
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">View from:</span>
-                    <input
-                      type="date"
-                      value={viewStartDate.toISOString().split('T')[0]}
-                      onChange={(e) => setViewStartDate(new Date(e.target.value))}
-                      className="input-field py-1 px-2 text-sm w-auto"
-                    />
-                  </div>
+
 
                   <button
                     onClick={() => {
