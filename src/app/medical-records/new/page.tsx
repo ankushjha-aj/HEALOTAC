@@ -216,6 +216,7 @@ function NewMedicalRecordPageInner() {
   const [searchCompany, setSearchCompany] = useState('')
   const [searchBattalion, setSearchBattalion] = useState('')
   const [searchBloodGroup, setSearchBloodGroup] = useState('')
+  const [searchDate, setSearchDate] = useState('')
   const [searchAcademyNumber, setSearchAcademyNumber] = useState('')
 
   // Fetch cadets for the dropdown
@@ -838,8 +839,25 @@ function NewMedicalRecordPageInner() {
 
             {/* Search Filters */}
             <div className="mt-8 mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-              <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Filter Cadets</h3>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter Cadets</h3>
+                {(searchName || searchCompany || searchBattalion || searchBloodGroup || searchDate || searchAcademyNumber) && (
+                  <button
+                    onClick={() => {
+                      setSearchName('')
+                      setSearchCompany('')
+                      setSearchBattalion('')
+                      setSearchBloodGroup('')
+                      setSearchDate('')
+                      setSearchAcademyNumber('')
+                    }}
+                    className="text-xs text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium"
+                  >
+                    Clear All Filters
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                 <div>
                   <label htmlFor="searchName" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                     Name
@@ -850,6 +868,19 @@ function NewMedicalRecordPageInner() {
                     value={searchName}
                     onChange={(e) => setSearchName(e.target.value)}
                     placeholder="Search by Name"
+                    className="input-field py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="searchAcademyNumber" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Academy Number
+                  </label>
+                  <input
+                    type="text"
+                    id="searchAcademyNumber"
+                    value={searchAcademyNumber}
+                    onChange={(e) => setSearchAcademyNumber(e.target.value)}
+                    placeholder="Search by Academy No."
                     className="input-field py-2 text-sm"
                   />
                 </div>
@@ -909,15 +940,15 @@ function NewMedicalRecordPageInner() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="searchAcademyNumber" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                    Academy Number
+                  <label htmlFor="searchDate" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Date Added
                   </label>
                   <input
-                    type="text"
-                    id="searchAcademyNumber"
-                    value={searchAcademyNumber}
-                    onChange={(e) => setSearchAcademyNumber(e.target.value)}
-                    placeholder="Search by Academy No."
+                    type="date"
+                    id="searchDate"
+                    value={searchDate}
+                    onChange={(e) => setSearchDate(e.target.value)}
+                    max={new Date().toISOString().split('T')[0]}
                     className="input-field py-2 text-sm"
                   />
                 </div>
@@ -929,7 +960,7 @@ function NewMedicalRecordPageInner() {
               <div className="mt-8">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                   Added Cadets
-                  {(searchName || searchCompany || searchBattalion || searchBloodGroup || searchAcademyNumber) && (
+                  {(searchName || searchCompany || searchBattalion || searchBloodGroup || searchDate || searchAcademyNumber) && (
                     <span className="text-sm font-normal text-gray-500 ml-2">
                       (Filtered)
                     </span>
@@ -953,6 +984,13 @@ function NewMedicalRecordPageInner() {
                       // Filter by Blood Group
                       if (searchBloodGroup && cadet.bloodGroup !== searchBloodGroup) {
                         return false
+                      }
+                      // Filter by Date
+                      if (searchDate) {
+                        const cadetDate = new Date(cadet.createdAt).toISOString().split('T')[0]
+                        if (cadetDate !== searchDate) {
+                          return false
+                        }
                       }
                       // Filter by Academy Number
                       if (searchAcademyNumber && (!cadet.academyNumber || !cadet.academyNumber.toString().includes(searchAcademyNumber))) {
