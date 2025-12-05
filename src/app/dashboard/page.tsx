@@ -6,52 +6,6 @@ import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Calendar, Users, Activity, TrendingUp, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 
-// Animated ECG Waveform Component
-const AnimatedECGWaveform = () => (
-  <svg
-    viewBox="0 0 800 80"
-    className="w-full h-12"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <defs>
-      <linearGradient id="ecgGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stopColor="#ef4444" />
-        <stop offset="25%" stopColor="#dc2626" />
-        <stop offset="50%" stopColor="#b91c1c" />
-        <stop offset="75%" stopColor="#dc2626" />
-        <stop offset="100%" stopColor="#ef4444" />
-      </linearGradient>
-    </defs>
-
-    {/* Single Continuous ECG Path Spanning Full Width */}
-    <path
-      d="M0 40 L50 40 L52 32 L54 48 L56 20 L58 60 L60 40 L90 40 L92 36 L94 44 L96 12 L98 68 L100 40 L130 40 L132 32 L134 48 L136 20 L138 60 L140 40 L170 40 L172 36 L174 44 L176 12 L178 68 L180 40 L210 40 L212 32 L214 48 L216 20 L218 60 L220 40 L250 40 L252 36 L254 44 L256 12 L258 68 L260 40 L290 40 L292 32 L294 48 L296 20 L298 60 L300 40 L330 40 L332 36 L334 44 L336 12 L338 68 L340 40 L370 40 L372 32 L374 48 L376 20 L378 60 L380 40 L410 40 L412 36 L414 44 L416 12 L418 68 L420 40 L450 40 L452 32 L454 48 L456 20 L458 60 L460 40 L490 40 L492 36 L494 44 L496 12 L498 68 L500 40 L530 40 L532 32 L534 48 L536 20 L538 60 L540 40 L570 40 L572 36 L574 44 L576 12 L578 68 L580 40 L610 40 L612 32 L614 48 L616 20 L618 60 L620 40 L650 40 L652 36 L654 44 L656 12 L658 68 L660 40 L690 40 L692 32 L694 48 L696 20 L698 60 L700 40 L730 40 L732 36 L734 44 L736 12 L738 68 L740 40 L770 40 L772 32 L774 48 L776 20 L778 60 L780 40 L800 40"
-      stroke="url(#ecgGradient)"
-      strokeWidth="3.5"
-      fill="none"
-    />
-
-    {/* Continuous flowing animation */}
-    <defs>
-      <style>
-        {`
-          @keyframes ecgFlow {
-            0% { stroke-dasharray: 0, 1600; }
-            50% { stroke-dasharray: 800, 800; }
-            100% { stroke-dasharray: 1600, 0; }
-          }
-          path {
-            animation: ecgFlow 5s linear infinite;
-          }
-        `}
-      </style>
-    </defs>
-  </svg>
-)
 
 // Interface definitions
 interface Cadet {
@@ -119,7 +73,7 @@ export default function DashboardPage() {
       const now = new Date()
       const date = now.toLocaleDateString()
       const time = now.toLocaleTimeString()
-      setCurrentDateTime(`${date} ${time}`)
+      setCurrentDateTime(`${date} ${time} `)
     }
 
     updateDateTime()
@@ -135,7 +89,7 @@ export default function DashboardPage() {
     setDbStatus('connecting...')
     try {
       const headers = {
-        'Authorization': `Bearer ${jwtToken}`,
+        'Authorization': `Bearer ${jwtToken} `,
         'Content-Type': 'application/json'
       }
 
@@ -149,7 +103,7 @@ export default function DashboardPage() {
         const recordsData = await recordsRes.json()
         setCadets(cadetsData)
         setMedicalRecords(recordsData)
-        setDbStatus(`connected (${cadetsData.length} cadets, ${recordsData.length} records)`)
+        setDbStatus(`connected(${cadetsData.length} cadets, ${recordsData.length} records)`)
         console.log('✅ Real-time data updated:', new Date().toLocaleTimeString())
       } else {
         if (cadetsRes.status === 401 || recordsRes.status === 401) {
@@ -158,13 +112,13 @@ export default function DashboardPage() {
           window.location.href = '/login'
           return
         }
-        setDbStatus(`api error (${cadetsRes.status}, ${recordsRes.status})`)
+        setDbStatus(`api error(${cadetsRes.status}, ${recordsRes.status})`)
         // No fallback mock data - dashboard will show empty state
         setCadets([])
         setMedicalRecords([])
       }
     } catch (error) {
-      setDbStatus(`connection failed: ${error instanceof Error ? error.message : 'unknown error'}`)
+      setDbStatus(`connection failed: ${error instanceof Error ? error.message : 'unknown error'} `)
       // No fallback mock data - dashboard will show empty state
       setCadets([])
       setMedicalRecords([])
@@ -211,51 +165,59 @@ export default function DashboardPage() {
   // Close tooltip when clicking outside (only needed for click interactions, not hover)
   // Removed for hover-only tooltip functionality
 
-  // Calculate stats from real data - show cadets with records added/updated today
-  const today = new Date()
-  const todayString = today.getFullYear() + '-' +
-    String(today.getMonth() + 1).padStart(2, '0') + '-' +
-    String(today.getDate()).padStart(2, '0')
+  // State for attendance stats and attendees
+  const [attendanceData, setAttendanceData] = useState<{
+    stats: { morning: number; evening: number; total: number },
+    attendees: (Cadet & { attendanceStatus: { morning: boolean; evening: boolean }, bloodGroup?: string | null })[]
+  } | null>(null)
 
-  // Get cadets who have medical records created or updated today
-  const todayRecords = medicalRecords.filter(record => {
-    const createdDate = new Date(record.createdAt).toISOString().split('T')[0] // Get YYYY-MM-DD part
-    const updatedDate = record.updatedAt ? new Date(record.updatedAt).toISOString().split('T')[0] : null
+  // State for selected date
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleDateString('sv'))
 
-    return createdDate === todayString || (updatedDate && updatedDate === todayString)
-  })
+  // Fetch attendance stats
+  const fetchStats = useCallback(async () => {
+    if (!jwtToken) return
+    try {
+      const response = await fetch(`/api/dashboard/stats?date=${selectedDate}`, {
+        headers: {
+          'Authorization': `Bearer ${jwtToken}`
+        }
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setAttendanceData(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch attendance stats:', error)
+    }
+  }, [jwtToken, selectedDate])
 
-  const todayCadets = new Set(todayRecords.map(record => record.cadetId))
+  useEffect(() => {
+    fetchStats()
+    // Poll for stats every 30 seconds
+    const interval = setInterval(fetchStats, 30000)
+    return () => clearInterval(interval)
+  }, [fetchStats])
 
   const stats = [
     {
-      label: 'Total Cadets for Today',
-      value: todayCadets.size.toString(),
+      label: 'Morning Attendance',
+      value: attendanceData ? attendanceData.stats.morning.toString() : '0',
+      icon: Users,
+    },
+    {
+      label: 'Evening Attendance',
+      value: attendanceData ? attendanceData.stats.evening.toString() : '0',
+      icon: Users,
+    },
+    {
+      label: 'Total Attendance',
+      value: attendanceData ? attendanceData.stats.total.toString() : '0',
       icon: Users,
     },
   ]
 
-  // Recent cadets with activity
-  const recentCadets = cadets
-    .map(cadet => ({
-      ...cadet,
-      lastActivity: cadet.createdAt
-    }))
-    .sort((a, b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime())
-    .slice(0, 5)
-
-  if (loading) {
-    return (
-      <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
-          </div>
-        </div>
-      </DashboardLayout>
-    )
-  }
+  // ... (loading check)
 
   return (
     <DashboardLayout>
@@ -269,8 +231,15 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="mt-4 lg:mt-0 flex items-center gap-3">
+            {/* Date Picker */}
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:ring-primary focus:border-primary"
+            />
             <button
-              onClick={() => window.location.reload()}
+              onClick={fetchStats}
               className="inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               title="Refresh data"
             >
@@ -279,8 +248,8 @@ export default function DashboardPage() {
             <button
               onClick={handleAddNewRecord}
               disabled={navigatingToNewRecord}
-              className={`btn-primary flex items-center gap-2 ${navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
-                }`}
+              className={`btn - primary flex items - center gap - 2 ${navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
+                } `}
             >
               {navigatingToNewRecord ? (
                 <>
@@ -295,23 +264,20 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.map((stat) => {
             const Icon = stat.icon
             return (
               <div key={stat.label} className="card p-6 relative">
-                {/* Full-width ECG Waveform background */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <AnimatedECGWaveform />
-                </div>
-
                 {/* Content overlay */}
                 <div className="relative z-10">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
-                      <div className="text-3xl font-bold text-gray-900 dark:text-white">
-                        {stat.value}
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                        <div className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                          {stat.value}
+                        </div>
                       </div>
                     </div>
                     <div className="relative">
@@ -327,19 +293,13 @@ export default function DashboardPage() {
           })}
         </div>
 
-        {/* Recent Cadets Table */}
+        {/* Daily Attendance Report Table */}
         <div className="card">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Recent Cadet Activity
+                Daily Attendance Report ({new Date(selectedDate).toLocaleDateString('en-GB')})
               </h3>
-              <Link
-                href="/cadets"
-                className="text-sm text-primary hover:text-primary/80"
-              >
-                View all cadets →
-              </Link>
             </div>
           </div>
 
@@ -352,22 +312,19 @@ export default function DashboardPage() {
                     Cadet Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Academy No
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Battalion
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Company
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Join Date
+                    Blood Group
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Course
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Academy Number
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Last Activity
+                    Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Actions
@@ -375,85 +332,77 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {recentCadets.map((cadet) => (
-                  <tr key={cadet.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 flex-shrink-0 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
-                          <span className="text-primary font-medium">
-                            {cadet.name.split(' ').map((n: string) => n[0]).join('')}
-                          </span>
+                {attendanceData?.attendees && attendanceData.attendees.length > 0 ? (
+                  attendanceData.attendees.map((cadet) => (
+                    <tr key={cadet.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="h-10 w-10 flex-shrink-0 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
+                            <span className="text-primary font-medium">
+                              {cadet.name.split(' ').map((n: string) => n[0]).join('')}
+                            </span>
+                          </div>
+                          <div className="ml-3 flex items-center gap-2">
+                            <Link
+                              href={`/ cadets / ${cadet.id} `}
+                              className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary transition-colors"
+                            >
+                              {cadet.name}
+                            </Link>
+                          </div>
                         </div>
-                        <div className="ml-3 flex items-center gap-2">
-                          <Link
-                            href={`/cadets/${cadet.id}`}
-                            className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary transition-colors"
-                          >
-                            {cadet.name}
-                          </Link>
-                          {cadet.relegated === 'Y' && (
-                            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-red-600 bg-red-100 rounded-full dark:text-red-400 dark:bg-red-900/30" title="Relegated">
-                              R
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {cadet.academyNumber || 'N/A'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {cadet.battalion}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {cadet.company}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {cadet.bloodGroup || 'N/A'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex gap-2">
+                          {cadet.attendanceStatus.morning && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                              Morning
                             </span>
                           )}
-                          {cadet.isForeign && (
-                            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-blue-600 bg-blue-100 rounded-full dark:text-blue-400 dark:bg-blue-900/30" title="Foreign Cadet">
-                              F
+                          {cadet.attendanceStatus.evening && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                              Evening
                             </span>
                           )}
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {cadet.battalion}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {(() => {
-                          const companyMap: { [key: string]: string } = {
-                            'M': 'Meiktila',
-                            'N': 'Naushera',
-                            'Z': 'Zojila',
-                            'J': 'Jessami',
-                            'K': 'Kohima',
-                            'P': 'Phillora'
-                          }
-                          return companyMap[cadet.company] ? `${cadet.company} - ${companyMap[cadet.company]}` : cadet.company
-                        })()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(cadet.joinDate).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {cadet.course || 'N/A'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {cadet.academyNumber || 'N/A'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(cadet.lastActivity || cadet.createdAt).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Link
-                        href={`/cadets/${cadet.id}`}
-                        className="text-primary hover:text-primary/80 font-medium text-sm"
-                      >
-                        View Cadet
-                      </Link>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Link
+                          href={`/ cadets / ${cadet.id} `}
+                          className="text-primary hover:text-primary/80 font-medium text-sm"
+                        >
+                          View Details
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                      No attendance records found for this date.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

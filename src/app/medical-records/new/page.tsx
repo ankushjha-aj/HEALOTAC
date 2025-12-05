@@ -247,7 +247,32 @@ function NewMedicalRecordPageInner() {
         if (response.ok) {
           const cadetsData = await response.json()
           console.log('✅ CADETS FETCHED:', cadetsData.length, 'cadets')
-          setCadets(cadetsData)
+
+          // Fetch attendance for each cadet (this could be optimized to a batch fetch in the future)
+          const cadetsWithAttendance = await Promise.all(cadetsData.map(async (cadet: Cadet) => {
+            try {
+              const attendanceRes = await fetch(`/api/attendance?cadetId=${cadet.id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+              })
+              if (attendanceRes.ok) {
+                const records = await attendanceRes.json()
+                const attendanceMap: Record<string, { morning: boolean; evening: boolean }> = {}
+                records.forEach((record: any) => {
+                  const dateKey = new Date(record.date).toISOString().split('T')[0]
+                  attendanceMap[dateKey] = {
+                    morning: record.morning,
+                    evening: record.evening
+                  }
+                })
+                return { ...cadet, attendance: attendanceMap }
+              }
+            } catch (e) {
+              console.error(`Failed to fetch attendance for cadet ${cadet.id}`, e)
+            }
+            return cadet
+          }))
+
+          setCadets(cadetsWithAttendance)
         } else if (response.status === 401) {
           console.error('❌ CADETS API: Authentication failed')
           setError('Authentication required')
@@ -1089,71 +1114,111 @@ function NewMedicalRecordPageInner() {
                             {Array.from({ length: 7 }).map((_, index) => {
                               const date = new Date(viewStartDate)
                               date.setDate(date.getDate() + index)
-                              const dateKey = date.toISOString().split('T')[0]
+                              // Fix: Use local date string (YYYY-MM-DD) instead of toISOString (UTC)
+                              // to avoid date shifting issues in timezones like IST
+                              const dateKey = date.toLocaleDateString('sv')
                               const attendance = cadet.attendance?.[dateKey] || { morning: false, evening: false }
 
                               // Check if date is in the future
                               const today = new Date()
                               today.setHours(0, 0, 0, 0)
-                              const isFutureDate = date > today
+                              // Compare dates by resetting time components
+                              const compareDate = new Date(date)
+                              compareDate.setHours(0, 0, 0, 0)
+                              const isFutureDate = compareDate > today
+
+                              const handleAttendanceChange = async (type: 'morning' | 'evening', checked: boolean) => {
+                                // Optimistic update
+                                setCadets(prevCadets => prevCadets.map(c => {
+                                  if (c.id === cadet.id) {
+                                    const currentAttendance = c.attendance?.[dateKey] || { morning: false, evening: false }
+                                    return {
+                                      ...c,
+                                      attendance: {
+                                        ...c.attendance,
+                                        [dateKey]: { ...currentAttendance, [type]: checked }
+                                      }
+                                    }
+                                  }
+                                  return c
+                                }))
+
+                                // API Call - only send the field that changed
+                                try {
+                                  const token = localStorage.getItem('jwt_token')
+                                  if (!token) return
+
+                                  // Only send the field that was changed
+                                  const payload: any = {
+                                    cadetId: cadet.id,
+                                    date: dateKey,
+                                  }
+
+                                  // Only include the field that was actually changed
+                                  if (type === 'morning') {
+                                    payload.morning = checked
+                                  } else {
+                                    payload.evening = checked
+                                  }
+
+                                  await fetch('/api/attendance', {
+                                    method: 'POST',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                      'Authorization': `Bearer ${token}`
+                                    },
+                                    body: JSON.stringify(payload),
+                                  })
+                                } catch (error) {
+                                  console.error('Failed to save attendance:', error)
+                                  // Revert optimistic update on error (optional but good practice)
+                                }
+                              }
+
+                              // Determine if it's currently AM or PM mode (IST)
+                              const now = new Date()
+                              const istHours = parseInt(now.toLocaleString('en-US', {
+                                timeZone: 'Asia/Kolkata',
+                                hour: '2-digit',
+                                hour12: false
+                              }))
+                              const isAMMode = istHours < 12 // 12:00 AM to 11:59 AM
+                              const isPMMode = istHours >= 12 // 12:00 PM to 11:59 PM
+
+                              // Check if this is today's date
+                              const todayDateStr = new Date().toLocaleDateString('sv', { timeZone: 'Asia/Kolkata' })
+                              const isToday = dateKey === todayDateStr
+
+                              // AM checkbox: disabled if future date, OR if already checked, OR (if today AND it's PM mode AND already has PM checked)
+                              const amDisabled = isFutureDate || attendance.morning
+
+                              // PM checkbox: disabled if future date, OR if already checked, OR (if today AND it's AM mode)
+                              const pmDisabled = isFutureDate || attendance.evening || (isToday && isAMMode)
 
                               return (
                                 <td key={index} className="px-2 py-4 whitespace-nowrap text-center">
                                   <div className="flex flex-col gap-1 items-center">
-                                    <div className="flex items-center gap-1">
-                                      <span className="text-[10px] font-medium text-gray-500 w-3">M</span>
+                                    <div className="flex items-center gap-2">
+                                      <span className={`text-xs font-semibold w-6 ${attendance.morning ? 'text-green-600' : 'text-gray-500'}`}>AM</span>
                                       <input
                                         type="checkbox"
                                         checked={attendance.morning}
-                                        disabled={isFutureDate}
-                                        onChange={(e) => {
-                                          const newChecked = e.target.checked
-                                          setCadets(prevCadets => prevCadets.map(c => {
-                                            if (c.id === cadet.id) {
-                                              const currentAttendance = c.attendance?.[dateKey] || { morning: false, evening: false }
-                                              return {
-                                                ...c,
-                                                attendance: {
-                                                  ...c.attendance,
-                                                  [dateKey]: { ...currentAttendance, morning: newChecked }
-                                                }
-                                              }
-                                            }
-                                            return c
-                                          }))
-                                        }}
-                                        className={`h-3 w-3 rounded border-gray-300 ${isFutureDate
-                                            ? 'text-gray-300 cursor-not-allowed bg-gray-100'
-                                            : 'text-blue-600 focus:ring-blue-500 cursor-pointer'
+                                        disabled={amDisabled}
+                                        onChange={(e) => handleAttendanceChange('morning', e.target.checked)}
+                                        className={`h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 accent-green-600 ${amDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                                           }`}
                                       />
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                      <span className="text-[10px] font-medium text-gray-500 w-3">E</span>
+                                    <div className="flex items-center gap-2">
+                                      <span className={`text-xs font-semibold w-6 ${attendance.evening ? 'text-green-600' : 'text-gray-500'}`}>PM</span>
                                       <input
                                         type="checkbox"
                                         checked={attendance.evening}
-                                        disabled={isFutureDate}
-                                        onChange={(e) => {
-                                          const newChecked = e.target.checked
-                                          setCadets(prevCadets => prevCadets.map(c => {
-                                            if (c.id === cadet.id) {
-                                              const currentAttendance = c.attendance?.[dateKey] || { morning: false, evening: false }
-                                              return {
-                                                ...c,
-                                                attendance: {
-                                                  ...c.attendance,
-                                                  [dateKey]: { ...currentAttendance, evening: newChecked }
-                                                }
-                                              }
-                                            }
-                                            return c
-                                          }))
-                                        }}
-                                        className={`h-3 w-3 rounded border-gray-300 ${isFutureDate
-                                            ? 'text-gray-300 cursor-not-allowed bg-gray-100'
-                                            : 'text-blue-600 focus:ring-blue-500 cursor-pointer'
+                                        disabled={pmDisabled}
+                                        onChange={(e) => handleAttendanceChange('evening', e.target.checked)}
+                                        className={`h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 accent-green-600 ${pmDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                                           }`}
+                                        title={isToday && isAMMode ? 'PM attendance can only be marked after 12:00 PM' : ''}
                                       />
                                     </div>
                                   </div>

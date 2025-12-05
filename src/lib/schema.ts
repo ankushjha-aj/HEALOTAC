@@ -115,6 +115,17 @@ export const medicalRecords = pgTable('medical_records', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
+// Attendance table
+export const attendance = pgTable('attendance', {
+  id: serial('id').primaryKey(),
+  cadetId: integer('cadet_id').references(() => cadets.id).notNull(),
+  date: timestamp('date').notNull(),
+  morning: boolean('morning').default(false).notNull(),
+  evening: boolean('evening').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
 // Types for TypeScript
 export type User = typeof users.$inferSelect
 export type NewUser = typeof users.$inferInsert
@@ -124,4 +135,7 @@ export type NewCadet = typeof cadets.$inferInsert
 
 export type MedicalRecord = typeof medicalRecords.$inferSelect
 export type NewMedicalRecord = typeof medicalRecords.$inferInsert
+
+export type Attendance = typeof attendance.$inferSelect
+export type NewAttendance = typeof attendance.$inferInsert
 
