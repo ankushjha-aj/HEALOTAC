@@ -353,7 +353,7 @@ export default function DashboardPage() {
             <button
               onClick={handleAddNewRecord}
               disabled={navigatingToNewRecord}
-              className={`btn - primary flex items - center gap - 2 ${navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
+              className={`btn-primary flex items-center gap-2 ${navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
                 } `}
             >
               {navigatingToNewRecord ? (
