@@ -362,7 +362,7 @@ export default function DashboardPage() {
                   <span>Loading...</span>
                 </>
               ) : (
-                <span>Add New Record</span>
+                <span>Add New Record</span> 
               )}
             </button>
           </div>
