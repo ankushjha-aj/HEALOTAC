@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Calendar, Users, Activity, TrendingUp, RefreshCw } from 'lucide-react'
+import { Calendar, Users, Activity, TrendingUp, RefreshCw, Download } from 'lucide-react'
 import Link from 'next/link'
 
 
@@ -54,6 +54,7 @@ export default function DashboardPage() {
   const [currentDateTime, setCurrentDateTime] = useState<string>('')
 
   const [navigatingToNewRecord, setNavigatingToNewRecord] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   // Check authentication on mount
   useEffect(() => {
@@ -240,6 +241,52 @@ export default function DashboardPage() {
       window.removeEventListener('storage', handleStorageChange)
     }
   }, []) // Empty dependency - only run once
+  const handleDownloadCSV = () => {
+    if (!attendanceData?.attendees) return
+
+    // Define CSV headers
+    const headers = [
+      'Cadet Name',
+      'Academy No',
+      'Battalion',
+      'Company',
+      'Blood Group',
+      'Morning Arrival',
+      'Evening Arrival',
+      'Date'
+    ]
+
+    // Map data to CSV rows
+    const rows = attendanceData.attendees.map(cadet => [
+      // Enclose in quotes to handle commas in names
+      `"${cadet.name}"`,
+      cadet.academyNumber || 'N/A',
+      cadet.battalion,
+      cadet.company,
+      cadet.bloodGroup || 'N/A',
+      cadet.attendanceStatus.morning ? 'Yes' : 'No',
+      cadet.attendanceStatus.evening ? 'Yes' : 'No',
+      selectedDate
+    ])
+
+    // Combine headers and rows
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n')
+
+    // Create blobs and download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', `sick_report_${selectedDate}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
 
 
   const stats = [
@@ -268,7 +315,7 @@ export default function DashboardPage() {
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Sick Reports</h2> 
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Sick Reports</h2>
             <p className="mt-1 text-gray-500 dark:text-gray-400">
               Real-time overview of medical records and cadet health status
             </p>
@@ -283,11 +330,25 @@ export default function DashboardPage() {
               className="p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:ring-primary focus:border-primary"
             />
             <button
-              onClick={() => window.location.reload()}
+              onClick={handleDownloadCSV}
               className="inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              title="Download CSV"
+            >
+              <Download className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => {
+                setIsRefreshing(true)
+                setTimeout(() => {
+                  window.location.reload()
+                }, 500)
+              }}
+              disabled={isRefreshing}
+              className={`inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isRefreshing ? 'cursor-not-allowed opacity-75' : ''
+                }`}
               title="Refresh page"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
             <button
               onClick={handleAddNewRecord}
