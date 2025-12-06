@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { getDb } from '@/lib/db'
 import { attendance, cadets } from '@/lib/schema'
 import { eq, and, sql } from 'drizzle-orm'
 import { createAuthMiddleware } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // GET /api/dashboard/stats
 // GET /api/dashboard/stats?date=YYYY-MM-DD
@@ -31,6 +32,9 @@ export async function GET(request: NextRequest) {
             const day = String(istDate.getDate()).padStart(2, '0')
             queryDateString = `${year}-${month}-${day}`
         }
+
+        // Use fresh database connection for real-time data
+        const db = getDb()
 
         // Fetch attendance records for the date using raw SQL
         // Build query string manually to avoid Drizzle parameter binding issues

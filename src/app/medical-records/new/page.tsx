@@ -1165,19 +1165,21 @@ function NewMedicalRecordPageInner() {
                                   // Wait for response to complete - this ensures DB is updated
                                   if (response.ok) {
                                     // Small delay to ensure DB transaction is fully committed
-                                    await new Promise(resolve => setTimeout(resolve, 100))
+                                    await new Promise(resolve => setTimeout(resolve, 50))
 
-                                    // INSTANT UPDATE: Broadcast to Dashboard to refresh immediately
+                                    // INSTANT UPDATE: Use localStorage to notify other tabs
+                                    // This triggers a 'storage' event in other tabs
                                     if (typeof window !== 'undefined') {
-                                      const channel = new BroadcastChannel('attendance-updates')
-                                      console.log('🔔 Broadcasting attendance update for:', dateKey)
-                                      channel.postMessage({
+                                      const updateKey = 'attendance-update-trigger'
+                                      const updateData = JSON.stringify({
                                         type: 'attendance-changed',
                                         date: dateKey,
                                         timestamp: Date.now()
                                       })
-                                      // Keep channel open briefly to ensure message is sent
-                                      setTimeout(() => channel.close(), 100)
+                                      console.log('🔔 Triggering instant update for:', dateKey)
+                                      localStorage.setItem(updateKey, updateData)
+                                      // Remove it after a brief moment (for next update to work)
+                                      setTimeout(() => localStorage.removeItem(updateKey), 100)
                                     }
                                   }
                                 } catch (error) {

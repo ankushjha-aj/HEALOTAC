@@ -205,32 +205,39 @@ export default function DashboardPage() {
     return () => clearInterval(interval)
   }, [fetchStats])
 
-  // Store fetchStats in a ref so BroadcastChannel listener can access latest version
+  // Store fetchStats in a ref so storage listener can access latest version
   const fetchStatsRef = useRef(fetchStats)
   useEffect(() => {
     fetchStatsRef.current = fetchStats
   }, [fetchStats])
 
   // INSTANT UPDATES: Listen for attendance changes from Cadet Records page
-  // Empty dependency array - channel stays open for entire component lifecycle
+  // Uses localStorage 'storage' event which fires when localStorage changes in ANOTHER tab
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    console.log('📡 Dashboard: BroadcastChannel listener STARTED (will stay open)')
-    const channel = new BroadcastChannel('attendance-updates')
+    console.log('📡 Dashboard: Listening for attendance updates via localStorage...')
 
-    channel.onmessage = (event) => {
-      console.log('📨 Dashboard received message:', event.data)
-      if (event.data.type === 'attendance-changed') {
-        // Immediately refresh data when attendance is updated
-        console.log('🚀 Instant update triggered for date:', event.data.date)
-        fetchStatsRef.current()
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'attendance-update-trigger' && event.newValue) {
+        try {
+          const data = JSON.parse(event.newValue)
+          console.log('📨 Dashboard received update:', data)
+          if (data.type === 'attendance-changed') {
+            console.log('🚀 INSTANT UPDATE triggered for date:', data.date)
+            fetchStatsRef.current()
+          }
+        } catch (e) {
+          console.error('Failed to parse storage event:', e)
+        }
       }
     }
 
+    window.addEventListener('storage', handleStorageChange)
+
     return () => {
-      console.log('📡 Dashboard: BroadcastChannel listener STOPPED')
-      channel.close()
+      console.log('📡 Dashboard: Stopped listening for updates')
+      window.removeEventListener('storage', handleStorageChange)
     }
   }, []) // Empty dependency - only run once
 
