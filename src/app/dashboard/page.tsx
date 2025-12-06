@@ -362,7 +362,7 @@ export default function DashboardPage() {
                   <span>Loading...</span>
                 </>
               ) : (
-                <span>Add New Record</span> 
+                <span>Add New Record</span>
               )}
             </button>
           </div>
@@ -449,7 +449,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="ml-3 flex items-center gap-2">
                             <Link
-                              href={`/ cadets / ${cadet.id} `}
+                              href={`/cadets/${cadet.id}`}
                               className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary transition-colors"
                             >
                               {cadet.name}
@@ -493,7 +493,7 @@ export default function DashboardPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Link
-                          href={`/ cadets / ${cadet.id} `}
+                          href={`/cadets/${cadet.id}`}
                           className="text-primary hover:text-primary/80 font-medium text-sm"
                         >
                           View Details
