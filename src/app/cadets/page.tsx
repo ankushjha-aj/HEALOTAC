@@ -267,6 +267,7 @@ export default function CadetsPage() {
   // Reset pagination to page 1 when search or filter changes
   useEffect(() => {
     pagination.goToPage(1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, showHighTrainingMissed, foreignFilter])
 
   // Get paginated cadets

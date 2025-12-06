@@ -403,7 +403,7 @@ export default function DashboardPage() {
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                Today's Sick Report Details ({new Date(selectedDate).toLocaleDateString('en-GB')})
+                Today&apos;s Sick Report Details ({new Date(selectedDate).toLocaleDateString('en-GB')})
               </h3>
             </div>
           </div>
