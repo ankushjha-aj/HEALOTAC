@@ -10,4 +10,4 @@ export const db = drizzle(sql)
 export function getDb() {
     const freshSql = neon(process.env.DATABASE_URL!)
     return drizzle(freshSql)
-}
+} 
