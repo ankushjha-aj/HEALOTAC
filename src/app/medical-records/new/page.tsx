@@ -224,6 +224,10 @@ function NewMedicalRecordPageInner() {
   const [viewStartDate, setViewStartDate] = useState(new Date())
   const [viewingCadet, setViewingCadet] = useState<Cadet | null>(null)
 
+  // CSV Download State
+  const [showDownloadModal, setShowDownloadModal] = useState(false)
+  const [downloadDate, setDownloadDate] = useState(new Date().toLocaleDateString('sv')) // Default to Today (YYYY-MM-DD)
+
   // Fetch cadets for the dropdown
   useEffect(() => {
     const fetchCadets = async () => {
@@ -551,16 +555,40 @@ function NewMedicalRecordPageInner() {
     })
   }, [cadets, searchName, searchCompany, searchBattalion, searchBloodGroup, searchDate, searchAcademyNumber])
 
-  const handleDownloadCadetsCSV = () => {
-    const headers = ['Cadet Name', 'Academy No', 'Battalion', 'Company', 'Blood Group', 'Join Date']
-    const rows = tableFilteredCadets.map(cadet => [
-      `"${cadet.name}"`,
-      cadet.academyNumber || 'N/A',
-      cadet.battalion,
-      cadet.company,
-      cadet.bloodGroup || 'N/A',
-      cadet.joinDate ? new Date(cadet.joinDate).toLocaleDateString() : 'N/A'
-    ])
+  const handleDownloadClick = () => {
+    setShowDownloadModal(true)
+  }
+
+  const executeDownloadCSV = () => {
+    const headers = ['Cadet Name', 'Academy No', 'Battalion', 'Company', 'Blood Group', 'Morning Arrival', 'Evening Arrival', 'Date']
+
+    // Filter cadets who have attendance (AM or PM) for the selected date
+    const rows = tableFilteredCadets
+      .filter(cadet => {
+        const attendance = cadet.attendance?.[downloadDate] || { morning: false, evening: false }
+        // Only include if at least one checkbox (AM or PM) is checked
+        return attendance.morning || attendance.evening
+      })
+      .map(cadet => {
+        const attendance = cadet.attendance?.[downloadDate] || { morning: false, evening: false }
+
+        return [
+          `"${cadet.name}"`,
+          cadet.academyNumber || 'N/A',
+          cadet.battalion,
+          cadet.company,
+          cadet.bloodGroup || 'N/A',
+          attendance.morning ? 'Yes' : 'No',
+          attendance.evening ? 'Yes' : 'No',
+          downloadDate
+        ]
+      })
+
+    if (rows.length === 0) {
+      alert(`No attendance records found for ${downloadDate}`)
+      setShowDownloadModal(false)
+      return
+    }
 
     const csvContent = [
       headers.join(','),
@@ -571,11 +599,13 @@ function NewMedicalRecordPageInner() {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.setAttribute('href', url)
-    link.setAttribute('download', `cadets_list_${new Date().toISOString().split('T')[0]}.csv`)
+    link.setAttribute('download', `cadet_report_${downloadDate}.csv`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+
+    setShowDownloadModal(false)
   }
 
   // Helper function to convert menstrual aids array to dropdown value
@@ -930,12 +960,11 @@ function NewMedicalRecordPageInner() {
                   Add New Cadet
                 </button>
                 <button
-                  onClick={handleDownloadCadetsCSV}
-                  className="btn-secondary flex items-center gap-2 px-6 py-3 text-lg"
+                  onClick={handleDownloadClick}
+                  className="btn-secondary flex items-center justify-center px-4 py-3"
                   title="Download Filtered List"
                 >
                   <Download className="h-6 w-6" />
-                  Download CSV
                 </button>
               </div>
             </div>
@@ -1384,6 +1413,57 @@ function NewMedicalRecordPageInner() {
                       className="btn-secondary px-4 py-2 text-sm"
                     >
                       Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Download Date Selection Modal */}
+            {showDownloadModal && (
+              <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowDownloadModal(false)}>
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
+                  <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Date</h3>
+                    <button
+                      onClick={() => setShowDownloadModal(false)}
+                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                  <div className="p-6">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                      Select the date for which you want to download the report.
+                    </p>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Date
+                        </label>
+                        <input
+                          type="date"
+                          value={downloadDate}
+                          onChange={(e) => setDownloadDate(e.target.value)}
+                          max={new Date().toISOString().split('T')[0]} // Optional: Prevent future dates
+                          className="input-field w-full"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex justify-end gap-3">
+                    <button
+                      onClick={() => setShowDownloadModal(false)}
+                      className="btn-secondary px-4 py-2 text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={executeDownloadCSV}
+                      className="btn-primary px-4 py-2 text-sm flex items-center gap-2"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download
                     </button>
                   </div>
                 </div>
