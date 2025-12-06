@@ -2,11 +2,11 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Suspense, useState, useEffect } from 'react'
+import { Suspense, useState, useEffect, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import Link from 'next/link'
-import { X, Plus, User, ChevronLeft, ChevronRight } from 'lucide-react'
+import { X, Plus, User, ChevronLeft, ChevronRight, Download } from 'lucide-react'
 import { useUser } from '@/hooks/useUser'
 
 interface Cadet {
@@ -515,6 +515,69 @@ function NewMedicalRecordPageInner() {
     )
   )
 
+
+
+  // Filtered cadets for the table (separate from search autocomplete)
+  const tableFilteredCadets = useMemo(() => {
+    return cadets.filter(cadet => {
+      // Filter by Name
+      if (searchName && !cadet.name.toLowerCase().includes(searchName.toLowerCase())) {
+        return false
+      }
+      // Filter by Company
+      if (searchCompany && cadet.company !== searchCompany) {
+        return false
+      }
+      // Filter by Battalion
+      if (searchBattalion && cadet.battalion !== searchBattalion) {
+        return false
+      }
+      // Filter by Blood Group
+      if (searchBloodGroup && cadet.bloodGroup !== searchBloodGroup) {
+        return false
+      }
+      // Filter by Date (Added Date)
+      if (searchDate) {
+        const cadetDate = new Date(cadet.createdAt).toISOString().split('T')[0]
+        if (cadetDate !== searchDate) {
+          return false
+        }
+      }
+      // Filter by Academy Number
+      if (searchAcademyNumber && (!cadet.academyNumber || !cadet.academyNumber.toString().includes(searchAcademyNumber))) {
+        return false
+      }
+      return true
+    })
+  }, [cadets, searchName, searchCompany, searchBattalion, searchBloodGroup, searchDate, searchAcademyNumber])
+
+  const handleDownloadCadetsCSV = () => {
+    const headers = ['Cadet Name', 'Academy No', 'Battalion', 'Company', 'Blood Group', 'Join Date']
+    const rows = tableFilteredCadets.map(cadet => [
+      `"${cadet.name}"`,
+      cadet.academyNumber || 'N/A',
+      cadet.battalion,
+      cadet.company,
+      cadet.bloodGroup || 'N/A',
+      cadet.joinDate ? new Date(cadet.joinDate).toLocaleDateString() : 'N/A'
+    ])
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('download', `cadets_list_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   // Helper function to convert menstrual aids array to dropdown value
   const getMenstrualAidsDropdownValue = (aids: string[]) => {
     if (!aids || aids.length === 0) return ''
@@ -858,13 +921,23 @@ function NewMedicalRecordPageInner() {
               </div>
 
               {/* Add Cadet Button */}
-              <button
-                onClick={() => setShowAddCadetModal(true)}
-                className="btn-primary flex items-center gap-2 px-6 py-3 text-lg"
-              >
-                <Plus className="h-6 w-6" />
-                Add New Cadet
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowAddCadetModal(true)}
+                  className="btn-primary flex items-center gap-2 px-6 py-3 text-lg"
+                >
+                  <Plus className="h-6 w-6" />
+                  Add New Cadet
+                </button>
+                <button
+                  onClick={handleDownloadCadetsCSV}
+                  className="btn-secondary flex items-center gap-2 px-6 py-3 text-lg"
+                  title="Download Filtered List"
+                >
+                  <Download className="h-6 w-6" />
+                  Download CSV
+                </button>
+              </div>
             </div>
 
             {/* Search Filters */}
@@ -1048,37 +1121,8 @@ function NewMedicalRecordPageInner() {
                       </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                      {cadets
-                        .filter(cadet => {
-                          // Filter by Name
-                          if (searchName && !cadet.name.toLowerCase().includes(searchName.toLowerCase())) {
-                            return false
-                          }
-                          // Filter by Company
-                          if (searchCompany && cadet.company !== searchCompany) {
-                            return false
-                          }
-                          // Filter by Battalion
-                          if (searchBattalion && cadet.battalion !== searchBattalion) {
-                            return false
-                          }
-                          // Filter by Blood Group
-                          if (searchBloodGroup && cadet.bloodGroup !== searchBloodGroup) {
-                            return false
-                          }
-                          // Filter by Date (Added Date) - keeping this filter logic as is, though it filters the rows not the columns
-                          if (searchDate) {
-                            const cadetDate = new Date(cadet.createdAt).toISOString().split('T')[0]
-                            if (cadetDate !== searchDate) {
-                              return false
-                            }
-                          }
-                          // Filter by Academy Number
-                          if (searchAcademyNumber && (!cadet.academyNumber || !cadet.academyNumber.toString().includes(searchAcademyNumber))) {
-                            return false
-                          }
-                          return true
-                        })
+
+                      {tableFilteredCadets
                         .map((cadet) => (
                           <tr key={cadet.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                             <td className="px-4 py-4 whitespace-nowrap sticky left-0 bg-white dark:bg-gray-900 z-10">
