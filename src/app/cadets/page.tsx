@@ -347,196 +347,198 @@ export default function CadetsPage() {
         </div>
 
         {/* Search Section */}
-        <div className="card p-4">
-          <div className="space-y-4">
-            {/* Multi-filter Search Inputs */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {/* Name / Academy Number Filter */}
-              <div>
-                <label htmlFor="filter-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Name / Academy No.
-                </label>
-                <div className="relative">
-                  <input
-                    id="filter-name"
-                    type="text"
-                    placeholder="Search name..."
-                    value={filters.name}
-                    onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
-                    className="input-field"
-                  />
-                </div>
-              </div>
-
-              {/* Company Filter with Autocomplete */}
+        {/* Search Section */}
+        <div className="mt-8 mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter Cadets</h3>
+            {(filters.name || filters.company || filters.battalion || filters.course || filters.bloodGroup || foreignFilter !== 'all') && (
+              <button
+                onClick={() => {
+                  setFilters({ name: '', company: '', battalion: '', course: '', bloodGroup: '' })
+                  setForeignFilter('all')
+                }}
+                className="text-xs text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 font-medium"
+              >
+                Clear All Filters
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            {/* Name / Academy Number Filter */}
+            <div>
+              <label htmlFor="filter-name" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                Name / Academy No.
+              </label>
               <div className="relative">
-                <label htmlFor="filter-company" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Company
-                </label>
                 <input
-                  id="filter-company"
+                  id="filter-name"
                   type="text"
-                  placeholder="Filter company..."
-                  value={filters.company}
-                  onChange={(e) => {
-                    setFilters(prev => ({ ...prev, company: e.target.value }))
-                    setShowCompanySuggestions(true)
-                  }}
-                  onFocus={() => setShowCompanySuggestions(true)}
-                  onBlur={() => setTimeout(() => setShowCompanySuggestions(false), 200)}
-                  className="input-field"
-                />
-                {showCompanySuggestions && (
-                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                    {(() => {
-                      const companyMap: { [key: string]: string } = {
-                        'M': 'Meiktila',
-                        'N': 'Naushera',
-                        'Z': 'Zojila',
-                        'J': 'Jessami',
-                        'K': 'Kohima',
-                        'P': 'Phillora'
-                      }
-
-                      // Create array of {code, name} objects
-                      const companies = Object.entries(companyMap).map(([code, name]) => ({ code, name }))
-
-                      // Filter based on input
-                      const filteredCompanies = companies.filter(c =>
-                        !filters.company ||
-                        c.name.toLowerCase().includes(filters.company.toLowerCase()) ||
-                        c.code.toLowerCase().includes(filters.company.toLowerCase())
-                      )
-
-                      if (filteredCompanies.length === 0) return null
-
-                      return filteredCompanies.map((company) => (
-                        <div
-                          key={company.code}
-                          className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-900 dark:text-white"
-                          onClick={() => {
-                            setFilters(prev => ({ ...prev, company: company.code }))
-                            setShowCompanySuggestions(false)
-                          }}
-                        >
-                          <span className="font-medium">{company.code}</span> - {company.name}
-                        </div>
-                      ))
-                    })()}
-                  </div>
-                )}
-              </div>
-
-              {/* Battalion Filter */}
-              <div>
-                <label htmlFor="filter-battalion" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Battalion
-                </label>
-                <input
-                  id="filter-battalion"
-                  type="text"
-                  placeholder="Filter battalion..."
-                  value={filters.battalion}
-                  onChange={(e) => setFilters(prev => ({ ...prev, battalion: e.target.value }))}
-                  className="input-field"
+                  placeholder="Search name..."
+                  value={filters.name}
+                  onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
+                  className="input-field py-2 text-sm"
                 />
               </div>
+            </div>
 
-              {/* Course Filter */}
-              <div>
-                <label htmlFor="filter-course" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Course
-                </label>
-                <input
-                  id="filter-course"
-                  type="text"
-                  placeholder="Filter course..."
-                  value={filters.course}
-                  onChange={(e) => setFilters(prev => ({ ...prev, course: e.target.value }))}
-                  className="input-field"
-                />
-              </div>
+            {/* Company Filter with Autocomplete */}
+            <div className="relative">
+              <label htmlFor="filter-company" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                Company
+              </label>
+              <input
+                id="filter-company"
+                type="text"
+                placeholder="Filter company..."
+                value={filters.company}
+                onChange={(e) => {
+                  setFilters(prev => ({ ...prev, company: e.target.value }))
+                  setShowCompanySuggestions(true)
+                }}
+                onFocus={() => setShowCompanySuggestions(true)}
+                onBlur={() => setTimeout(() => setShowCompanySuggestions(false), 200)}
+                className="input-field py-2 text-sm"
+              />
+              {showCompanySuggestions && (
+                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                  {(() => {
+                    const companyMap: { [key: string]: string } = {
+                      'M': 'Meiktila',
+                      'N': 'Naushera',
+                      'Z': 'Zojila',
+                      'J': 'Jessami',
+                      'K': 'Kohima',
+                      'P': 'Phillora'
+                    }
 
-              {/* Blood Group Filter */}
-              <div>
-                <label htmlFor="filter-blood-group" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Blood Group
+                    // Create array of {code, name} objects
+                    const companies = Object.entries(companyMap).map(([code, name]) => ({ code, name }))
+
+                    // Filter based on input
+                    const filteredCompanies = companies.filter(c =>
+                      !filters.company ||
+                      c.name.toLowerCase().includes(filters.company.toLowerCase()) ||
+                      c.code.toLowerCase().includes(filters.company.toLowerCase())
+                    )
+
+                    if (filteredCompanies.length === 0) return null
+
+                    return filteredCompanies.map((company) => (
+                      <div
+                        key={company.code}
+                        className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-900 dark:text-white"
+                        onClick={() => {
+                          setFilters(prev => ({ ...prev, company: company.code }))
+                          setShowCompanySuggestions(false)
+                        }}
+                      >
+                        <span className="font-medium">{company.code}</span> - {company.name}
+                      </div>
+                    ))
+                  })()}
+                </div>
+              )}
+            </div>
+
+            {/* Battalion Filter */}
+            <div>
+              <label htmlFor="filter-battalion" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                Battalion
+              </label>
+              <input
+                id="filter-battalion"
+                type="text"
+                placeholder="Filter battalion..."
+                value={filters.battalion}
+                onChange={(e) => setFilters(prev => ({ ...prev, battalion: e.target.value }))}
+                className="input-field py-2 text-sm"
+              />
+            </div>
+
+            {/* Course Filter */}
+            <div>
+              <label htmlFor="filter-course" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                Course
+              </label>
+              <input
+                id="filter-course"
+                type="text"
+                placeholder="Filter course..."
+                value={filters.course}
+                onChange={(e) => setFilters(prev => ({ ...prev, course: e.target.value }))}
+                className="input-field py-2 text-sm"
+              />
+            </div>
+
+            {/* Blood Group Filter */}
+            <div>
+              <label htmlFor="filter-blood-group" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                Blood Group
+              </label>
+              <select
+                id="filter-blood-group"
+                value={filters.bloodGroup}
+                onChange={(e) => setFilters(prev => ({ ...prev, bloodGroup: e.target.value }))}
+                className="input-field py-2 text-sm"
+              >
+                <option value="">All Blood Groups</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+
+            {/* Combined Filters Container */}
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label htmlFor="filter-foreign" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  F. Cadets
                 </label>
                 <select
-                  id="filter-blood-group"
-                  value={filters.bloodGroup}
-                  onChange={(e) => setFilters(prev => ({ ...prev, bloodGroup: e.target.value }))}
-                  className="input-field"
+                  id="filter-foreign"
+                  value={foreignFilter}
+                  onChange={(e) => setForeignFilter(e.target.value)}
+                  className="input-field py-2 text-sm"
                 >
-                  <option value="">All Blood Groups</option>
-                  <option value="A+">A+</option>
-                  <option value="A-">A-</option>
-                  <option value="B+">B+</option>
-                  <option value="B-">B-</option>
-                  <option value="AB+">AB+</option>
-                  <option value="AB-">AB-</option>
-                  <option value="O+">O+</option>
-                  <option value="O-">O-</option>
+                  <option value="all">All</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
                 </select>
               </div>
 
-              <div className="flex items-end gap-4">
-                <div className="flex-1">
-                  <label htmlFor="filter-foreign" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Foreign Cadets
-                  </label>
-                  <select
-                    id="filter-foreign"
-                    value={foreignFilter}
-                    onChange={(e) => setForeignFilter(e.target.value)}
-                    className="input-field"
-                  >
-                    <option value="all">All</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                </div>
-
-                {/* Records per Page */}
-                <div className="flex-1">
-                  <label htmlFor="records-per-page" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Records/Page
-                  </label>
-                  <select
-                    id="records-per-page"
-                    value={pagination.itemsPerPage}
-                    onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
-                    className="input-field"
-                  >
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                    <option value={30}>30</option>
-                    <option value={50}>50</option>
-                  </select>
-                </div>
+              {/* Records per Page */}
+              <div className="flex-1">
+                <label htmlFor="records-per-page" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  Records/Page
+                </label>
+                <select
+                  id="records-per-page"
+                  value={pagination.itemsPerPage}
+                  onChange={(e) => pagination.setItemsPerPage(Number(e.target.value))}
+                  className="input-field py-2 text-sm"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={30}>30</option>
+                  <option value={50}>50</option>
+                </select>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Clear Filters and Results Count */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 order-2 sm:order-1">
-              Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, filteredCadets.length)} of {filteredCadets.length} cadets
-              {showHighTrainingMissed && ` (filtered: ≥30 days training missed)`}
-            </p>
-
-            <button
-              onClick={() => {
-                setFilters({ name: '', company: '', battalion: '', course: '', bloodGroup: '' })
-                setForeignFilter('all')
-              }}
-              className="text-sm text-primary hover:text-primary/80 font-medium order-1 sm:order-2 whitespace-nowrap"
-              disabled={!filters.name && !filters.company && !filters.battalion && !filters.course && !filters.bloodGroup && foreignFilter === 'all'}
-            >
-              Clear all filters
-            </button>
-          </div>
+        {/* Showing results count */}
+        <div className="mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Showing {pagination.startIndex + 1}-{Math.min(pagination.endIndex + 1, filteredCadets.length)} of {filteredCadets.length} cadets
+            {showHighTrainingMissed && ` (filtered: ≥30 days training missed)`}
+          </p>
         </div>
 
 
