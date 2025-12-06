@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Calendar, Users, Activity, TrendingUp, RefreshCw, Download } from 'lucide-react'
+import { Calendar, Users, Activity, TrendingUp, RefreshCw, Download, X } from 'lucide-react'
 import Link from 'next/link'
 
 
@@ -55,6 +55,10 @@ export default function DashboardPage() {
 
   const [navigatingToNewRecord, setNavigatingToNewRecord] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
+
+  // Download Modal State
+  const [showDownloadModal, setShowDownloadModal] = useState(false)
+  const [downloadDate, setDownloadDate] = useState<string>(new Date().toLocaleDateString('sv'))
 
   // Check authentication on mount
   useEffect(() => {
@@ -241,50 +245,92 @@ export default function DashboardPage() {
       window.removeEventListener('storage', handleStorageChange)
     }
   }, []) // Empty dependency - only run once
-  const handleDownloadCSV = () => {
-    if (!attendanceData?.attendees) return
 
-    // Define CSV headers
-    const headers = [
-      'Cadet Name',
-      'Academy No',
-      'Battalion',
-      'Company',
-      'Blood Group',
-      'Morning Arrival',
-      'Evening Arrival',
-      'Date'
-    ]
 
-    // Map data to CSV rows
-    const rows = attendanceData.attendees.map(cadet => [
-      // Enclose in quotes to handle commas in names
-      `"${cadet.name}"`,
-      cadet.academyNumber || 'N/A',
-      cadet.battalion,
-      cadet.company,
-      cadet.bloodGroup || 'N/A',
-      cadet.attendanceStatus.morning ? 'Yes' : 'No',
-      cadet.attendanceStatus.evening ? 'Yes' : 'No',
-      selectedDate
-    ])
+  const handleOpenDownloadModal = () => {
+    setDownloadDate(selectedDate)
+    setShowDownloadModal(true)
+  }
 
-    // Combine headers and rows
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.join(','))
-    ].join('\n')
+  const executeDownloadCSV = async () => {
+    setLoading(true)
+    try {
+      // Fetch data for the specific download date if different from currently displayed date
+      // Or just always fetch to be safe and ensure fresh data
+      const headers = {
+        'Authorization': `Bearer ${jwtToken} `,
+        'Cache-Control': 'no-cache'
+      }
 
-    // Create blobs and download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.setAttribute('href', url)
-    link.setAttribute('download', `sick_report_${selectedDate}.csv`)
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+      // Use the same endpoint as dashboard stats but for the requested download date
+      const timestamp = Date.now()
+      const response = await fetch(`/api/dashboard/stats?date=${downloadDate}&_t=${timestamp}`, {
+        headers,
+        cache: 'no-store'
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch data for download')
+      }
+
+      const data = await response.json()
+
+      if (!data.attendees || data.attendees.length === 0) {
+        alert(`No attendance records found for ${downloadDate}`)
+        setLoading(false)
+        setShowDownloadModal(false)
+        return
+      }
+
+      // Define CSV headers
+      const csvHeaders = [
+        'Cadet Name',
+        'Academy No',
+        'Battalion',
+        'Company',
+        'Blood Group',
+        'Morning Arrival',
+        'Evening Arrival',
+        'Date'
+      ]
+
+      // Map data to CSV rows
+      const rows = data.attendees.map((cadet: any) => [
+        // Enclose in quotes to handle commas in names
+        `"${cadet.name}"`,
+        cadet.academyNumber || 'N/A',
+        cadet.battalion,
+        cadet.company,
+        cadet.bloodGroup || 'N/A',
+        cadet.attendanceStatus.morning ? 'Yes' : 'No',
+        cadet.attendanceStatus.evening ? 'Yes' : 'No',
+        downloadDate
+      ])
+
+      // Combine headers and rows
+      const csvContent = [
+        csvHeaders.join(','),
+        ...rows.map((row: any[]) => row.join(','))
+      ].join('\n')
+
+      // Create blobs and download link
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.setAttribute('href', url)
+      link.setAttribute('download', `sick_report_${downloadDate}.csv`)
+      link.style.visibility = 'hidden'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      setShowDownloadModal(false)
+    } catch (error) {
+      console.error('Download error:', error)
+      alert('Failed to download CSV. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
 
@@ -330,7 +376,7 @@ export default function DashboardPage() {
               className="p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:ring-primary focus:border-primary"
             />
             <button
-              onClick={handleDownloadCSV}
+              onClick={handleOpenDownloadModal}
               className="inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               title="Download CSV"
             >
@@ -512,6 +558,57 @@ export default function DashboardPage() {
             </table>
           </div>
         </div>
+
+        {/* Download Modal - Copied and adapted from New Record page */}
+        {showDownloadModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowDownloadModal(false)}>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Date</h3>
+                <button
+                  onClick={() => setShowDownloadModal(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="p-6">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Select the date for which you want to download the report.
+                </p>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Date
+                    </label>
+                    <input
+                      type="date"
+                      value={downloadDate}
+                      onChange={(e) => setDownloadDate(e.target.value)}
+                      max={new Date().toISOString().split('T')[0]} // Optional: Prevent future dates
+                      className="input-field w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDownloadModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={executeDownloadCSV}
+                  className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Download
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   )
