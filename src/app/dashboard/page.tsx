@@ -244,17 +244,17 @@ export default function DashboardPage() {
 
   const stats = [
     {
-      label: 'AM Attendance',
+      label: 'Morning Attendance (AM)',
       value: attendanceData ? attendanceData.stats.morning.toString() : '0',
       icon: Users,
     },
     {
-      label: 'PM Attendance',
+      label: 'Evening Attendance (PM)',
       value: attendanceData ? attendanceData.stats.evening.toString() : '0',
       icon: Users,
     },
     {
-      label: 'Total Attendance',
+      label: 'Total Attendance (Today)',
       value: attendanceData ? attendanceData.stats.total.toString() : '0',
       icon: Users,
     },
@@ -268,7 +268,7 @@ export default function DashboardPage() {
         {/* Page Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Sick Reports</h2> 
             <p className="mt-1 text-gray-500 dark:text-gray-400">
               Real-time overview of medical records and cadet health status
             </p>
@@ -283,9 +283,9 @@ export default function DashboardPage() {
               className="p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:ring-primary focus:border-primary"
             />
             <button
-              onClick={fetchStats}
+              onClick={() => window.location.reload()}
               className="inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              title="Refresh data"
+              title="Refresh page"
             >
               <RefreshCw className="h-4 w-4" />
             </button>
@@ -318,7 +318,7 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                        <p className="text-sm font-bold text-gray-600 dark:text-gray-400">{stat.label}</p>
                         <div className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                           {stat.value}
                         </div>
@@ -337,12 +337,12 @@ export default function DashboardPage() {
           })}
         </div>
 
-        {/* Daily Attendance Report Table */}
+        {/* TODAY'S SICK REPORT DETAILS Table */}
         <div className="card">
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Daily Attendance Report ({new Date(selectedDate).toLocaleDateString('en-GB')})
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                Today's Sick Report Details ({new Date(selectedDate).toLocaleDateString('en-GB')})
               </h3>
             </div>
           </div>
