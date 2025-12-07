@@ -364,7 +364,7 @@ export default function DashboardPage() {
       icon: AlertTriangle,
     },
     {
-      label: 'Foreign Cadets',
+      label: 'Foreign Cadets', 
       value: cadets.filter(c => c.isForeign).length.toString(),
       icon: Globe,
     },
