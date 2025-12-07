@@ -119,6 +119,26 @@ export async function PATCH(
       return NextResponse.json({ message: 'No updates provided' })
     }
 
+    // Recalculate totalTrainingDaysMissed if any training field is updated
+    if (updateData.attendC !== undefined || updateData.miDetained !== undefined ||
+      updateData.attendB !== undefined || updateData.exPpg !== undefined) {
+      // Get current record to merge values
+      const [currentRecord] = await db
+        .select()
+        .from(medicalRecords)
+        .where(eq(medicalRecords.id, parseInt(id)))
+        .limit(1)
+
+      if (currentRecord) {
+        // Use updated values or fall back to current values
+        const attendC = updateData.attendC !== undefined ? updateData.attendC : currentRecord.attendC
+        const miDetained = updateData.miDetained !== undefined ? updateData.miDetained : currentRecord.miDetained
+
+        // totalTrainingDaysMissed = attendC + miDetained (attendB and exPpg contribute fractional days shown separately)
+        updateData.totalTrainingDaysMissed = attendC + miDetained
+      }
+    }
+
     updateData.updatedAt = new Date()
 
     const [updatedRecord] = await db

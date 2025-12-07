@@ -1206,8 +1206,13 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     type="number"
                     min="0"
                     value={editFormData.attendC}
-                    onChange={(e) => setEditFormData(prev => ({ ...prev, attendC: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                    onChange={(e) => setEditFormData(prev => ({
+                      ...prev,
+                      attendC: e.target.value,
+                      miDetained: e.target.value && parseInt(e.target.value) > 0 ? '0' : prev.miDetained
+                    }))}
+                    disabled={editFormData.admittedInMH === 'Yes' || (parseInt(editFormData.miDetained) > 0)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -1219,7 +1224,8 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     min="0"
                     value={editFormData.attendB}
                     onChange={(e) => setEditFormData(prev => ({ ...prev, attendB: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                    disabled={editFormData.admittedInMH === 'Yes'}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -1231,7 +1237,8 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     min="0"
                     value={editFormData.exPpg}
                     onChange={(e) => setEditFormData(prev => ({ ...prev, exPpg: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                    disabled={editFormData.admittedInMH === 'Yes'}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
                 <div>
@@ -1254,8 +1261,13 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     type="number"
                     min="0"
                     value={editFormData.miDetained}
-                    onChange={(e) => setEditFormData(prev => ({ ...prev, miDetained: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                    onChange={(e) => setEditFormData(prev => ({
+                      ...prev,
+                      miDetained: e.target.value,
+                      attendC: e.target.value && parseInt(e.target.value) > 0 ? '0' : prev.attendC
+                    }))}
+                    disabled={editFormData.admittedInMH === 'Yes' || (parseInt(editFormData.attendC) > 0)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -1306,7 +1318,18 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                   <input
                     type="checkbox"
                     checked={editFormData.admittedInMH === 'Yes'}
-                    onChange={(e) => setEditFormData(prev => ({ ...prev, admittedInMH: e.target.checked ? 'Yes' : '' }))}
+                    onChange={(e) => setEditFormData(prev => ({
+                      ...prev,
+                      admittedInMH: e.target.checked ? 'Yes' : '',
+                      monitoringCase: e.target.checked ? true : prev.monitoringCase,
+                      // Clear training fields when MH/BH/CH is toggled on
+                      ...(e.target.checked ? {
+                        attendC: '0',
+                        attendB: '0',
+                        exPpg: '0',
+                        miDetained: '0'
+                      } : {})
+                    }))}
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
