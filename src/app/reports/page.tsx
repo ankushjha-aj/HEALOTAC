@@ -198,12 +198,10 @@ export default function ReportsPage() {
 
     // Simulate processing time
     setTimeout(() => {
-      const headers = ['ID', 'Cadet ID', 'Name', 'Company', 'Battalion', 'Date of Reporting', 'Medical Problem', 'Diagnosis', 'Medical Status', 'Attend C', 'Training Days Missed', 'Monitoring Case', 'Contact No', 'Remarks', 'Created At']
+      const headers = ['Name', 'Company', 'Battalion', 'Date of Reporting', 'Medical Problem', 'Diagnosis', 'Medical Status', 'Attend C', 'Training Days Missed', 'Monitoring Case', 'Contact No', 'Remarks', 'Created At']
       const csvContent = [
         headers.join(','),
         ...reportData.map(record => [
-          record.id,
-          record.cadetId,
           `"${record.name}"`,
           `"${record.company}"`,
           `"${record.battalion}"`,
@@ -288,8 +286,8 @@ export default function ReportsPage() {
             <button
               onClick={() => handlePeriodChange('yesterday')}
               className={`p-4 rounded-lg border-2 ${!useCustomRange && selectedPeriod === 'yesterday'
-                  ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
+                ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
+                : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
                 }`}
               disabled={useCustomRange}
             >
@@ -301,8 +299,8 @@ export default function ReportsPage() {
             <button
               onClick={() => handlePeriodChange('today')}
               className={`p-4 rounded-lg border-2 ${!useCustomRange && selectedPeriod === 'today'
-                  ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
+                ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
+                : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
                 }`}
               disabled={useCustomRange}
             >
@@ -314,8 +312,8 @@ export default function ReportsPage() {
             <button
               onClick={() => handlePeriodChange('week')}
               className={`p-4 rounded-lg border-2 ${!useCustomRange && selectedPeriod === 'week'
-                  ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
+                ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
+                : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
                 }`}
               disabled={useCustomRange}
             >
@@ -327,8 +325,8 @@ export default function ReportsPage() {
             <button
               onClick={handleCustomRangeToggle}
               className={`p-4 rounded-lg border-2 ${useCustomRange
-                  ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
+                ? 'border-primary bg-primary/10 dark:bg-primary/20 text-primary'
+                : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
                 }`}
             >
               <Calendar className="h-6 w-6 mx-auto mb-2" />
@@ -501,16 +499,16 @@ export default function ReportsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${record.medicalStatus === 'Active'
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
                           }`}>
                           {record.medicalStatus}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${record.monitoringCase
-                            ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                          ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
                           }`}>
                           {record.monitoringCase ? 'Yes' : 'No'}
                         </span>
