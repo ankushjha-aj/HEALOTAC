@@ -17,7 +17,7 @@
     "start:3007": "next start -H 0.0.0.0 -p 3007",
     "start:3008": "next start -H 0.0.0.0 -p 3008",
     "start:3009": "next start -H 0.0.0.0 -p 3009",
-    "start:3010": "next start -H 0.0.0.0 -p 3010",
+    "start:3010": "next start -H 0.0.0.0 -p 3010", 
     "lint": "next lint",
     "migrate": "node scripts/migrate.js",
     "seed": "node scripts/seed.js"
