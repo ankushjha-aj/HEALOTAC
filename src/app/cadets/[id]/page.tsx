@@ -8,6 +8,7 @@ import { ArrowLeft, Calendar, User, MapPin, Phone, FileText, Activity, Clock, Ru
 import Link from 'next/link'
 import MedicalRecordsList from './MedicalRecordsList'
 import { usePagination } from '@/hooks/usePagination'
+import { useUser } from '@/hooks/useUser'
 import PaginationControls from '@/components/PaginationControls'
 import jsPDF from 'jspdf'
 
@@ -129,6 +130,8 @@ export default function CadetDetailsPage({
   const router = useRouter()
   const searchParams = useSearchParams()
   const cadetId = parseInt(params.id)
+  const { user } = useUser()
+  const isReadOnly = ['brig', 'coco'].includes(user?.username?.toLowerCase() || '')
   const [cadetInfo, setCadetInfo] = useState<CadetInfo | null>(null)
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
   const [loading, setLoading] = useState(true)
@@ -659,16 +662,18 @@ export default function CadetDetailsPage({
                         </span>
                       )}
                     </h1>
-                    <Link
-                      href={`/cadets/${cadetId}/edit`}
-                      className="inline-flex items-center justify-center p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                      title="Edit cadet information"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                      </svg>
-                    </Link>
+                    {!isReadOnly && (
+                      <Link
+                        href={`/cadets/${cadetId}/edit`}
+                        className="inline-flex items-center justify-center p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                        title="Edit cadet information"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                      </Link>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-4">
                     <MapPin className="h-4 w-4" />
@@ -1210,7 +1215,7 @@ export default function CadetDetailsPage({
                         >
                           <Plus className="h-4 w-4" />
                         </div>
-                      ) : (
+                      ) : !isReadOnly && (
                         <Link
                           href={`/medical-records/new?cadetId=${cadetId}`}
                           className="inline-flex items-center justify-center p-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"

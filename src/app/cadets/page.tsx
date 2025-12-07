@@ -79,6 +79,7 @@ export default function CadetsPage() {
 
   const router = useRouter()
   const { user } = useUser()
+  const isReadOnly = ['brig', 'coco'].includes(user?.username?.toLowerCase() || '')
 
   // ESC key handler for delete confirmation modal
   useEffect(() => {
@@ -329,21 +330,22 @@ export default function CadetsPage() {
                 )}
               </div>
             </button>
-            <button
-              onClick={handleAddNewRecord}
-              disabled={navigatingToNewRecord}
-              className={`btn-primary flex items-center gap-2 ${navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
-                }`}
-            >
-              {navigatingToNewRecord ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Loading...</span>
-                </>
-              ) : (
-                <span>Add New Record</span>
-              )}
-            </button>
+            {!isReadOnly && (
+              <button
+                onClick={handleAddNewRecord}
+                disabled={navigatingToNewRecord}
+                className={`btn-primary flex items-center gap-2 ${navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''}`}
+              >
+                {navigatingToNewRecord ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Loading...</span>
+                  </>
+                ) : (
+                  <span>Add New Record</span>
+                )}
+              </button>
+            )}
           </div>
         </div>
 
@@ -659,14 +661,16 @@ export default function CadetsPage() {
                         >
                           View
                         </Link>
-                        <Link
-                          href={`/cadets/${cadet.id}/edit`}
-                          className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                          title="Edit cadet information"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Link>
-                        {user?.role !== 'user' && (
+                        {!isReadOnly && (
+                          <Link
+                            href={`/cadets/${cadet.id}/edit`}
+                            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                            title="Edit cadet information"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Link>
+                        )}
+                        {user?.role !== 'user' && !isReadOnly && (
                           <button
                             onClick={() => handleDeleteCadet(cadet)}
                             className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"

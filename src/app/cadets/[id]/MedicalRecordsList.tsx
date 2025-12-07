@@ -112,8 +112,12 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
     ['comdt', 'dcci'].includes(user?.role?.toLowerCase() || '') ||
     ['comdt', 'dcci'].includes(user?.username?.toLowerCase() || '') ||
     user?.role === 'RMO' // Fallback: Allow RMO to see/edit if role assignment is messy
-  // const canSeeCommandantRemarks = isCommandant || user?.role === 'RMO' // Optional: Allow RMO to see
-  const canSeeCommandantRemarks = user?.role !== 'user' // Visible to admins (RMO, Comdt) but not regular users
+
+  // Check for Read-Only users (Brig, Coco)
+  const isReadOnly = ['brig', 'coco'].includes(user?.username?.toLowerCase() || '')
+
+  // Visible to admins (RMO, Comdt, Dcci) AND Read-Only users (Brig, Coco)
+  const canSeeCommandantRemarks = user?.role !== 'user' || isReadOnly
 
   const handleEditRemark = (record: MedicalRecord) => {
     setEditingRemarkId(record.id)
@@ -586,7 +590,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                         <Edit className="h-4 w-4" />
                       </button>
                     )}
-                    {user?.role !== 'user' && cadetInfo && (
+                    {user?.role !== 'user' && !isReadOnly && cadetInfo && (
                       <button
                         onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
                         className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
@@ -618,7 +622,9 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                       className="relative inline-flex items-center cursor-pointer"
                       title={!canCheck ? "Please come back after 24 hours in order to change status to returned" : isChecked ? "Cadet has been marked as returned" : user?.role === 'user' ? "You are not authorized to manage anything else adding cadet record" : "Double-click to mark cadet as returned"}
                       onDoubleClick={(e) => {
-                        if (!isChecked && canCheck && onReturn && user?.role !== 'user') {
+                        // Prevent if already checked, or not authorized, or not active
+                        // Also prevent Read-Only users (Brig, Coco)
+                        if (!isChecked && canCheck && onReturn && user?.role !== 'user' && !isReadOnly) {
                           onReturn(record.id, daysMissed)
                           setShowModal(true)
                         }
@@ -712,13 +718,15 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                           <Edit className="h-4 w-4" />
                         </button>
                       )}
-                      <button
-                        onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
-                        className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
-                        title="Download PDF with medical record data"
-                      >
-                        <Download className="h-4 w-4" />
-                      </button>
+                      {!isReadOnly && (
+                        <button
+                          onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
+                          className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
+                          title="Download PDF with medical record data"
+                        >
+                          <Download className="h-4 w-4" />
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
