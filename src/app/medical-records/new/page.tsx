@@ -92,8 +92,10 @@ interface CadetFormData {
   sexuallyActive?: string
   maritalStatus?: string
   pregnancyHistory?: string
+  hasPregnancyHistory?: boolean
   contraceptiveHistory?: string
   surgeryHistory?: string
+  hasSurgeryHistory?: boolean
   medicalCondition?: string
   hemoglobinLevel?: string
   // Physical Test
@@ -197,8 +199,10 @@ function NewMedicalRecordPageInner() {
     sexuallyActive: '',
     maritalStatus: '',
     pregnancyHistory: '',
+    hasPregnancyHistory: false,
     contraceptiveHistory: '',
     surgeryHistory: '',
+    hasSurgeryHistory: false,
     medicalCondition: '',
     hemoglobinLevel: '',
     // Physical Test
@@ -707,7 +711,12 @@ function NewMedicalRecordPageInner() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(cadetFormData),
+        body: JSON.stringify({
+          ...cadetFormData,
+          // Remove UI-only fields
+          hasPregnancyHistory: undefined,
+          hasSurgeryHistory: undefined
+        }),
       })
 
       console.log('📤 SENDING CADET DATA TO API:', cadetFormData)
@@ -790,8 +799,10 @@ function NewMedicalRecordPageInner() {
           sexuallyActive: '',
           maritalStatus: '',
           pregnancyHistory: '',
+          hasPregnancyHistory: false,
           contraceptiveHistory: '',
           surgeryHistory: '',
+          hasSurgeryHistory: false,
           medicalCondition: '',
           hemoglobinLevel: '',
           // Physical Test
@@ -3294,14 +3305,14 @@ function NewMedicalRecordPageInner() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               History of any Pregnancy / Abortion
                             </label>
-                            <div className="flex gap-4 items-center">
+                            <div className="flex gap-4 items-center mb-2">
                               <label className="flex items-center">
                                 <input
                                   type="radio"
                                   name="pregnancyRadio"
                                   value="Yes"
-                                  checked={cadetFormData.pregnancyHistory !== '' && cadetFormData.pregnancyHistory !== undefined}
-                                  onChange={() => setCadetFormData(prev => ({ ...prev, pregnancyHistory: 'Please specify...' }))}
+                                  checked={cadetFormData.hasPregnancyHistory === true}
+                                  onChange={() => setCadetFormData(prev => ({ ...prev, hasPregnancyHistory: true, pregnancyHistory: '' }))}
                                   className="mr-2"
                                 />
                                 Yes
@@ -3311,20 +3322,20 @@ function NewMedicalRecordPageInner() {
                                   type="radio"
                                   name="pregnancyRadio"
                                   value="No"
-                                  checked={cadetFormData.pregnancyHistory === ''}
-                                  onChange={() => setCadetFormData(prev => ({ ...prev, pregnancyHistory: '' }))}
+                                  checked={cadetFormData.hasPregnancyHistory === false}
+                                  onChange={() => setCadetFormData(prev => ({ ...prev, hasPregnancyHistory: false, pregnancyHistory: '' }))}
                                   className="mr-2"
                                 />
                                 No
                               </label>
                             </div>
-                            {(cadetFormData.pregnancyHistory !== '' && cadetFormData.pregnancyHistory !== undefined) && (
-                              <input
-                                type="text"
+                            {cadetFormData.hasPregnancyHistory && (
+                              <textarea
                                 name="pregnancyHistory"
+                                rows={2}
                                 value={cadetFormData.pregnancyHistory}
                                 onChange={handleCadetFormChange}
-                                className="input-field mt-2"
+                                className="input-field"
                                 placeholder="Please specify..."
                               />
                             )}
@@ -3351,14 +3362,14 @@ function NewMedicalRecordPageInner() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                               Underwent any Surgery
                             </label>
-                            <div className="flex gap-4 items-center">
+                            <div className="flex gap-4 items-center mb-2">
                               <label className="flex items-center">
                                 <input
                                   type="radio"
                                   name="surgeryRadio"
                                   value="Yes"
-                                  checked={cadetFormData.surgeryHistory !== '' && cadetFormData.surgeryHistory !== undefined}
-                                  onChange={() => setCadetFormData(prev => ({ ...prev, surgeryHistory: 'Please specify the surgery...' }))}
+                                  checked={cadetFormData.hasSurgeryHistory === true}
+                                  onChange={() => setCadetFormData(prev => ({ ...prev, hasSurgeryHistory: true, surgeryHistory: '' }))}
                                   className="mr-2"
                                 />
                                 Yes
@@ -3368,20 +3379,20 @@ function NewMedicalRecordPageInner() {
                                   type="radio"
                                   name="surgeryRadio"
                                   value="No"
-                                  checked={cadetFormData.surgeryHistory === ''}
-                                  onChange={() => setCadetFormData(prev => ({ ...prev, surgeryHistory: '' }))}
+                                  checked={cadetFormData.hasSurgeryHistory === false}
+                                  onChange={() => setCadetFormData(prev => ({ ...prev, hasSurgeryHistory: false, surgeryHistory: '' }))}
                                   className="mr-2"
                                 />
                                 No
                               </label>
                             </div>
-                            {(cadetFormData.surgeryHistory !== '' && cadetFormData.surgeryHistory !== undefined) && (
-                              <input
-                                type="text"
+                            {cadetFormData.hasSurgeryHistory && (
+                              <textarea
                                 name="surgeryHistory"
+                                rows={2}
                                 value={cadetFormData.surgeryHistory}
                                 onChange={handleCadetFormChange}
-                                className="input-field mt-2"
+                                className="input-field"
                                 placeholder="Please specify the surgery..."
                               />
                             )}
