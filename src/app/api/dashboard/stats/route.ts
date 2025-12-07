@@ -39,11 +39,12 @@ export async function GET(request: NextRequest) {
         // Fetch attendance records for the date using raw SQL
         // Build query string manually to avoid Drizzle parameter binding issues
         const querySQL = `SELECT 
-            a.id as attendance_id, a.cadet_id, a.date, a.morning, a.evening,
+            a.id as attendance_id, a.cadet_id, a.date, a.morning, a.evening, a.updated_at,
             c.id, c.name, c.battalion, c.company, c.academy_number, c.blood_group, c.relegated, c.is_foreign
         FROM attendance a
         LEFT JOIN cadets c ON a.cadet_id = c.id
-        WHERE a.date::date = '${queryDateString}'::date`
+        WHERE a.date::date = '${queryDateString}'::date
+        ORDER BY a.updated_at ASC`
 
         const attendanceRecords = await db.execute(sql.raw(querySQL))
 
@@ -69,7 +70,8 @@ export async function GET(request: NextRequest) {
                     attendanceStatus: {
                         morning: row.morning,
                         evening: row.evening
-                    }
+                    },
+                    updatedAt: row.updated_at
                 })
             }
         })
