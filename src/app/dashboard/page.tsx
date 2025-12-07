@@ -358,16 +358,6 @@ export default function DashboardPage() {
       value: attendanceData ? attendanceData.stats.total.toString() : '0',
       icon: Users,
     },
-    {
-      label: 'Relegated Cadets',
-      value: cadets.filter(c => c.relegated === 'Yes' || c.relegated === 'Y').length.toString(),
-      icon: AlertTriangle,
-    },
-    {
-      label: 'Foreign Cadets', 
-      value: cadets.filter(c => c.isForeign).length.toString(),
-      icon: Globe,
-    },
   ]
 
   // ... (loading check)
@@ -433,7 +423,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {stats.map((stat) => {
             const Icon = stat.icon
             return (

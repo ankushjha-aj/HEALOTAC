@@ -506,7 +506,7 @@ export default function MedicalHistoryPage() {
                 <input
                   id="filter-problem"
                   type="text"
-                  placeholder="Filter problem..."
+                  placeholder="Filter..."
                   value={filters.medicalProblem}
                   onChange={(e) => setFilters(prev => ({ ...prev, medicalProblem: e.target.value }))}
                   className="input-field py-2 text-sm pr-20"
