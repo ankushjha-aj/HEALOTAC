@@ -138,6 +138,10 @@ export async function PATCH(
     if ('weight' in updates) {
       updateData.weight = updates.weight ? parseInt(updates.weight) : null
     }
+    // Handle currentWeight from frontend as weight in DB
+    if ('currentWeight' in updates) {
+      updateData.weight = updates.currentWeight ? parseInt(updates.currentWeight) : null
+    }
     if ('age' in updates) {
       updateData.age = updates.age ? parseInt(updates.age) : null
     }

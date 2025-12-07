@@ -642,7 +642,7 @@ export default function CadetDetailsPage({
                 <span className="text-primary font-bold text-2xl">
                   {cadetInfo.name.split(' ').map((n: string) => n[0]).join('')}
                 </span>
-              </div> 
+              </div>
               <div className="space-y-3">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -758,12 +758,12 @@ export default function CadetDetailsPage({
                         </div>
                       )}
 
-                      {cadetInfo.currentWeight && (
+                      {cadetInfo.weight && (
                         <div className="flex items-center gap-2">
                           <Weight className="h-4 w-4 text-primary" />
                           <div>
                             <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Current Weight</p>
-                            <p className="text-sm font-medium">{cadetInfo.currentWeight} kg</p>
+                            <p className="text-sm font-medium">{cadetInfo.weight} kg</p>
                           </div>
                         </div>
                       )}
