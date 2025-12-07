@@ -105,6 +105,8 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
   const [showModal, setShowModal] = useState(false)
   const [editingRemarkId, setEditingRemarkId] = useState<number | null>(null)
   const [remarkText, setRemarkText] = useState('')
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
+  const [pdfFilename, setPdfFilename] = useState<string>('')
   const { user } = useUser()
 
   // Check for allowed roles/usernames (comdt, dcci)
@@ -558,24 +560,37 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
       // Serialize the PDF document
       const pdfBytes = await pdfDoc.save()
 
-      // Create a blob and download
+      // Create a blob and show preview
       const blob = new Blob([pdfBytes] as BlobPart[], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
 
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `MI_ROOM_${cadetInfo.name.replace(/\s+/g, '_')}_${record.id}_filled.pdf`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-
-      // Clean up the URL object
-      URL.revokeObjectURL(url)
+      // Store for preview modal instead of direct download
+      setPdfPreviewUrl(url)
+      setPdfFilename(`MI_ROOM_${cadetInfo.name.replace(/\s+/g, '_')}_${record.id}_filled.pdf`)
 
     } catch (error) {
       console.error('Error generating PDF:', error)
       alert('Error generating PDF. Please try again.')
     }
+  }
+
+  const handleDownloadPdf = () => {
+    if (pdfPreviewUrl && pdfFilename) {
+      const link = document.createElement('a')
+      link.href = pdfPreviewUrl
+      link.download = pdfFilename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
+
+  const closePdfPreview = () => {
+    if (pdfPreviewUrl) {
+      URL.revokeObjectURL(pdfPreviewUrl)
+    }
+    setPdfPreviewUrl(null)
+    setPdfFilename('')
   }
 
   return (
@@ -967,6 +982,52 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                   OK
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PDF Preview Modal */}
+      {pdfPreviewUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                PDF Preview
+              </h3>
+              <button
+                onClick={closePdfPreview}
+                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* PDF Preview */}
+            <div className="flex-1 p-4 bg-gray-100 dark:bg-gray-900">
+              <iframe
+                src={pdfPreviewUrl}
+                className="w-full h-full rounded-lg border border-gray-300 dark:border-gray-600"
+                title="PDF Preview"
+              />
+            </div>
+
+            {/* Footer with Download Button */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+              <button
+                onClick={closePdfPreview}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={handleDownloadPdf}
+                className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download PDF
+              </button>
             </div>
           </div>
         </div>
