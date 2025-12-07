@@ -75,7 +75,7 @@ export default function DashboardPage() {
       setIsAuthenticated(true)
     } else {
       // Redirect to login if no token
-      window.location.href = '/login'
+      window.location.href = '/'
     }
   }, [])
 
@@ -121,7 +121,7 @@ export default function DashboardPage() {
         if (cadetsRes.status === 401 || recordsRes.status === 401) {
           // Token expired, redirect to login
           localStorage.removeItem('jwt_token')
-          window.location.href = '/login'
+          window.location.href = '/'
           return
         }
         setDbStatus(`api error(${cadetsRes.status}, ${recordsRes.status})`)
