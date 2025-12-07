@@ -79,7 +79,10 @@ export default function CadetsPage() {
 
   const router = useRouter()
   const { user } = useUser()
-  const isReadOnly = ['brig', 'coco'].includes(user?.username?.toLowerCase() || '')
+  const isReadOnly = (user?.username?.toLowerCase() || '').includes('brig') ||
+    (user?.username?.toLowerCase() || '').includes('coco') ||
+    (user?.name?.toLowerCase() || '').includes('brig') ||
+    (user?.name?.toLowerCase() || '').includes('coco')
 
   // ESC key handler for delete confirmation modal
   useEffect(() => {

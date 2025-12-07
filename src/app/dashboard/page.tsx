@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Calendar, Users, Activity, TrendingUp, RefreshCw, Download, X } from 'lucide-react'
+import { Calendar, Users, Activity, TrendingUp, RefreshCw, Download, X, Globe, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
+import { useUser } from '@/hooks/useUser'
 
 
 // Interface definitions
@@ -55,6 +56,12 @@ export default function DashboardPage() {
 
   const [navigatingToNewRecord, setNavigatingToNewRecord] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
+
+  const { user } = useUser()
+  const isReadOnly = (user?.username?.toLowerCase() || '').includes('brig') ||
+    (user?.username?.toLowerCase() || '').includes('coco') ||
+    (user?.name?.toLowerCase() || '').includes('brig') ||
+    (user?.name?.toLowerCase() || '').includes('coco')
 
   // Download Modal State
   const [showDownloadModal, setShowDownloadModal] = useState(false)
@@ -351,6 +358,16 @@ export default function DashboardPage() {
       value: attendanceData ? attendanceData.stats.total.toString() : '0',
       icon: Users,
     },
+    {
+      label: 'Relegated Cadets',
+      value: cadets.filter(c => c.relegated === 'Yes' || c.relegated === 'Y').length.toString(),
+      icon: AlertTriangle,
+    },
+    {
+      label: 'Foreign Cadets',
+      value: cadets.filter(c => c.isForeign).length.toString(),
+      icon: Globe,
+    },
   ]
 
   // ... (loading check)
@@ -396,26 +413,27 @@ export default function DashboardPage() {
             >
               <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
-            <button
-              onClick={handleAddNewRecord}
-              disabled={navigatingToNewRecord}
-              className={`btn-primary flex items-center gap-2 ${navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''
-                } `}
-            >
-              {navigatingToNewRecord ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Loading...</span>
-                </>
-              ) : (
-                <span>Add New Record</span>
-              )}
-            </button>
+            {!isReadOnly && (
+              <button
+                onClick={handleAddNewRecord}
+                disabled={navigatingToNewRecord}
+                className={`btn-primary flex items-center gap-2 ${navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''}`}
+              >
+                {navigatingToNewRecord ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Loading...</span>
+                  </>
+                ) : (
+                  <span>Add New Record</span>
+                )}
+              </button>
+            )}
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           {stats.map((stat) => {
             const Icon = stat.icon
             return (
@@ -500,6 +518,16 @@ export default function DashboardPage() {
                             >
                               {cadet.name}
                             </Link>
+                            {(cadet.relegated === 'Yes' || cadet.relegated === 'Y') && (
+                              <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-red-600 bg-red-100 rounded-full dark:text-red-400 dark:bg-red-900/30" title="Relegated">
+                                R
+                              </span>
+                            )}
+                            {cadet.isForeign && (
+                              <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-blue-600 bg-blue-100 rounded-full dark:text-blue-400 dark:bg-blue-900/30" title="Foreign Cadet">
+                                F
+                              </span>
+                            )}
                           </div>
                         </div>
                       </td>

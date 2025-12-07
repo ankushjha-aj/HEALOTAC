@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { Calendar, User, MapPin, FileText, Filter, Eye, Search } from 'lucide-react'
 import Link from 'next/link'
+import { useUser } from '@/hooks/useUser'
 import { usePagination } from '@/hooks/usePagination'
 import PaginationControls from '@/components/PaginationControls'
 import { useRouter } from 'next/navigation'
@@ -46,6 +47,12 @@ export default function MedicalHistoryPage() {
   const [foreignFilter, setForeignFilter] = useState('all')
   const [currentDateTime, setCurrentDateTime] = useState<string>('')
   const [updatingRecordId, setUpdatingRecordId] = useState<number | null>(null)
+
+  const { user } = useUser()
+  const isReadOnly = (user?.username?.toLowerCase() || '').includes('brig') ||
+    (user?.username?.toLowerCase() || '').includes('coco') ||
+    (user?.name?.toLowerCase() || '').includes('brig') ||
+    (user?.name?.toLowerCase() || '').includes('coco')
 
   const router = useRouter()
 
@@ -295,21 +302,22 @@ export default function MedicalHistoryPage() {
               {currentDateTime}
             </div>
             <div className="flex gap-2">
-              <button
-                onClick={handleAddNewRecord}
-                disabled={updatingRecordId === -1}
-                className={`btn-primary flex items-center gap-2 ${updatingRecordId === -1 ? 'cursor-not-allowed opacity-75' : ''
-                  }`}
-              >
-                {updatingRecordId === -1 ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Loading...</span>
-                  </>
-                ) : (
-                  <span>Add New Record</span>
-                )}
-              </button>
+              {!isReadOnly && (
+                <button
+                  onClick={handleAddNewRecord}
+                  disabled={updatingRecordId === -1}
+                  className={`btn-primary flex items-center gap-2 ${updatingRecordId === -1 ? 'cursor-not-allowed opacity-75' : ''}`}
+                >
+                  {updatingRecordId === -1 ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Loading...</span>
+                    </>
+                  ) : (
+                    <span>Add New Record</span>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>

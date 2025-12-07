@@ -131,7 +131,10 @@ export default function CadetDetailsPage({
   const searchParams = useSearchParams()
   const cadetId = parseInt(params.id)
   const { user } = useUser()
-  const isReadOnly = ['brig', 'coco'].includes(user?.username?.toLowerCase() || '')
+  const isReadOnly = (user?.username?.toLowerCase() || '').includes('brig') ||
+    (user?.username?.toLowerCase() || '').includes('coco') ||
+    (user?.name?.toLowerCase() || '').includes('brig') ||
+    (user?.name?.toLowerCase() || '').includes('coco')
   const [cadetInfo, setCadetInfo] = useState<CadetInfo | null>(null)
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([])
   const [loading, setLoading] = useState(true)

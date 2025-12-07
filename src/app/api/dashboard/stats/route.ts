@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
         // Build query string manually to avoid Drizzle parameter binding issues
         const querySQL = `SELECT 
             a.id as attendance_id, a.cadet_id, a.date, a.morning, a.evening,
-            c.id, c.name, c.battalion, c.company, c.academy_number, c.blood_group
+            c.id, c.name, c.battalion, c.company, c.academy_number, c.blood_group, c.relegated, c.is_foreign
         FROM attendance a
         LEFT JOIN cadets c ON a.cadet_id = c.id
         WHERE a.date::date = '${queryDateString}'::date`
@@ -64,6 +64,8 @@ export async function GET(request: NextRequest) {
                     company: row.company,
                     academyNumber: row.academy_number,
                     bloodGroup: row.blood_group,
+                    relegated: row.relegated,
+                    isForeign: row.is_foreign,
                     attendanceStatus: {
                         morning: row.morning,
                         evening: row.evening

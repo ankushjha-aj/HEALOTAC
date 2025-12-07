@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Users, Activity, Plus, FileText, LogOut } from 'lucide-react' 
+import { Home, Users, Activity, Plus, FileText, LogOut } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import Image from 'next/image'
@@ -41,8 +41,15 @@ export default function Sidebar() {
     }, 800) // 800ms delay for smooth animation
   }
 
-  // Check if user is NA user
-  const isNAUser = user?.role === 'user'
+  // Check for Read-Only users (Brig, Coco)
+  const isReadOnly = (user?.username?.toLowerCase() || '').includes('brig') ||
+    (user?.username?.toLowerCase() || '').includes('coco') ||
+    (user?.name?.toLowerCase() || '').includes('brig') ||
+    (user?.name?.toLowerCase() || '').includes('coco')
+
+  // Check if user is NA user (restricted to only Add Record)
+  // Exclude read-only users from this restriction (they can view everything but edit nothing)
+  const isNAUser = user?.role === 'user' && !isReadOnly
 
   return (
     <aside className="w-64 flex-col bg-white dark:bg-gray-800/50 border-r border-gray-200 dark:border-gray-700/50 p-4 hidden lg:flex sticky top-0 h-screen overflow-y-auto">
@@ -54,13 +61,16 @@ export default function Sidebar() {
           </div>
         </div>
       </div>
-      
+
       <nav className="flex-1 flex flex-col gap-2">
         {navigation.map((item) => {
           const isActive = pathname === item.href
-          
+
           // Special handling for Add Record button
           if (item.name === 'Add Record') {
+            // Hide for Read-Only users
+            if (isReadOnly) return null
+
             return (
               <button
                 key={item.name}
@@ -68,8 +78,8 @@ export default function Sidebar() {
                 disabled={navigatingToNewRecord}
                 className={`
                   flex items-center gap-3 rounded-lg px-3 py-2 font-medium
-                  ${isActive 
-                    ? 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-white' 
+                  ${isActive
+                    ? 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-white'
                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }
                   ${navigatingToNewRecord ? 'cursor-not-allowed opacity-75' : ''}
@@ -84,7 +94,7 @@ export default function Sidebar() {
               </button>
             )
           }
-          
+
           // For NA users, show disabled navigation items for other pages
           if (isNAUser && item.name !== 'Add Record') {
             return (
@@ -103,7 +113,7 @@ export default function Sidebar() {
               </div>
             )
           }
-          
+
           // Regular navigation links for non-NA users
           const Icon = item.icon
           return (
@@ -112,8 +122,8 @@ export default function Sidebar() {
               href={item.href}
               className={`
                 flex items-center gap-3 rounded-lg px-3 py-2 font-medium
-                ${isActive 
-                  ? 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-white' 
+                ${isActive
+                  ? 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-white'
                   : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }
               `}

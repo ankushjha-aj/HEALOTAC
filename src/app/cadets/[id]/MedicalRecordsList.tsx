@@ -114,7 +114,10 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
     user?.role === 'RMO' // Fallback: Allow RMO to see/edit if role assignment is messy
 
   // Check for Read-Only users (Brig, Coco)
-  const isReadOnly = ['brig', 'coco'].includes(user?.username?.toLowerCase() || '')
+  const isReadOnly = (user?.username?.toLowerCase() || '').includes('brig') ||
+    (user?.username?.toLowerCase() || '').includes('coco') ||
+    (user?.name?.toLowerCase() || '').includes('brig') ||
+    (user?.name?.toLowerCase() || '').includes('coco')
 
   // Visible to admins (RMO, Comdt, Dcci) AND Read-Only users (Brig, Coco)
   const canSeeCommandantRemarks = user?.role !== 'user' || isReadOnly
