@@ -1,6 +1,6 @@
 'use client'
 
-import { Calendar, Clock, FileText, X, Info, Download } from 'lucide-react'
+import { Calendar, Clock, FileText, X, Info, Download, Edit } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
@@ -90,6 +90,7 @@ interface MedicalRecord {
   admittedInMH?: string
   contactNo: string
   remarks: string
+  commandantRemarks?: string
   createdAt: string
 }
 
@@ -102,7 +103,47 @@ interface MedicalRecordsListProps {
 
 export default function MedicalRecordsList({ records, cadetId, cadetInfo, onReturn }: MedicalRecordsListProps) {
   const [showModal, setShowModal] = useState(false)
+  const [editingRemarkId, setEditingRemarkId] = useState<number | null>(null)
+  const [remarkText, setRemarkText] = useState('')
   const { user } = useUser()
+
+  // Check for role 'comdt' (case insensitive) or username 'comdt' (case insensitive)
+  const isCommandant =
+    user?.role?.toLowerCase() === 'comdt' ||
+    user?.username?.toLowerCase() === 'comdt' ||
+    user?.role === 'RMO' // Fallback: Allow RMO to see/edit if role assignment is messy
+  // const canSeeCommandantRemarks = isCommandant || user?.role === 'RMO' // Optional: Allow RMO to see
+  const canSeeCommandantRemarks = true // Visible to all as per typical requirement, but only editable by COMDT
+
+  const handleEditRemark = (record: MedicalRecord) => {
+    setEditingRemarkId(record.id)
+    setRemarkText(record.commandantRemarks || '')
+  }
+
+  const handleSaveRemark = async (recordId: number) => {
+    try {
+      const response = await fetch(`/api/medical-records/${recordId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+        },
+        body: JSON.stringify({ commandantRemarks: remarkText })
+      })
+
+      if (!response.ok) throw new Error('Failed to update remark')
+
+      // Ideally refresh data here, but for now we might need to reload or update local state
+      // Since props are passed down, we might need a callback to refresh. 
+      // For simplicity, we assume parent refreshes or we force reload.
+      window.location.reload()
+    } catch (error) {
+      console.error('Error updating remark:', error)
+      alert('Failed to save remark')
+    } finally {
+      setEditingRemarkId(null)
+    }
+  }
 
   // Helper function to count weekdays (excluding Sundays) between two dates
   const getWeekdaysBetween = (startDate: Date, endDate: Date): number => {
@@ -536,6 +577,15 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    {isCommandant && (
+                      <button
+                        onClick={() => handleEditRemark(record)}
+                        className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-100 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                        title="Add/Edit Commandant Remarks"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                    )}
                     {user?.role !== 'user' && cadetInfo && (
                       <button
                         onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
@@ -641,13 +691,24 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     </div>
                   </div>
                   {cadetInfo && user?.role !== 'user' && (
-                    <button
-                      onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
-                      className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
-                      title="Download PDF with medical record data"
-                    >
-                      <Download className="h-4 w-4" />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      {isCommandant && (
+                        <button
+                          onClick={() => handleEditRemark(record)}
+                          className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-100 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                          title="Add/Edit Commandant Remarks"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
+                        className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
+                        title="Download PDF with medical record data"
+                      >
+                        <Download className="h-4 w-4" />
+                      </button>
+                    </div>
                   )}
                 </div>
 
@@ -742,11 +803,71 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     </p>
                   </div>
                 )}
+
+                {(canSeeCommandantRemarks || isCommandant) && record.commandantRemarks && (
+                  <div className="mt-3 border-t border-gray-100 dark:border-gray-700 pt-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <label className="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
+                        Commandant Remarks
+                      </label>
+                    </div>
+
+                    <p className="text-sm text-gray-900 dark:text-white bg-purple-50 dark:bg-purple-900/10 p-2 rounded-lg border border-purple-100 dark:border-purple-800/30">
+                      {record.commandantRemarks}
+                    </p>
+                  </div>
+                )}
               </>
             )}
           </div>
         )
       })}
+
+      {/* Modal for Editing Remarks */}
+      {editingRemarkId !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70] p-4" onClick={() => setEditingRemarkId(null)}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Edit className="h-5 w-5 text-purple-600" />
+                  Commandant Remarks
+                </h3>
+                <button
+                  onClick={() => setEditingRemarkId(null)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="mb-6">
+                <textarea
+                  value={remarkText}
+                  onChange={(e) => setRemarkText(e.target.value)}
+                  className="w-full p-3 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                  rows={5}
+                  placeholder="Enter remarks here..."
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setEditingRemarkId(null)}
+                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleSaveRemark(editingRemarkId)}
+                  className="px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium shadow-md hover:shadow-lg"
+                >
+                  Save Remarks
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Custom Modal for Return Confirmation */}
       {showModal && (

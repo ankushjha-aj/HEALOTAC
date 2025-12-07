@@ -111,6 +111,7 @@ export const medicalRecords = pgTable('medical_records', {
   admittedInMH: varchar('admitted_in_mh', { length: 10 }), // New field for MH/BH/CH admission
   contactNo: varchar('contact_no', { length: 20 }),
   remarks: text('remarks'),
+  commandantRemarks: text('commandant_remarks'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })

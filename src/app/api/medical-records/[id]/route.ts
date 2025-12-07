@@ -89,6 +89,52 @@ export async function PUT(
   }
 }
 
+// PATCH /api/medical-records/[id] - Partial update
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const updates = await request.json()
+    const { id } = params
+
+    // Filter out undefined values
+    const updateData: any = {}
+
+    if (updates.commandantRemarks !== undefined) updateData.commandantRemarks = updates.commandantRemarks
+    if (updates.medicalProblem !== undefined) updateData.medicalProblem = updates.medicalProblem
+    if (updates.diagnosis !== undefined) updateData.diagnosis = updates.diagnosis
+    if (updates.remarks !== undefined) updateData.remarks = updates.remarks
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ message: 'No updates provided' })
+    }
+
+    updateData.updatedAt = new Date()
+
+    const [updatedRecord] = await db
+      .update(medicalRecords)
+      .set(updateData)
+      .where(eq(medicalRecords.id, parseInt(id)))
+      .returning()
+
+    if (!updatedRecord) {
+      return NextResponse.json(
+        { error: 'Medical record not found' },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json(updatedRecord)
+  } catch (error) {
+    console.error('❌ Error updating medical record:', error)
+    return NextResponse.json(
+      { error: 'Failed to update medical record' },
+      { status: 500 }
+    )
+  }
+}
+
 // DELETE /api/medical-records/[id] - Delete medical record
 export async function DELETE(
   request: NextRequest,
