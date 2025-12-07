@@ -113,7 +113,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
     user?.username?.toLowerCase() === 'comdt' ||
     user?.role === 'RMO' // Fallback: Allow RMO to see/edit if role assignment is messy
   // const canSeeCommandantRemarks = isCommandant || user?.role === 'RMO' // Optional: Allow RMO to see
-  const canSeeCommandantRemarks = true // Visible to all as per typical requirement, but only editable by COMDT
+  const canSeeCommandantRemarks = user?.role !== 'user' // Visible to admins (RMO, Comdt) but not regular users
 
   const handleEditRemark = (record: MedicalRecord) => {
     setEditingRemarkId(record.id)
