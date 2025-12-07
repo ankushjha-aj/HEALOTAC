@@ -105,6 +105,15 @@ export async function PATCH(
     if (updates.medicalProblem !== undefined) updateData.medicalProblem = updates.medicalProblem
     if (updates.diagnosis !== undefined) updateData.diagnosis = updates.diagnosis
     if (updates.remarks !== undefined) updateData.remarks = updates.remarks
+    if (updates.attendC !== undefined) updateData.attendC = parseInt(updates.attendC)
+    if (updates.attendB !== undefined) updateData.attendB = parseInt(updates.attendB)
+    if (updates.exPpg !== undefined) updateData.exPpg = parseInt(updates.exPpg)
+    if (updates.physiotherapy !== undefined) updateData.physiotherapy = parseInt(updates.physiotherapy)
+    if (updates.miDetained !== undefined) updateData.miDetained = parseInt(updates.miDetained)
+    if (updates.contactNo !== undefined) updateData.contactNo = updates.contactNo
+    if (updates.monitoringCase !== undefined) updateData.monitoringCase = updates.monitoringCase
+    if (updates.dateOfReporting !== undefined) updateData.dateOfReporting = new Date(updates.dateOfReporting)
+    if (updates.admittedInMH !== undefined) updateData.admittedInMH = updates.admittedInMH
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ message: 'No updates provided' })

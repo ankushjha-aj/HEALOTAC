@@ -107,6 +107,35 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
   const [remarkText, setRemarkText] = useState('')
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null)
   const [pdfFilename, setPdfFilename] = useState<string>('')
+  const [editingRecord, setEditingRecord] = useState<MedicalRecord | null>(null)
+  const [editFormData, setEditFormData] = useState<{
+    medicalProblem: string
+    diagnosis: string
+    dateOfReporting: string
+    attendC: string
+    attendB: string
+    exPpg: string
+    physiotherapy: string
+    miDetained: string
+    contactNo: string
+    remarks: string
+    monitoringCase: boolean
+    admittedInMH: string
+  }>({
+    medicalProblem: '',
+    diagnosis: '',
+    dateOfReporting: '',
+    attendC: '0',
+    attendB: '0',
+    exPpg: '0',
+    physiotherapy: '0',
+    miDetained: '0',
+    contactNo: '',
+    remarks: '',
+    monitoringCase: false,
+    admittedInMH: ''
+  })
+  const [isSavingEdit, setIsSavingEdit] = useState(false)
   const { user } = useUser()
 
   // Check for allowed roles/usernames (comdt, dcci)
@@ -174,6 +203,64 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
       alert('Failed to save remark')
     } finally {
       setEditingRemarkId(null)
+    }
+  }
+
+  const handleEditRecord = (record: MedicalRecord) => {
+    setEditingRecord(record)
+    setEditFormData({
+      medicalProblem: record.medicalProblem || '',
+      diagnosis: record.diagnosis || '',
+      dateOfReporting: record.dateOfReporting ? new Date(record.dateOfReporting).toISOString().split('T')[0] : '',
+      attendC: String(record.attendC || 0),
+      attendB: String(record.attendB || 0),
+      exPpg: String(record.exPpg || 0),
+      physiotherapy: String(record.physiotherapy || 0),
+      miDetained: String(record.miDetained || 0),
+      contactNo: record.contactNo || '',
+      remarks: record.remarks || '',
+      monitoringCase: record.monitoringCase || false,
+      admittedInMH: record.admittedInMH || ''
+    })
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingRecord) return
+
+    setIsSavingEdit(true)
+    try {
+      const response = await fetch(`/api/medical-records/${editingRecord.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+        },
+        body: JSON.stringify({
+          medicalProblem: editFormData.medicalProblem,
+          diagnosis: editFormData.diagnosis,
+          dateOfReporting: editFormData.dateOfReporting,
+          attendC: editFormData.attendC,
+          attendB: editFormData.attendB,
+          exPpg: editFormData.exPpg,
+          physiotherapy: editFormData.physiotherapy,
+          miDetained: editFormData.miDetained,
+          contactNo: editFormData.contactNo,
+          remarks: editFormData.remarks,
+          monitoringCase: editFormData.monitoringCase,
+          admittedInMH: editFormData.admittedInMH
+        })
+      })
+
+      if (!response.ok) throw new Error('Failed to update record')
+
+      alert('Medical record updated successfully!')
+      window.location.reload()
+    } catch (error) {
+      console.error('Error updating medical record:', error)
+      alert('Failed to update medical record')
+    } finally {
+      setIsSavingEdit(false)
+      setEditingRecord(null)
     }
   }
 
@@ -634,6 +721,15 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     )}
                     {user?.role !== 'user' && !isReadOnly && cadetInfo && (
                       <button
+                        onClick={() => handleEditRecord(record)}
+                        className="p-2 text-blue-500 hover:text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                        title="Edit Medical Record"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                    )}
+                    {user?.role !== 'user' && !isReadOnly && cadetInfo && (
+                      <button
                         onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
                         className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
                         title="Download PDF with medical record data"
@@ -702,7 +798,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Diagnosis
                     </label>
-                    <p className="text-sm text-gray-900 dark:text-white mt-1">
+                    <p className="text-sm text-gray-900 dark:text-white mt-1 whitespace-pre-wrap">
                       {record.diagnosis}
                     </p>
                   </div>
@@ -713,7 +809,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Remarks
                     </label>
-                    <p className="text-sm text-gray-900 dark:text-white mt-1">
+                    <p className="text-sm text-gray-900 dark:text-white mt-1 whitespace-pre-wrap">
                       {record.remarks}
                     </p>
                   </div>
@@ -763,6 +859,15 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                       )}
                       {!isReadOnly && (
                         <button
+                          onClick={() => handleEditRecord(record)}
+                          className="p-2 text-blue-500 hover:text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                          title="Edit Medical Record"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                      )}
+                      {!isReadOnly && (
+                        <button
                           onClick={() => generateMedicalRecordPDF(record, cadetInfo)}
                           className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
                           title="Download PDF with medical record data"
@@ -780,7 +885,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                       <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Diagnosis
                       </label>
-                      <p className="text-sm text-gray-900 dark:text-white mt-1">
+                      <p className="text-sm text-gray-900 dark:text-white mt-1 whitespace-pre-wrap">
                         {record.diagnosis}
                       </p>
                     </div>
@@ -860,7 +965,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Remarks
                     </label>
-                    <p className="text-sm text-gray-900 dark:text-white mt-1">
+                    <p className="text-sm text-gray-900 dark:text-white mt-1 whitespace-pre-wrap">
                       {record.remarks}
                     </p>
                   </div>
@@ -1027,6 +1132,214 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
               >
                 <Download className="h-4 w-4" />
                 Download PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Medical Record Modal */}
+      {editingRecord && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Edit Medical Record
+              </h3>
+              <button
+                onClick={() => setEditingRecord(null)}
+                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Form Content */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {/* Medical Problem */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Medical Problem
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.medicalProblem}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, medicalProblem: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                />
+              </div>
+
+              {/* Diagnosis */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Diagnosis
+                </label>
+                <textarea
+                  rows={3}
+                  value={editFormData.diagnosis}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, diagnosis: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                />
+              </div>
+
+              {/* Date of Reporting */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Date of Reporting
+                </label>
+                <input
+                  type="date"
+                  value={editFormData.dateOfReporting}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, dateOfReporting: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                />
+              </div>
+
+              {/* Training Details Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Attend C
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editFormData.attendC}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, attendC: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Attend B
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editFormData.attendB}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, attendB: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Ex-PPG
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editFormData.exPpg}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, exPpg: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Physiotherapy
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editFormData.physiotherapy}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, physiotherapy: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    MI Detained
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editFormData.miDetained}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, miDetained: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                  />
+                </div>
+              </div>
+
+              {/* Contact Number */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Contact Number
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.contactNo}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, contactNo: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                />
+              </div>
+
+              {/* Remarks */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Remarks
+                </label>
+                <textarea
+                  rows={3}
+                  value={editFormData.remarks}
+                  onChange={(e) => setEditFormData(prev => ({ ...prev, remarks: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary"
+                />
+              </div>
+
+              {/* Monitoring Case Toggle */}
+              <div className="flex items-center gap-3">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editFormData.monitoringCase}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, monitoringCase: e.target.checked }))}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+                </label>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Monitoring Case</span>
+              </div>
+
+              {/* MH/BH/CH Admission Toggle */}
+              <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-800/30">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editFormData.admittedInMH === 'Yes'}
+                    onChange={(e) => setEditFormData(prev => ({ ...prev, admittedInMH: e.target.checked ? 'Yes' : '' }))}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                </label>
+                <div>
+                  <span className="text-sm font-medium text-purple-700 dark:text-purple-300">Admitted in MH/BH/CH</span>
+                  <p className="text-xs text-purple-600 dark:text-purple-400">Toggle on if cadet is admitted to Military Hospital/Base Hospital/Civil Hospital</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer with Save Button */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-3">
+              <button
+                onClick={() => setEditingRecord(null)}
+                disabled={isSavingEdit}
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={isSavingEdit}
+                className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                {isSavingEdit ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Saving...
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
               </button>
             </div>
           </div>
