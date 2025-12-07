@@ -121,18 +121,41 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
 
   const handleEditRemark = (record: MedicalRecord) => {
     setEditingRemarkId(record.id)
-    setRemarkText(record.commandantRemarks || '')
+    setRemarkText('') // Start with empty text for appending
   }
 
   const handleSaveRemark = async (recordId: number) => {
     try {
+      if (!remarkText.trim()) {
+        setEditingRemarkId(null)
+        return
+      }
+
+      const record = records.find(r => r.id === recordId)
+      const existing = record?.commandantRemarks || ''
+
+      // Determine signer based on username/role
+      let signer = user?.role === 'RMO' ? 'RMO' : 'Admin'
+      const username = user?.username?.toLowerCase() || ''
+      if (username.includes('dcci')) signer = 'DCCI'
+      else if (username.includes('comdt')) signer = 'COMDT'
+      else if (username.includes('brig')) signer = 'BRIG'
+      else if (username.includes('coco')) signer = 'COCO'
+
+      const signedRemark = `${remarkText} -- ${signer}`
+
+      // Append new remark with a separator
+      const newContent = existing
+        ? `${existing}\n\n• ${signedRemark}`
+        : `• ${signedRemark}`
+
       const response = await fetch(`/api/medical-records/${recordId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
         },
-        body: JSON.stringify({ commandantRemarks: remarkText })
+        body: JSON.stringify({ commandantRemarks: newContent })
       })
 
       if (!response.ok) throw new Error('Failed to update remark')
@@ -584,9 +607,10 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     {isCommandant && (
                       <button
                         onClick={() => handleEditRemark(record)}
-                        className="p-2 text-purple-600 hover:text-purple-700 hover:bg-purple-100 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                        className="p-2 text-purple-600 hover:text-purple-700 hover:bg-purple-100 dark:hover:bg-purple-900/20 rounded-lg transition-colors flex items-center gap-2"
                         title="Add/Edit Additional Remarks"
                       >
+                        <span className="text-xs font-medium">Additional remarks</span>
                         <Edit className="h-4 w-4" />
                       </button>
                     )}
@@ -682,7 +706,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     <label className="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider">
                       Additional Remarks
                     </label>
-                    <p className="text-sm text-gray-900 dark:text-white bg-purple-50 dark:bg-purple-900/10 p-2 rounded-lg border border-purple-100 dark:border-purple-800/30 mt-1">
+                    <p className="text-sm text-gray-900 dark:text-white bg-purple-50 dark:bg-purple-900/10 p-2 rounded-lg border border-purple-100 dark:border-purple-800/30 mt-1 whitespace-pre-wrap">
                       {record.commandantRemarks}
                     </p>
                   </div>
@@ -712,9 +736,10 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                       {isCommandant && (
                         <button
                           onClick={() => handleEditRemark(record)}
-                          className="p-2 text-purple-600 hover:text-purple-700 hover:bg-purple-100 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                          className="p-2 text-purple-600 hover:text-purple-700 hover:bg-purple-100 dark:hover:bg-purple-900/20 rounded-lg transition-colors flex items-center gap-2"
                           title="Add/Edit Additional Remarks"
                         >
+                          <span className="text-xs font-medium">Additional remarks</span>
                           <Edit className="h-4 w-4" />
                         </button>
                       )}
@@ -828,7 +853,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     <label className="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider">
                       Additional Remarks
                     </label>
-                    <p className="text-sm text-gray-900 dark:text-white bg-purple-50 dark:bg-purple-900/10 p-2 rounded-lg border border-purple-100 dark:border-purple-800/30 mt-1">
+                    <p className="text-sm text-gray-900 dark:text-white bg-purple-50 dark:bg-purple-900/10 p-2 rounded-lg border border-purple-100 dark:border-purple-800/30 mt-1 whitespace-pre-wrap">
                       {record.commandantRemarks}
                     </p>
                   </div>
@@ -847,7 +872,7 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                   <Edit className="h-5 w-5 text-purple-600" />
-                  Additional Remarks
+                  Add Reminder / Remark
                 </h3>
                 <button
                   onClick={() => setEditingRemarkId(null)}
@@ -856,7 +881,29 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                   <X className="h-5 w-5" />
                 </button>
               </div>
+
+              {/* Show Existing Remarks */}
+              {(() => {
+                const record = records.find(r => r.id === editingRemarkId)
+                if (record?.commandantRemarks) {
+                  return (
+                    <div className="mb-4">
+                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-2">
+                        Previous Remarks
+                      </label>
+                      <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-sm text-gray-700 dark:text-gray-300 max-h-40 overflow-y-auto whitespace-pre-wrap">
+                        {record.commandantRemarks}
+                      </div>
+                    </div>
+                  )
+                }
+                return null
+              })()}
+
               <div className="mb-6">
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-2">
+                  New Remark
+                </label>
                 <textarea
                   value={remarkText}
                   onChange={(e) => setRemarkText(e.target.value)}
