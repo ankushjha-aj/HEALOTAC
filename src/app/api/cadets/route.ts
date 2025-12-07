@@ -38,7 +38,10 @@ export async function POST(request: NextRequest) {
       covidDose1, covidDose2, covidDose3, hepatitisBDose1, hepatitisBDose2, tetanusToxoid,
       chickenPoxDose1, chickenPoxDose2, chickenPoxSuffered, yellowFever, pastMedicalHistory,
       // Tests
+      // Tests
       enduranceTest, agilityTest, speedTest,
+      // Physical Test
+      ppt, ipet, bpet, swm,
       // Strength Tests
       verticalJump, ballThrow, lowerBackStrength, shoulderDynamometerLeft, shoulderDynamometerRight,
       handGripDynamometerLeft, handGripDynamometerRight,
@@ -107,6 +110,11 @@ export async function POST(request: NextRequest) {
       enduranceTest: enduranceTest ? enduranceTest.toString() : null,
       agilityTest: agilityTest ? agilityTest.toString() : null,
       speedTest: speedTest ? speedTest.toString() : null,
+      // Physical Test
+      ppt: ppt || null,
+      ipet: ipet || null,
+      bpet: bpet || null,
+      swm: swm || null,
       // Strength Tests
       verticalJump: verticalJump ? verticalJump.toString() : null,
       ballThrow: ballThrow ? ballThrow.toString() : null,

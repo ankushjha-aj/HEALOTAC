@@ -794,6 +794,11 @@ function NewMedicalRecordPageInner() {
           surgeryHistory: '',
           medicalCondition: '',
           hemoglobinLevel: '',
+          // Physical Test
+          ppt: '',
+          ipet: '',
+          bpet: '',
+          swm: '',
         })
 
         alert('Cadet added successfully!')
