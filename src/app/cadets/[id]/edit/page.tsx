@@ -244,7 +244,7 @@ export default function EditCadetPage({
         company: formData.company,
         joinDate: formData.joinDate,
         height: formData.height ? parseInt(formData.height) : undefined,
-        weight: formData.weight ? parseInt(formData.weight) : undefined,
+        weight: formData.weight ? parseFloat(formData.weight) : undefined,
         age: formData.age ? parseInt(formData.age) : undefined,
         course: formData.course || undefined,
         sex: formData.sex || undefined,
@@ -505,11 +505,11 @@ export default function EditCadetPage({
                     name="weight"
                     value={formData.weight}
                     onChange={handleInputChange}
-                    className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                    placeholder="e.g. 70"
+                    className="input-field"
+                    placeholder="e.g. 70.5"
                     min="30"
                     max="200"
-                    disabled
+                    step="0.1"
                   />
                 </div>
 

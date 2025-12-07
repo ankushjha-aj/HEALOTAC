@@ -73,7 +73,7 @@ export async function PUT(
         joinDate: joinDate ? new Date(joinDate) : undefined,
         academyNumber: academyNumber ? parseInt(academyNumber) : undefined,
         height: typeof height === 'number' ? height : height ? parseInt(height) : undefined,
-        weight: typeof weight === 'number' ? weight : weight ? parseInt(weight) : undefined,
+        weight: typeof weight === 'number' ? weight.toString() : weight ? weight.toString() : undefined,
         age: typeof age === 'number' ? age : age ? parseInt(age) : undefined,
         course,
         sex,
@@ -136,11 +136,11 @@ export async function PATCH(
       updateData.height = updates.height ? parseInt(updates.height) : null
     }
     if ('weight' in updates) {
-      updateData.weight = updates.weight ? parseInt(updates.weight) : null
+      updateData.weight = updates.weight ? updates.weight.toString() : null
     }
     // Handle currentWeight from frontend as weight in DB
     if ('currentWeight' in updates) {
-      updateData.weight = updates.currentWeight ? parseInt(updates.currentWeight) : null
+      updateData.weight = updates.currentWeight ? updates.currentWeight.toString() : null
     }
     if ('age' in updates) {
       updateData.age = updates.age ? parseInt(updates.age) : null
