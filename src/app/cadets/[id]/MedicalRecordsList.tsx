@@ -898,35 +898,59 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     <div className="text-sm text-gray-900 dark:text-white mt-1 space-y-1">
                       {/* Only show Attend C if > 0 */}
                       {record.attendC && Number(record.attendC) > 0 ? (
-                        <div>Attend C: {record.attendC}</div>
+                        <div className="flex items-center gap-2">
+                          <span>Attend C: {record.attendC}</span>
+                          <div className="relative group">
+                            <Info className="h-3 w-3 text-gray-400 cursor-help" />
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                              Counted as 1 day per occurrence in training days missed
+                            </div>
+                          </div>
+                        </div>
                       ) : null}
 
                       {/* Only show MI Detained if > 0 */}
                       {record.miDetained && Number(record.miDetained) > 0 ? (
-                        <div>MI Detained: {record.miDetained}</div>
+                        <div className="flex items-center gap-2">
+                          <span>MI Detained: {record.miDetained}</span>
+                          <div className="relative group">
+                            <Info className="h-3 w-3 text-gray-400 cursor-help" />
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                              Counted as 1 day per occurrence in training days missed
+                            </div>
+                          </div>
+                        </div>
                       ) : null}
 
                       {/* Only show Ex-PPG if > 0 */}
                       {record.exPpg && Number(record.exPpg) > 0 ? (
-                        <div>Ex-PPG: {record.exPpg} (+{(record.exPpg * 0.25).toFixed(2)} day{(record.exPpg * 0.25) !== 1 ? 's' : ''} missed)</div>
+                        <div className="flex items-center gap-2">
+                          <span>Ex-PPG: {record.exPpg} (+{(record.exPpg * 0.25).toFixed(2)} day{(record.exPpg * 0.25) !== 1 ? 's' : ''} missed)</span>
+                          <div className="relative group">
+                            <Info className="h-3 w-3 text-gray-400 cursor-help" />
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                              Counted as 0.25 day per occurrence in training days missed
+                            </div>
+                          </div>
+                        </div>
                       ) : null}
 
                       {/* Only show Attend B if > 0 */}
                       {record.attendB && Number(record.attendB) > 0 ? (
-                        <div>Attend B: {record.attendB} (+{(record.attendB * 0.25).toFixed(2)} day{(record.attendB * 0.25) !== 1 ? 's' : ''} missed)</div>
-                      ) : null}
-
-                      {/* Only show Physiotherapy if > 0 */}
-                      {record.physiotherapy && Number(record.physiotherapy) > 0 ? (
                         <div className="flex items-center gap-2">
-                          <span>Physiotherapy: {record.physiotherapy}</span>
+                          <span>Attend B: {record.attendB} (+{(record.attendB * 0.25).toFixed(2)} day{(record.attendB * 0.25) !== 1 ? 's' : ''} missed)</span>
                           <div className="relative group">
                             <Info className="h-3 w-3 text-gray-400 cursor-help" />
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                              Not counted in training days missed
+                              Counted as 0.25 day per occurrence in training days missed
                             </div>
                           </div>
                         </div>
+                      ) : null}
+
+                      {/* Only show Physiotherapy if > 0 - no info button as it doesn't count */}
+                      {record.physiotherapy && Number(record.physiotherapy) > 0 ? (
+                        <div>Physiotherapy: {record.physiotherapy}</div>
                       ) : null}
 
                       {/* Calculate and show total training days missed for this record */}
@@ -1209,9 +1233,10 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     onChange={(e) => setEditFormData(prev => ({
                       ...prev,
                       attendC: e.target.value,
-                      miDetained: e.target.value && parseInt(e.target.value) > 0 ? '0' : prev.miDetained
+                      // Clear others when Attend C is set
+                      ...(parseInt(e.target.value) > 0 ? { attendB: '0', exPpg: '0', miDetained: '0' } : {})
                     }))}
-                    disabled={editFormData.admittedInMH === 'Yes' || (parseInt(editFormData.miDetained) > 0)}
+                    disabled={editFormData.admittedInMH === 'Yes' || parseInt(editFormData.attendB) > 0 || parseInt(editFormData.exPpg) > 0 || parseInt(editFormData.miDetained) > 0}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
@@ -1223,8 +1248,13 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     type="number"
                     min="0"
                     value={editFormData.attendB}
-                    onChange={(e) => setEditFormData(prev => ({ ...prev, attendB: e.target.value }))}
-                    disabled={editFormData.admittedInMH === 'Yes'}
+                    onChange={(e) => setEditFormData(prev => ({
+                      ...prev,
+                      attendB: e.target.value,
+                      // Clear others when Attend B is set
+                      ...(parseInt(e.target.value) > 0 ? { attendC: '0', exPpg: '0', miDetained: '0' } : {})
+                    }))}
+                    disabled={editFormData.admittedInMH === 'Yes' || parseInt(editFormData.attendC) > 0 || parseInt(editFormData.exPpg) > 0 || parseInt(editFormData.miDetained) > 0}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
@@ -1236,8 +1266,13 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     type="number"
                     min="0"
                     value={editFormData.exPpg}
-                    onChange={(e) => setEditFormData(prev => ({ ...prev, exPpg: e.target.value }))}
-                    disabled={editFormData.admittedInMH === 'Yes'}
+                    onChange={(e) => setEditFormData(prev => ({
+                      ...prev,
+                      exPpg: e.target.value,
+                      // Clear others when Ex-PPG is set
+                      ...(parseInt(e.target.value) > 0 ? { attendC: '0', attendB: '0', miDetained: '0' } : {})
+                    }))}
+                    disabled={editFormData.admittedInMH === 'Yes' || parseInt(editFormData.attendC) > 0 || parseInt(editFormData.attendB) > 0 || parseInt(editFormData.miDetained) > 0}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
@@ -1264,9 +1299,10 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                     onChange={(e) => setEditFormData(prev => ({
                       ...prev,
                       miDetained: e.target.value,
-                      attendC: e.target.value && parseInt(e.target.value) > 0 ? '0' : prev.attendC
+                      // Clear others when MI Detained is set
+                      ...(parseInt(e.target.value) > 0 ? { attendC: '0', attendB: '0', exPpg: '0' } : {})
                     }))}
-                    disabled={editFormData.admittedInMH === 'Yes' || (parseInt(editFormData.attendC) > 0)}
+                    disabled={editFormData.admittedInMH === 'Yes' || parseInt(editFormData.attendC) > 0 || parseInt(editFormData.attendB) > 0 || parseInt(editFormData.exPpg) > 0}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
