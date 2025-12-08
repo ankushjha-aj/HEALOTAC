@@ -51,7 +51,53 @@ export async function GET(
     // Now query for this specific cadet - try multiple approaches
     console.log(`🔍 SEARCHING FOR RECORDS WITH cadetId = ${cadetId} (type: ${typeof cadetId})`)
 
-    // Try a simple where query
+    // AUTOMATIC COMPLETION LOGIC START
+    // Fetch all active records for this cadet first
+    const activeRecords = await db.select()
+      .from(medicalRecords)
+      .where(
+        sql`${medicalRecords.cadetId} = ${cadetId} AND ${medicalRecords.medicalStatus} = 'Active'`
+      );
+
+    const now = new Date();
+    // Normalize "now" to midnight for consistent day comparison if needed, 
+    // but the user example suggests simple date comparison.
+    // Let's stick to the current timestamp for strict expiry or normalized dates?
+    // User said: "today is ninth... give credit attendance of three days... at or on 12 it should get to complete"
+    // 9 + 3 = 12. So if Today >= 12th, it is complete.
+
+    for (const record of activeRecords) {
+      // Calculate total duration in days from relevant fields
+      const attendC = record.attendC || 0;
+      const miDetained = record.miDetained || 0;
+      // Note: User explicitly mentioned "do it only for the attend C and MI detailed one" and "skip the monitoring spot right now"
+      const totalDurationDays = attendC + miDetained;
+
+      if (totalDurationDays > 0) {
+        const reportDate = new Date(record.dateOfReporting);
+
+        // Calculate completion date
+        // Logic: Report Date + Duration = Completion Date
+        // Example: Report 9th, Duration 3 days (9, 10, 11). Becomes free on 12th.
+        const completionDate = new Date(reportDate);
+        completionDate.setDate(completionDate.getDate() + totalDurationDays);
+
+        // Check if current date is past or equal to completion date
+        if (now >= completionDate) {
+          console.log(`🔄 AUTO-COMPLETING Record ${record.id}: Duration ${totalDurationDays} days ended on ${completionDate.toISOString()}`);
+
+          await db.update(medicalRecords)
+            .set({
+              medicalStatus: 'Completed',
+              updatedAt: new Date()
+            })
+            .where(eq(medicalRecords.id, record.id));
+        }
+      }
+    }
+    // AUTOMATIC COMPLETION LOGIC END
+
+    // Try a simple where query to fetch (potentially updated) records
     const medicalRecordsResult = await db.select().from(medicalRecords).where(eq(medicalRecords.cadetId, cadetId))
 
     console.log(`📊 QUERY RESULT: ${medicalRecordsResult.length} records`)
