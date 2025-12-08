@@ -831,8 +831,13 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
               <>
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
                       {record.medicalProblem}
+                      {record.medicalStatus === 'Completed' && (
+                        <span className="inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                          Completed
+                        </span>
+                      )}
                     </h3>
                     <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex items-center gap-1">
