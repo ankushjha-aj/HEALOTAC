@@ -22,6 +22,7 @@ interface Cadet {
   course?: string
   academyNumber?: number
   isForeign?: boolean
+  hasMedicalRecord?: boolean
 }
 
 interface MedicalRecord {
@@ -502,6 +503,12 @@ export default function DashboardPage() {
                             </span>
                           </div>
                           <div className="ml-3 flex items-center gap-2">
+                            {cadet.hasMedicalRecord && (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check-circle text-green-500 fill-green-100 dark:fill-green-900/30">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                              </svg>
+                            )}
                             <Link
                               href={`/cadets/${cadet.id}`}
                               className="text-sm font-medium text-gray-900 dark:text-white hover:text-primary transition-colors"

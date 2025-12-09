@@ -700,8 +700,13 @@ export default function MedicalRecordsList({ records, cadetId, cadetInfo, onRetu
                       <div className="h-4 w-4 rounded-full bg-purple-500"></div>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                      <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                         Admitted in MH
+                        {record.medicalStatus === 'Completed' && (
+                          <span className="inline-flex px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                            Completed
+                          </span>
+                        )}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {new Date(record.dateOfReporting).toLocaleDateString()}

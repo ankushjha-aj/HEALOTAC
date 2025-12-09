@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Calendar, User, MapPin, FileText, Filter, Eye, Search } from 'lucide-react'
+import { Calendar, User, MapPin, FileText, Filter, Eye, Search, Clock } from 'lucide-react'
 import Link from 'next/link'
 import { useUser } from '@/hooks/useUser'
 import { usePagination } from '@/hooks/usePagination'
@@ -20,6 +20,7 @@ interface MedicalRecord {
   diagnosis?: string
   medicalStatus: string
   attendC: number
+  miDetained: number // Add miDetained field
   totalTrainingDaysMissed: number
   contactNo: string
   remarks: string
@@ -76,21 +77,23 @@ export default function MedicalHistoryPage() {
 
         const records = await response.json()
 
-        // Check for records that need automatic completion based on attendC
+        // Check for records that need automatic completion based on attendC or miDetained
         const recordsToUpdate = []
         const now = new Date()
 
         for (const record of records) {
-          // Only process records that are Active and have attendC > 0
-          if (record.medicalStatus === 'Active' && record.attendC && record.attendC > 0 && record.admittedInMH !== 'Yes') {
+          // Only process records that are Active and have attendC > 0 or miDetained > 0
+          if (record.medicalStatus === 'Active' && ((record.attendC && record.attendC > 0) || (record.miDetained && record.miDetained > 0)) && record.admittedInMH !== 'Yes') {
             const reportingDate = new Date(record.dateOfReporting)
             const attendanceEndDate = new Date(reportingDate)
-            attendanceEndDate.setDate(attendanceEndDate.getDate() + record.attendC)
+            // Use the greater of attendC or miDetained (they are mutually exclusive usually, but take max to be safe)
+            const days = Math.max(record.attendC || 0, record.miDetained || 0)
+            attendanceEndDate.setDate(attendanceEndDate.getDate() + days)
 
             // If current date is past the attendance end date, mark as completed
             if (now >= attendanceEndDate) {
               recordsToUpdate.push(record.id)
-              console.log(`🔄 Auto-completing record ${record.id} for cadet ${record.name} (attendC: ${record.attendC}, reported: ${record.dateOfReporting})`)
+              console.log(`🔄 Auto-completing record ${record.id} for cadet ${record.name} (days: ${days}, reported: ${record.dateOfReporting})`)
             }
           }
         }
@@ -767,42 +770,36 @@ export default function MedicalHistoryPage() {
                             }`}>
                             {record.admittedInMH === 'Yes' && record.medicalStatus === 'Active' ? 'Admitted in MH' : record.medicalStatus}
                           </span>
-                          {/* Auto-completion indicator for Active records with attendC */}
+                          {/* Auto-completion indicator for Active records with attendC or miDetained */}
                           {(() => {
-                            // Debug logging
-                            if (record.medicalStatus === 'Active' && record.attendC && record.attendC > 0) {
-                              console.log('🔍 Checking record:', {
-                                id: record.id,
-                                name: record.name,
-                                status: record.medicalStatus,
-                                attendC: record.attendC,
-                                admittedInMH: record.admittedInMH,
-                                dateOfReporting: record.dateOfReporting
-                              })
+                            // Only show for Active records that are not admitted in MH and have duration
+                            if (record.medicalStatus !== 'Active' || record.admittedInMH === 'Yes') return null
+                            const days = Math.max(record.attendC || 0, record.miDetained || 0)
+                            if (days <= 0) return null
+
+                            const reportingDate = new Date(record.dateOfReporting)
+                            const attendanceEndDate = new Date(reportingDate)
+                            attendanceEndDate.setDate(attendanceEndDate.getDate() + days)
+
+                            const now = new Date()
+                            const diffMs = attendanceEndDate.getTime() - now.getTime()
+
+                            // If expired/completed logically but not yet updated in DB
+                            if (diffMs <= 0) {
+                              return <span className="inline-flex items-center gap-1 text-xs font-medium text-orange-600 dark:text-orange-400 ml-2 animate-pulse" title="Auto-completing soon...">
+                                <Clock className="w-3 h-3" />
+                                <span>0h</span>
+                              </span>
                             }
 
-                            return record.medicalStatus === 'Active' && record.attendC && record.attendC > 0 && record.admittedInMH !== 'Yes' ? (() => {
-                              const reportingDate = new Date(record.dateOfReporting)
-                              const attendanceEndDate = new Date(reportingDate)
-                              attendanceEndDate.setDate(attendanceEndDate.getDate() + record.attendC)
-                              const now = new Date()
-                              const daysUntilExpiry = Math.ceil((attendanceEndDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+                            const daysRemaining = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+                            const hoursRemaining = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
 
-                              console.log('📅 Date calculation for record', record.id, ':', {
-                                reportingDate: reportingDate.toDateString(),
-                                attendanceEndDate: attendanceEndDate.toDateString(),
-                                now: now.toDateString(),
-                                daysUntilExpiry,
-                                willShowIndicator: daysUntilExpiry <= 2
-                              })
-
-                              if (daysUntilExpiry <= 0) {
-                                return <span className="text-xs text-orange-600 dark:text-orange-400 ml-2" title="Will auto-complete on next page load">⏰</span>
-                              } else if (daysUntilExpiry <= 2) {
-                                return <span className="text-xs text-orange-600 dark:text-orange-400 ml-2" title={`Auto-completes in ${daysUntilExpiry} day${daysUntilExpiry !== 1 ? 's' : ''}`}>⏳</span>
-                              }
-                              return null
-                            })() : null
+                            return (
+                              <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 ml-2 cursor-help" title={`Auto-completes in: ${daysRemaining}d ${hoursRemaining}h (${attendanceEndDate.toLocaleDateString()})`}>
+                                <Clock className="w-4 h-4" />
+                              </span>
+                            )
                           })()}
                           <div className="flex gap-1">
                             {record.admittedInMH !== 'Yes' && record.medicalStatus !== 'Active' && (
