@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation'
 interface MedicalRecord {
   id: number
   cadetId: number // Add cadetId field
-  name: string
+  name: string 
   company: string
   battalion: string
   dateOfReporting: string
