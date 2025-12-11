@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Database, BarChart2, LogOut } from 'lucide-react'
 import Image from 'next/image'
 
@@ -82,7 +83,7 @@ export default function AdminDashboardPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
                     {/* Database Card */}
-                    <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden relative border border-gray-200 dark:border-gray-700">
+                    <Link href="/admin/database" className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden relative border border-gray-200 dark:border-gray-700 block">
                         <div className="p-8 flex flex-col items-center justify-center text-center h-full min-h-[250px]">
                             <div className="p-5 bg-blue-50 dark:bg-blue-900/20 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
                                 <Database className="w-12 h-12 text-blue-600 dark:text-blue-400" />
@@ -94,7 +95,7 @@ export default function AdminDashboardPage() {
                         </div>
                         {/* Hover Effect Border Bottom */}
                         <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-600 dark:bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-                    </div>
+                    </Link>
 
                     {/* Insights Card */}
                     <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden relative border border-gray-200 dark:border-gray-700">
