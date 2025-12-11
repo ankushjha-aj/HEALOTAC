@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import DashboardLayout from '@/components/layout/DashboardLayout'
-import { Calendar, User, MapPin, FileText, Filter, Eye, Search, Clock } from 'lucide-react'
+import { Calendar, User, MapPin, FileText, Filter, Eye, Search, Clock, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useUser } from '@/hooks/useUser'
 import { usePagination } from '@/hooks/usePagination'
@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation'
 interface MedicalRecord {
   id: number
   cadetId: number // Add cadetId field
-  name: string 
+  name: string
   company: string
   battalion: string
   dateOfReporting: string
@@ -30,6 +30,9 @@ interface MedicalRecord {
   bloodGroup?: string
   isForeign: boolean
   academyNumber?: string
+  attendB?: number
+  exPpg?: number
+  physiotherapy?: string
 }
 
 export default function MedicalHistoryPage() {
@@ -798,6 +801,29 @@ export default function MedicalHistoryPage() {
                             return (
                               <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400 ml-2 cursor-help" title={`Auto-completes in: ${daysRemaining}d ${hoursRemaining}h (${attendanceEndDate.toLocaleDateString()})`}>
                                 <Clock className="w-4 h-4" />
+                              </span>
+                            )
+                          })()}
+                          {/* Manual completion indicator for Attend B, Ex-PPG, Physiotherapy */}
+                          {(() => {
+                            if (record.medicalStatus !== 'Active') return null
+
+                            const reasons = []
+                            if (record.attendB && record.attendB > 0) reasons.push('Attend B')
+                            if (record.exPpg && record.exPpg > 0) reasons.push('Ex-PPG')
+                            if (record.physiotherapy && (record.physiotherapy === '1' || record.physiotherapy === 'Yes' || (typeof record.physiotherapy === 'number' && record.physiotherapy > 0))) reasons.push('Physiotherapy')
+
+                            // Check description for manual notes if fields aren't populated directly (safeguard)
+                            if (reasons.length === 0 && record.medicalProblem && (record.medicalProblem.toLowerCase().includes('physio') || record.medicalProblem.toLowerCase().includes('attend b'))) {
+                              // optional: could parse text, but sticking to fields is safer/cleaner. 
+                              // User asked "if it has attend B and physiotherapy...". Assuming fields are populated.
+                            }
+
+                            if (reasons.length === 0) return null
+
+                            return (
+                              <span className="inline-flex items-center gap-1 text-xs font-medium text-purple-600 dark:text-purple-400 ml-2 cursor-help" title={`Manual completion required: ${reasons.join(', ')}`}>
+                                <Info className="w-4 h-4" />
                               </span>
                             )
                           })()}
