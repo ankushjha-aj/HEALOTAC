@@ -811,12 +811,20 @@ export default function MedicalHistoryPage() {
                             const reasons = []
                             if (record.attendB && record.attendB > 0) reasons.push('Attend B')
                             if (record.exPpg && record.exPpg > 0) reasons.push('Ex-PPG')
-                            if (record.physiotherapy && (record.physiotherapy === '1' || record.physiotherapy === 'Yes' || (typeof record.physiotherapy === 'number' && record.physiotherapy > 0))) reasons.push('Physiotherapy')
+
+                            // Check Physiotherapy days vs Attendance days
+                            const days = Math.max(record.attendC || 0, record.miDetained || 0)
+                            const physioDays = typeof record.physiotherapy === 'number' ? record.physiotherapy : (Number(record.physiotherapy) || 0)
+
+                            // Only warn if Physio days exceed valid auto-complete days
+                            // If days (attendance) is 0, auto-complete won't happen anyway, so any physio is manual
+                            if (physioDays > 0 && physioDays > days) {
+                              reasons.push(days > 0 ? 'Physiotherapy (> Attendance)' : 'Physiotherapy')
+                            }
 
                             // Check description for manual notes if fields aren't populated directly (safeguard)
                             if (reasons.length === 0 && record.medicalProblem && (record.medicalProblem.toLowerCase().includes('physio') || record.medicalProblem.toLowerCase().includes('attend b'))) {
-                              // optional: could parse text, but sticking to fields is safer/cleaner. 
-                              // User asked "if it has attend B and physiotherapy...". Assuming fields are populated.
+                              // Safeguard retained but less aggressive
                             }
 
                             if (reasons.length === 0) return null
