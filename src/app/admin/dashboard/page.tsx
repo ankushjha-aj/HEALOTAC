@@ -98,7 +98,7 @@ export default function AdminDashboardPage() {
                     </Link>
 
                     {/* Insights Card */}
-                    <div className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden relative border border-gray-200 dark:border-gray-700">
+                    <Link href="/admin/insights" className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden relative border border-gray-200 dark:border-gray-700 block">
                         <div className="p-8 flex flex-col items-center justify-center text-center h-full min-h-[250px]">
                             <div className="p-5 bg-purple-50 dark:bg-purple-900/20 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
                                 <BarChart2 className="w-12 h-12 text-purple-600 dark:text-purple-400" />
@@ -110,7 +110,7 @@ export default function AdminDashboardPage() {
                         </div>
                         {/* Hover Effect Border Bottom */}
                         <div className="absolute bottom-0 left-0 w-full h-1 bg-purple-600 dark:bg-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-                    </div>
+                    </Link>
 
                 </div>
             </main>
