@@ -72,8 +72,8 @@ export default function InsightsPage() {
     const [modalData, setModalData] = useState<any[]>([])
     const [modalLoading, setModalLoading] = useState(false)
 
-    const handleDrillDown = async (company: string, type: 'all' | 'healthy' | 'sick') => {
-        setModalTitle(`${company} - ${type === 'all' ? 'All Cadets' : type === 'healthy' ? 'HealthyCadets' : 'Active Sick Report'}`)
+    const handleDrillDown = async (company: string, type: 'all' | 'healthy' | 'sick' | 'never_reported') => {
+        setModalTitle(`${company} - ${type === 'all' ? 'All Cadets' : type === 'healthy' ? 'HealthyCadets' : type === 'never_reported' ? 'Never Reported' : 'Active Sick Report'}`)
         setModalOpen(true)
         setModalLoading(true)
         setModalData([])
@@ -280,7 +280,7 @@ export default function InsightsPage() {
                                             <td className="px-6 py-4 font-medium text-gray-900 dark:text-white capitalize">{c.name}</td>
                                             <td className="px-6 py-4 text-gray-500 dark:text-gray-400 font-mono">{c.academy_number || 'N/A'}</td>
                                             <td className="px-6 py-4">
-                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${c.status === 'Fit' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${(c.status === 'Fit' || c.status === 'Clean Record') ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
                                                     {c.status}
                                                 </span>
                                             </td>
@@ -360,7 +360,10 @@ export default function InsightsPage() {
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 group">
+                    <div
+                        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 group cursor-pointer hover:border-purple-300 dark:hover:border-purple-700 transition-all"
+                        onClick={() => handleDrillDown('All', 'never_reported')}
+                    >
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg text-green-600 dark:text-green-400 group-hover:bg-green-600 group-hover:text-white transition-colors">
                                 <HeartPulse className="w-6 h-6" />
