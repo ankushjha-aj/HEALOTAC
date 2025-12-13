@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Users, Activity, Plus, FileText, LogOut } from 'lucide-react'
+import { Home, Users, Activity, Plus, FileText, LogOut, Shield } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/hooks/useUser'
 import Image from 'next/image'
@@ -19,6 +19,7 @@ const navigation = [
   { name: 'Medical History', href: '/medical-history', icon: Activity },
   { name: 'Add Record', href: '/medical-records/new', icon: Plus },
   { name: 'Reports', href: '/reports', icon: FileText },
+  { name: 'Admin Panel', href: '/admin', icon: Shield },
 ]
 
 export default function Sidebar() {
