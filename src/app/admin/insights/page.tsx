@@ -66,43 +66,90 @@ export default function InsightsPage() {
         fetchStats()
     }, [])
 
+    // --- DRILL DOWN LOGIC ---
+    const [modalOpen, setModalOpen] = useState(false)
+    const [modalTitle, setModalTitle] = useState('')
+    const [modalData, setModalData] = useState<any[]>([])
+    const [modalLoading, setModalLoading] = useState(false)
+
+    const handleDrillDown = async (company: string, type: 'all' | 'healthy' | 'sick') => {
+        setModalTitle(`${company} - ${type === 'all' ? 'All Cadets' : type === 'healthy' ? 'HealthyCadets' : 'Active Sick Report'}`)
+        setModalOpen(true)
+        setModalLoading(true)
+        setModalData([])
+
+        try {
+            const token = localStorage.getItem('jwt_token')
+            const res = await fetch(`/api/admin/insights/drilldown?company=${encodeURIComponent(company)}&type=${type}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            if (res.ok) {
+                const json = await res.json()
+                setModalData(json.cadets || [])
+            }
+        } catch (e) {
+            console.error(e)
+        } finally {
+            setModalLoading(false)
+        }
+    }
+
     // --- CHARTS ---
 
-    const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899']
+    // Updated Palette for Distinctive High Contrast
+    // Blue, Bright Yellow, Green, Red, Purple, Cyan
+    const COLORS = ['#2563EB', '#FACC15', '#16A34A', '#DC2626', '#9333EA', '#0891B2']
 
     const PieChart = ({ data }: { data: any[] }) => {
         if (!data || data.length === 0) return <div className="text-center text-gray-400 py-10">No Data</div>
 
-        // Calculate totals
         const total = data.reduce((acc, curr) => acc + Number(curr.total_cadets), 0)
-
         let cumulativePercent = 0
-
-        // Create conic gradient string for pure CSS pie chart
-        const gradientParts = data.map((item, idx) => {
-            const percent = (Number(item.total_cadets) / total) * 100
-            const start = cumulativePercent
-            cumulativePercent += percent
-            const color = COLORS[idx % COLORS.length]
-            return `${color} ${start}% ${cumulativePercent}%`
-        }).join(', ')
 
         return (
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8 h-full">
-                {/* CSS Pie Chart */}
-                <div
-                    className="w-48 h-48 rounded-full border-4 border-gray-100 dark:border-gray-700 shadow-sm transition-transform hover:scale-105"
-                    style={{ background: `conic-gradient(${gradientParts})` }}
-                ></div>
 
-                {/* Legend */}
+                <div className="relative w-48 h-48">
+                    <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                        {data.map((item, idx) => {
+                            const percent = (Number(item.total_cadets) / total)
+                            const C = 157.1 // 2 * PI * 25
+                            const strokeDasharray = `${percent * C} ${C}`
+                            const offset = cumulativePercent * C
+                            cumulativePercent += percent
+
+                            return (
+                                <circle
+                                    key={idx}
+                                    cx="50"
+                                    cy="50"
+                                    r="25"
+                                    fill="transparent"
+                                    stroke={COLORS[idx % COLORS.length]}
+                                    strokeWidth="50" /* Full radius width creates a pie */
+                                    strokeDasharray={strokeDasharray}
+                                    strokeDashoffset={-offset}
+                                    className="cursor-pointer hover:opacity-80 transition-opacity"
+                                    onClick={() => handleDrillDown(item.company, 'all')}
+                                >
+                                    <title>{item.company}: {item.total_cadets}</title>
+                                </circle>
+                            )
+                        })}
+                    </svg>
+                </div>
+
                 <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                     {data.map((item, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
+                        <button
+                            key={idx}
+                            onClick={() => handleDrillDown(item.company, 'all')}
+                            className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 p-1 rounded transition-colors text-left"
+                        >
                             <span className="w-3 h-3 rounded-full" style={{ background: COLORS[idx % COLORS.length] }}></span>
                             <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{item.company}</span>
                             <span className="text-xs text-gray-500 dark:text-gray-400">({item.total_cadets})</span>
-                        </div>
+                        </button>
                     ))}
                 </div>
             </div>
@@ -126,10 +173,9 @@ export default function InsightsPage() {
 
                     return (
                         <div key={idx} className="flex flex-col items-center gap-3 group relative">
-                            {/* Ring Container */}
-                            <div className="relative w-24 h-24 flex items-center justify-center">
-                                {/* Background Circle (Sick/Total) */}
-                                <svg className="transform -rotate-90 w-full h-full">
+                            <div className="relative w-24 h-24 flex items-center justify-center transition-transform hover:scale-105">
+                                {/* Background Circle (Red/Sick Portion click) */}
+                                <svg className="transform -rotate-90 w-full h-full absolute inset-0">
                                     <circle
                                         cx="48"
                                         cy="48"
@@ -137,7 +183,7 @@ export default function InsightsPage() {
                                         stroke="currentColor"
                                         strokeWidth="8"
                                         fill="transparent"
-                                        className="text-red-100 dark:text-red-900/30"
+                                        className="text-red-100 dark:text-red-900/30 pointer-events-none"
                                     />
                                     <circle
                                         cx="48"
@@ -146,11 +192,17 @@ export default function InsightsPage() {
                                         stroke="currentColor"
                                         strokeWidth="8"
                                         fill="transparent"
-                                        className="text-red-500 transition-all duration-1000 ease-out"
-                                    />
+                                        className="text-red-500 cursor-pointer hover:stroke-red-600 transition-colors"
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleDrillDown(item.company, 'sick')
+                                        }}
+                                    >
+                                        <title>Active Sick: {sick}</title>
+                                    </circle>
                                 </svg>
 
-                                {/* Foreground Circle (Healthy) */}
+                                {/* Foreground Circle (Green/Healthy Portion click) */}
                                 <svg className="absolute top-0 left-0 transform -rotate-90 w-full h-full">
                                     <circle
                                         cx="48"
@@ -162,22 +214,29 @@ export default function InsightsPage() {
                                         strokeDasharray={circumference}
                                         strokeDashoffset={strokeDashoffset}
                                         strokeLinecap="round"
-                                        className="text-green-500 transition-all duration-1000 ease-out"
-                                    />
+                                        className="text-green-500 transition-all duration-1000 ease-out cursor-pointer hover:stroke-green-600 hover:brightness-110"
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleDrillDown(item.company, 'healthy')
+                                        }}
+                                    >
+                                        <title>Healthy: {healthy}</title>
+                                    </circle>
                                 </svg>
 
-                                {/* Center Text */}
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                {/* Center Text - Non-clickable / Info Only */}
+                                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                                     <span className="text-sm font-bold text-gray-900 dark:text-white">{Math.round(healthyPercent)}%</span>
-                                    <span className="text-[10px] text-gray-500 dark:text-gray-400">Fit</span>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">Fit</span>
                                 </div>
                             </div>
 
-                            {/* Label */}
                             <div className="text-center">
                                 <span className="block text-sm font-bold text-gray-700 dark:text-gray-300">{item.company}</span>
-                                <span className="text-xs text-gray-500 dark:text-gray-400">
-                                    <span className="text-green-600 dark:text-green-400">{healthy}</span> / <span className="text-red-500 dark:text-red-400">{sick}</span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 flex justify-center gap-2">
+                                    <button onClick={() => handleDrillDown(item.company, 'healthy')} className="text-green-600 dark:text-green-400 hover:underline">{healthy}</button>
+                                    /
+                                    <button onClick={() => handleDrillDown(item.company, 'sick')} className="text-red-500 dark:text-red-400 hover:underline">{sick}</button>
                                 </span>
                             </div>
                         </div>
@@ -187,8 +246,68 @@ export default function InsightsPage() {
         )
     }
 
+    // --- MODAL ---
+    const Modal = () => {
+        if (!modalOpen) return null
+
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col animate-in zoom-in-95 duration-200">
+                    <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center shrink-0">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">{modalTitle}</h3>
+                        <button onClick={() => setModalOpen(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition">
+                            <ArrowLeft className="w-5 h-5" /> {/* Close Icon */}
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-0">
+                        {modalLoading ? (
+                            <div className="p-8 flex justify-center">
+                                <RefreshCw className="w-8 h-8 animate-spin text-purple-600" />
+                            </div>
+                        ) : (
+                            <table className="w-full text-sm text-left">
+                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300 sticky top-0 z-10">
+                                    <tr>
+                                        <th className="px-6 py-3">Name</th>
+                                        <th className="px-6 py-3">Academy No</th>
+                                        <th className="px-6 py-3">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                    {modalData.length > 0 ? modalData.map((c: any, i) => (
+                                        <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                            <td className="px-6 py-4 font-medium text-gray-900 dark:text-white capitalize">{c.name}</td>
+                                            <td className="px-6 py-4 text-gray-500 dark:text-gray-400 font-mono">{c.academy_number || 'N/A'}</td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${c.status === 'Fit' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                                                    {c.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan={3} className="px-6 py-8 text-center text-gray-500">No cadets found in this category.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+
+                    <div className="p-4 border-t border-gray-100 dark:border-gray-700 shrink-0 flex justify-end">
+                        <button onClick={() => setModalOpen(false)} className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 transition">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col font-display">
+            <Modal />
             {/* Header */}
             <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-16 flex items-center justify-between px-6 shrink-0 z-10">
                 <div className="flex items-center gap-4">
