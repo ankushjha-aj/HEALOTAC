@@ -1,4 +1,4 @@
-# 🏥 HEALOTAC   
+# 🏥 HEALOTAC    
 
 A modern, responsive web application for managing medical records of Indian Army cadets. Built with Next.js 14, TypeScript, and Tailwind CSS.
 
